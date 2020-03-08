@@ -35,7 +35,7 @@
 <meta property="og:image" content="http://yoursite.com/2020/02/14/%E6%8B%9C%E5%8D%A0%E5%BA%AD%E5%B0%86%E5%86%9B%E9%97%AE%E9%A2%98/overview.png">
 <meta property="article:published_time" content="2020-02-14T13:54:27.000Z">
 <meta property="article:modified_time" content="2020-03-07T13:01:42.351Z">
-<meta property="article:author" content="Liebing Yu (余列冰)">
+<meta property="article:author" content="Liebing Yu">
 <meta property="article:tag" content="System">
 <meta property="article:tag" content="Distributed System">
 <meta property="article:tag" content="Consistency">
@@ -46,7 +46,7 @@
 
 
 
-<link rel="icon" href="/favicon.png">
+<link rel="icon" href="/img/favicon.ico">
 
 
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
@@ -104,7 +104,7 @@
                href="/archives">Archives</a>
             
             <a class="navbar-item "
-               href="/tags">Categories</a>
+               href="/categories">Categories</a>
             
             <a class="navbar-item "
                href="/about">About</a>
@@ -165,6 +165,12 @@
                 
             </a>
                
+            <a class="navbar-item" title="知" href="https://www.zhihu.com/people/liebingyu" target="_blank" rel="noopener">
+                
+                知
+                
+            </a>
+               
             
         </div>
     </div>
@@ -188,6 +194,7 @@
             
             
             17 minutes read (About 2520 words)
+            <span id="busuanzi_container_site_pv"><i class="fa fa-eye" aria-hidden="true"></i> <span id="busuanzi_value_site_uv"></span></span>
         </span>
         
     </div>
@@ -195,7 +202,6 @@
     
         <html><head></head><body><p>&#x62DC;&#x5360;&#x5EAD;&#x5C06;&#x519B;&#x95EE;&#x9898;(The Byzantine Generals Problem)&#x63D0;&#x4F9B;&#x4E86;&#x5BF9;<strong>&#x5206;&#x5E03;&#x5F0F;&#x5171;&#x8BC6;&#x95EE;&#x9898;</strong>&#x7684;&#x4E00;&#x79CD;&#x60C5;&#x666F;&#x5316;&#x63CF;&#x8FF0;, &#x7531;Leslie Lamport&#x7B49;&#x4EBA;&#x5728;1982&#x5E74;&#x9996;&#x6B21;&#x53D1;&#x8868;. <a href="https://www-inst.eecs.berkeley.edu/~cs162/sp16/static/readings/Original_Byzantine.pdf" target="_blank" rel="noopener">&#x8BBA;&#x6587;</a>&#x540C;&#x65F6;&#x63D0;&#x4F9B;&#x4E86;&#x4E24;&#x79CD;&#x89E3;&#x51B3;&#x62DC;&#x5360;&#x5EAD;&#x5C06;&#x519B;&#x95EE;&#x9898;&#x7684;&#x7B97;&#x6CD5;&#xFF1A;</p>
 <a id="more"></a>
-
 <ul>
 <li>&#x53E3;&#x4FE1;&#x6D88;&#x606F;&#x578B;&#x89E3;&#x51B3;&#x65B9;&#x6848;(A solution with oral message);</li>
 <li>&#x7B7E;&#x540D;&#x6D88;&#x606F;&#x578B;&#x89E3;&#x51B3;&#x65B9;&#x6848;(A solution with signed message).<br>&#x672C;&#x6587;&#x4E4B;&#x540E;&#x5C06;&#x8BE6;&#x7EC6;&#x8BB2;&#x8FF0;&#x8FD9;&#x4E24;&#x79CD;&#x7B97;&#x6CD5;. &#x4E8B;&#x5B9E;&#x4E0A;, &#x62DC;&#x5360;&#x5EAD;&#x5C06;&#x519B;&#x95EE;&#x9898;&#x662F;&#x5206;&#x5E03;&#x5F0F;&#x7CFB;&#x7EDF;&#x9886;&#x57DF;&#x6700;&#x590D;&#x6742;&#x7684;<strong>&#x5BB9;&#x9519;&#x6A21;&#x578B;</strong>, &#x5B83;&#x63CF;&#x8FF0;&#x4E86;&#x5982;&#x4F55;&#x5728;&#x5B58;&#x5728;&#x6076;&#x610F;&#x884C;&#x4E3A;(&#x5982;&#x6D88;&#x606F;&#x7BE1;&#x6539;&#x6216;&#x4F2A;&#x9020;)&#x7684;&#x60C5;&#x51B5;&#x4E0B;&#x4F7F;&#x5206;&#x5E03;&#x5F0F;&#x7CFB;&#x7EDF;&#x8FBE;&#x6210;&#x4E00;&#x81F4;. &#x662F;&#x6211;&#x4EEC;&#x7406;&#x89E3;&#x5206;&#x5E03;&#x5F0F;&#x4E00;&#x81F4;&#x6027;&#x534F;&#x8BAE;&#x548C;&#x7B97;&#x6CD5;&#x7684;&#x91CD;&#x8981;&#x57FA;&#x7840;.</li>
@@ -323,14 +329,38 @@
 
 
 
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    
+<div id="valine-thread"></div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src='//cdn.jsdelivr.net/gh/AshinWang/SimpleValine@v0.1/SimpleValine.min.js'></script>
+<script>
+    new Valine({
+        el: '#valine-thread',
+        appId: 'yH4pXH6SVqWNsdXcF5TeQVmD-MdYXbMMI',
+        appKey: '1OIsff76fPfsFsiyhNUoJ0o5',
+        notify: true,
+        verify: false,
+        avatar: '',
+        placeholder: 'If you have any questions, please comment here!',
+        meta: ['nick', 'mail'],
+        visitor: true,
+        lang: 'en'
+    })
+</script>
+
+
+</div>
+
     </div>
 </section>
     <footer class="footer">
     <div class="container">
         <div class="columns content">
             <div class="column is-narrow has-text-centered">
-                &copy; 2019-2020 Liebing Yu (余列冰)&nbsp;
-                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+                &copy; 2019-2020 Liebing Yu&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. <span id="busuanzi_container_site_pv">Visited <span id="busuanzi_value_site_uv"></span> Times</span>
             </div>
             <div class="column is-hidden-mobile"></div>
 
@@ -339,9 +369,16 @@
                 <div class="columns is-mobile is-multiline is-centered">
                 
                     
-                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/LB-Yu" target="_blank" rel="noopener">
+                <a class="column is-narrow has-text-black" title="xcTorres" href="https://xctorres.github.io/" target="_blank" rel="noopener">
                     
-                    GitHub
+                    xcTorres
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Honly" href="https://guanhonly.github.io/" target="_blank" rel="noopener">
+                    
+                    Honly
                     
                 </a>
                 
@@ -353,7 +390,6 @@
     </div>
 
     <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_uv"></span>次</span>
 
 </footer>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
