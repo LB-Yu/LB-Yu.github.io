@@ -26,7 +26,7 @@
 <meta property="og:description" content="Softmax regression (SR) (or multinomial logistic regression) is a generalization of logistic regression to the case where we want to handle multiple classes. Same as the blog about LR, this blog will">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2019-07-02T04:00:00.000Z">
-<meta property="article:modified_time" content="2020-03-07T13:47:51.945Z">
+<meta property="article:modified_time" content="2020-03-09T05:42:42.455Z">
 <meta property="article:author" content="Liebing Yu">
 <meta property="article:tag" content="Machine Learning">
 <meta property="article:tag" content="Algorithm">
@@ -182,6 +182,11 @@
             <time datetime="2019-07-02T04:00:00.000Z" itemprop="datePublished">Jul 2 2019</time>
         </span>
         
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/Machine-Learning/">Machine Learning</a>
+        </span>
+        
         
         <span class="column is-narrow">
             
@@ -192,7 +197,7 @@
     </div>
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <html><head></head><body><p>Softmax regression (SR) (or multinomial logistic regression) is a generalization of logistic regression to the case where we want to handle multiple classes. Same as the <a href="/2019/08/02/Logistic-Regression">blog</a> about LR, this blog will detail the modeling approach, loss function, forward and backward propagation of SR. In the end, I will use python with numpy to implement SR and give the use on data sets iris and mnist. You can find all the code <a href="https://github.com/LB-Yu/publication/tree/master/sr" target="_blank" rel="noopener">here</a>.</p>
+        <html><head></head><body><p>Softmax regression (SR) (or multinomial logistic regression) is a generalization of logistic regression to the case where we want to handle multiple classes. Same as the <a href="/2019/08/02/Logistic-Regression">blog</a> about LR, this blog will detail the <strong>modeling approach</strong>, <strong>loss function</strong>, <strong>forward and backward propagation</strong> of SR. In the end, I will use python with numpy to implement SR and give the use on data sets iris and mnist. You can find all the code <a href="https://github.com/LB-Yu/publication/tree/master/sr" target="_blank" rel="noopener">here</a>.</p>
 <a id="more"></a>
 <h1 id="Softmax-function"><a href="#Softmax-function" class="headerlink" title="Softmax function"></a>Softmax function</h1><p>The softmax function is defined by the following formula. Where <script type="math/tex">K</script> is the number of classes and <script type="math/tex">K \geqslant 2</script>.</p>
 <script type="math/tex; mode=display">softmax(x)=\frac{1}{\sum_{j=1}^{K}e^{x^{(j)}}}\begin{bmatrix} e^{x^{(1)}}\\ e^{x^{(2)}}\\ \vdots \\ e^{x^{(K)}} \end{bmatrix}</script><p>Unfortunately, the original softmax definition has a numerical overflow problem in actual use. For a large positive <script type="math/tex">x^{(i)}</script> value, the value of <script type="math/tex">e^{x^{(i)}}</script> may be quite large and cause a numerical overflow. Similarly, for a smaller negative <script type="math/tex">x^{(i)}</script> value, the value of <script type="math/tex">e^{x^{(i)}}</script> may be very close to zero, resulting in a numerical underflow. Therefore, in practice we use the following equivalent formula.</p>
