@@ -133,7 +133,7 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
-            <a href="/2019/07/23/AI-System-GPU-Acceleration-for-AD/" itemprop="url">AI System - GPU Acceleration for AD</a>
+            <a href="/2019/07/23/Tinyflow-A-Simple-Neural-Network-Framework/" itemprop="url">Tinyflow - A Simple Neural Network Framework</a>
         
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
@@ -150,15 +150,15 @@
         <span class="column is-narrow">
             
             
-            5 minutes read (About 806 words)
+            7 minutes read (About 1004 words)
         </span>
         
     </div>
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <html><head></head><body><p>In recent years, the development of hardware has led to a rapid increase in the computing speed of computers. Deep learning has therefore become popular, and the computational acceleration of GPUs has played a crucial role in the development of deep learning. As we all know, the current popular deep learning frameworks such as tensorfow, pytorch, mxnet, etc. all support GPU acceleration. The previous <a href="/2019/07/22/AI-System-Automatic-Differentiation/index.html">blog</a> described the automatic differentiation (AD) algorithm and implemented it with numpy using python. In fact, we can also use the GPU to accelerate AD. This blog will do the job and eventually implement a multi-layer neural network. It can be seen that the use of the GPU can significantly accelerate the training process. You could find all the code <a href="https://github.com/LB-Yu/publication/tree/master/gpu_for_ad" target="_blank" rel="noopener">here</a></p></body></html>
+        <html><head></head><body><p>In recent years, thanks to the rapid growth of computing power, deep learning has blossomed. The increase in computing power is largely due to the GPUs. As we all know, the current popular deep learning frameworks such as tensorfow, pytorch, mxnet, etc. all support GPU acceleration. In order to explore the implementation principles behind the deep learning framework, this blog post will attempt to build a simple deep learning framework - <a href="https://github.com/LB-Yu/tinyflow" target="_blank" rel="noopener">Tinyflow</a>. We will build a general automatic differentiation framework in which you can add any custom operator. To keep it simple, Tinyflow only implements the operators necessary for multilayer perceptron (MLP) models (such as <code>MatMulOp</code>, <code>ReluOp</code>, <code>SoftmaxCrossEntropyOp</code>), and of course it supports the addition of any other operators (such as <code>ConvOp</code>). At the bottom, we will use GPUs to accelerate matrix operations. Although compared to the mature deep learning framework, Tinyflow is very simple, but it does have the two core elements necessary for deep learning framework: automatic differentiation and GPU operation acceleration.</p></body></html>
         <p class="article-more-link">
-            <a href="/2019/07/23/AI-System-GPU-Acceleration-for-AD/#more">Read More</a>
+            <a href="/2019/07/23/Tinyflow-A-Simple-Neural-Network-Framework/#more">Read More</a>
         </p>
     
     </div>
@@ -173,7 +173,7 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
-            <a href="/2019/07/22/AI-System-Automatic-Differentiation/" itemprop="url">AI System - Automatic Differentiation (AD)</a>
+            <a href="/2019/07/22/Automatic-Differentiation-Based-on-Computation-Graph/" itemprop="url">Automatic Differentiation Based on Computation Graph</a>
         
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
@@ -190,15 +190,15 @@
         <span class="column is-narrow">
             
             
-            20 minutes read (About 2960 words)
+            21 minutes read (About 3154 words)
         </span>
         
     </div>
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <html><head></head><body><p>Automatic differentiation (AD), also called algorithmic differentiation or simply &#x201C;autodiff&#x201D; is one of the basic algorithms hidden behind the deep learning framework such as tensorflow, pytorch, mxnet, etc. It&#x2019;s AD technique that allows us to focus on the design of the model structure without paying much attention to the gradient calculations during model training. However, this blog will focus on the principle and implementation of AD. Finally, we will implement an AD framework based on computational graphs and use it for logistic regression. You can find all the code <a href="https://github.com/LB-Yu/publication/tree/master/autodiff_py" target="_blank" rel="noopener">here</a>.</p></body></html>
+        <html><head></head><body><p><strong>Automatic differentiation</strong> (AD), also called algorithmic differentiation or simply &#x201C;autodiff&#x201D; is one of the basic algorithms hidden behind the <strong>deep learning framework</strong> such as tensorflow, pytorch, mxnet, etc. It&#x2019;s AD technique that allows us to focus on the design of the model structure without paying much attention to the gradient calculations during model training. However, this blog post will focus on the <strong>principle</strong> and <strong>implementation</strong> of AD. Finally, we will implement an AD framework based on <strong>computational graphs</strong> and use it for logistic regression. You could find all the code <a href="https://github.com/LB-Yu/distributed_system_courses/tree/master/cse559w/assignment1" target="_blank" rel="noopener">here</a>.</p></body></html>
         <p class="article-more-link">
-            <a href="/2019/07/22/AI-System-Automatic-Differentiation/#more">Read More</a>
+            <a href="/2019/07/22/Automatic-Differentiation-Based-on-Computation-Graph/#more">Read More</a>
         </p>
     
     </div>
@@ -217,8 +217,7 @@
     <div class="container">
         <div class="columns content">
             <div class="column is-narrow has-text-centered">
-                &copy; 2019-2020 Liebing Yu&nbsp;
-                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. 
+                &copy; 2019-2020 Liebing Yu&nbsp;. 
                 <span id="busuanzi_container_site_uv"><span id="busuanzi_value_site_uv"></span> visitors, </span>
                 <span id="busuanzi_container_site_pv">visited <span id="busuanzi_value_site_pv"></span> times</span>
             </div>

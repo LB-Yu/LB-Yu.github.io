@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head>
+    <meta charset="utf-8">
+<title>深入思考Java虚拟机运行时数据区域 - Liebing Yu&#39;s Homepage</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="">
+
+
+
+<meta name="keywords" content="code">
+
+
+
+    <meta name="description" content="&amp;#x2018;Java&amp;#x865A;&amp;#x62DF;&amp;#x673A;&amp;#x89C4;&amp;#x8303;&amp;#x2019;&amp;#x628A;Java&amp;#x865A;&amp;#x62DF;&amp;#x673A;&amp;#x7684;&amp;#x8FD0;&amp;#x884C;&amp;#x65F6;&amp;#x6570;&amp;#x636E;&amp;#x533A;&amp;#x57DF;&amp;#x5212;&amp;#x5206;&amp;#x4E3A;&amp;#x7EBF;&amp;#x7A0B;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入思考Java虚拟机运行时数据区域">
+<meta property="og:url" content="http://yoursite.com/2020/04/22/%E6%B7%B1%E5%85%A5%E6%80%9D%E8%80%83Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA%E5%9F%9F/index.html">
+<meta property="og:site_name" content="Liebing Yu&#39;s Homepage">
+<meta property="og:description" content="&amp;#x2018;Java&amp;#x865A;&amp;#x62DF;&amp;#x673A;&amp;#x89C4;&amp;#x8303;&amp;#x2019;&amp;#x628A;Java&amp;#x865A;&amp;#x62DF;&amp;#x673A;&amp;#x7684;&amp;#x8FD0;&amp;#x884C;&amp;#x65F6;&amp;#x6570;&amp;#x636E;&amp;#x533A;&amp;#x57DF;&amp;#x5212;&amp;#x5206;&amp;#x4E3A;&amp;#x7EBF;&amp;#x7A0B;">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/2020/04/22/%E6%B7%B1%E5%85%A5%E6%80%9D%E8%80%83Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA%E5%9F%9F/runtime_area.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/22/%E6%B7%B1%E5%85%A5%E6%80%9D%E8%80%83Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA%E5%9F%9F/vm_stack.png">
+<meta property="article:published_time" content="2020-04-22T07:48:58.000Z">
+<meta property="article:modified_time" content="2020-04-30T13:16:37.693Z">
+<meta property="article:author" content="Liebing Yu">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="JVM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2020/04/22/%E6%B7%B1%E5%85%A5%E6%80%9D%E8%80%83Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA%E5%9F%9F/runtime_area.png">
+
+
+
+
+
+<link rel="icon" href="/img/favicon.ico">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt="" height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/archives">Archives</a>
+            
+            <a class="navbar-item "
+               href="/categories">Categories</a>
+            
+            <a class="navbar-item "
+               href="/about">About</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#线程隔离区域">1&nbsp;&nbsp;<b>线程隔离区域</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#程序计数器">1.1&nbsp;&nbsp;程序计数器</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#虚拟机栈和本地方法栈">1.2&nbsp;&nbsp;虚拟机栈和本地方法栈</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#运行时栈帧结构">1.2.1&nbsp;&nbsp;运行时栈帧结构</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#内存溢出异常">1.2.2&nbsp;&nbsp;内存溢出异常</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#线程共享区域">2&nbsp;&nbsp;<b>线程共享区域</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#方法区">2.1&nbsp;&nbsp;方法区</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#堆">2.2&nbsp;&nbsp;堆</a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/LB-Yu" target="_blank" rel="noopener">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="知" href="https://www.zhihu.com/people/liebingyu" target="_blank" rel="noopener">
+                
+                知
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            深入思考Java虚拟机运行时数据区域
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2020-04-22T07:48:58.000Z" itemprop="datePublished">Apr 22 2020</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/Programming-Language/">Programming Language</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            19 minutes read (About 2886 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <html><head></head><body><p>&#x2018;Java&#x865A;&#x62DF;&#x673A;&#x89C4;&#x8303;&#x2019;&#x628A;Java&#x865A;&#x62DF;&#x673A;&#x7684;&#x8FD0;&#x884C;&#x65F6;&#x6570;&#x636E;&#x533A;&#x57DF;&#x5212;&#x5206;&#x4E3A;&#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x7684;<strong>&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;</strong>, <strong>&#x865A;&#x62DF;&#x673A;&#x6808;</strong>, <strong>&#x672C;&#x5730;&#x65B9;&#x6CD5;&#x6808;</strong>&#x548C;&#x7EBF;&#x7A0B;&#x5171;&#x4EAB;&#x7684;<strong>&#x65B9;&#x6CD5;&#x533A;</strong>, <strong>&#x5806;</strong>. &#x7136;&#x800C;, &#x2018;Java&#x865A;&#x62DF;&#x673A;&#x89C4;&#x8303;&#x2019;&#x6240;&#x63CF;&#x8FF0;&#x7684;&#x662F;Java&#x865A;&#x62DF;&#x673A;&#x7684;&#x6982;&#x5FF5;&#x6A21;&#x578B;(&#x4EE3;&#x8868;&#x6240;&#x6709;Java&#x865A;&#x62DF;&#x673A;&#x7684;&#x7EDF;&#x4E00;&#x5916;&#x89C2;), &#x5E76;&#x672A;&#x89C4;&#x5B9A;&#x4E0A;&#x8FF0;5&#x4E2A;&#x8FD0;&#x884C;&#x65F6;&#x6570;&#x636E;&#x533A;&#x57DF;&#x7684;&#x5177;&#x4F53;&#x5B9E;&#x73B0;&#x7EC6;&#x8282;, &#x56E0;&#x6B64;&#x5404;&#x6B3E;&#x5177;&#x4F53;&#x7684;Java&#x865A;&#x62DF;&#x673A;&#x53EF;&#x80FD;&#x4F1A;&#x7528;&#x5404;&#x79CD;&#x5E73;&#x53F0;&#x76F8;&#x5173;&#x7684;, &#x66F4;&#x9AD8;&#x6548;&#x7684;&#x65B9;&#x5F0F;&#x8FDB;&#x884C;&#x7B49;&#x4EF7;&#x7684;&#x5B9E;&#x73B0;. Java&#x865A;&#x62DF;&#x673A;&#x9700;&#x8981;&#x5B9E;&#x73B0;&#x81EA;&#x52A8;&#x5185;&#x5B58;&#x7BA1;&#x7406;(&#x4E3B;&#x8981;&#x662F;&#x5806;&#x548C;&#x65B9;&#x6CD5;&#x533A;&#x7684;&#x5185;&#x5B58;&#x7BA1;&#x7406;), &#x52BF;&#x5FC5;&#x5F15;&#x5165;&#x5783;&#x573E;&#x6536;&#x96C6;&#x5668;, &#x800C;&#x5185;&#x5B58;&#x7684;&#x5E03;&#x5C40;&#x4E0E;&#x7BA1;&#x7406;&#x53C8;&#x4E0E;&#x6240;&#x9009;&#x7528;&#x7684;&#x5783;&#x573E;&#x6536;&#x96C6;&#x5668;&#x606F;&#x606F;&#x76F8;&#x5173;, &#x6240;&#x4EE5;&#x5373;&#x4F7F;&#x662F;&#x540C;&#x4E00;&#x79CD;&#x865A;&#x62DF;&#x673A;, &#x4F7F;&#x7528;&#x4E0D;&#x540C;&#x5783;&#x573E;&#x6536;&#x96C6;&#x5668;&#x65F6;&#x5176;&#x8FD0;&#x884C;&#x65F6;&#x6570;&#x636E;&#x533A;&#x57DF;(&#x4E3B;&#x8981;&#x6307;&#x5806;&#x548C;&#x65B9;&#x6CD5;&#x533A;)&#x7684;&#x5B9E;&#x73B0;&#x90FD;&#x53EF;&#x80FD;&#x5B58;&#x5728;&#x5DEE;&#x522B;. &#x672C;&#x6587;&#x7740;&#x91CD;&#x8BB2;&#x8FF0;Java&#x865A;&#x62DF;&#x673A;&#x8FD0;&#x884C;&#x65F6;&#x6570;&#x636E;&#x533A;&#x57DF;&#x7684;&#x6982;&#x5FF5;&#x6A21;&#x578B;, &#x5728;&#x4E00;&#x4E9B;&#x91CD;&#x70B9;&#x90E8;&#x5206;&#x52A0;&#x5165;&#x4E86;&#x5BF9;HotSpot&#x865A;&#x62DF;&#x673A;&#x5177;&#x4F53;&#x5B9E;&#x73B0;&#x7684;&#x63A2;&#x8BA8;, &#x7279;&#x522B;&#x603B;&#x7ED3;&#x4E86;HotSpot&#x865A;&#x62DF;&#x673A;&#x6240;&#x5B9E;&#x73B0;&#x7684;&#x5404;&#x4E2A;&#x5783;&#x573E;&#x6536;&#x96C6;&#x5668;&#x7684;&#x539F;&#x7406;&#x53CA;&#x5176;&#x5BF9;&#x5E94;&#x7684;&#x81EA;&#x52A8;&#x5185;&#x5B58;&#x7BA1;&#x7406;&#x65B9;&#x6CD5;.</p>
+<a id="more"></a>
+<p>&#x9664;&#x8BB2;&#x8FF0;Java&#x865A;&#x62DF;&#x673A;&#x5404;&#x4E2A;&#x8FD0;&#x884C;&#x65F6;&#x6570;&#x636E;&#x533A;&#x57DF;&#x7684;&#x529F;&#x80FD;, &#x539F;&#x7406;&#x53CA;&#x5B9E;&#x73B0;&#x7EC6;&#x8282;&#x5916;, &#x66F4;&#x91CD;&#x8981;&#x7684;&#x662F;, &#x672C;&#x6587;&#x5C06;&#x6DF1;&#x5165;&#x601D;&#x8003;&#x8BF8;&#x5982;, &#x4E3A;&#x4EC0;&#x4E48;&#x8981;&#x8BBE;&#x8BA1;&#x8FD9;&#x4E9B;&#x533A;&#x57DF;? &#x4E3A;&#x4EC0;&#x4E48;&#x8FD9;&#x4E2A;&#x533A;&#x57DF;&#x8981;&#x8FD9;&#x4E48;&#x5B9E;&#x73B0;? &#x662F;&#x4E0D;&#x662F;&#x5FC5;&#x987B;&#x8FD9;&#x4E48;&#x5B9E;&#x73B0;? &#x7B49;&#x95EE;&#x9898;. &#x4F8B;&#x5982;, &#x6211;&#x4EEC;&#x90FD;&#x77E5;&#x9053;&#x5728;&#x2019;Java&#x865A;&#x62DF;&#x673A;&#x89C4;&#x8303;&#x4E2D;&#x2019;&#x89C4;&#x5B9A;&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;&#x662F;&#x7EBF;&#x7A0B;&#x79C1;&#x6709;&#x7684;, &#x90A3;&#x4E48;&#x4E3A;&#x4EC0;&#x4E48;&#x8981;&#x89C4;&#x5B9A;&#x5B83;&#x662F;&#x7EBF;&#x7A0B;&#x79C1;&#x6709;&#x7684;? &#x5B83;&#x662F;&#x4E0D;&#x662F;&#x5FC5;&#x987B;&#x662F;&#x7EBF;&#x7A0B;&#x79C1;&#x6709;&#x7684;? &#x6709;&#x6CA1;&#x6709;&#x53EF;&#x80FD;&#x5C06;&#x5176;&#x5B9E;&#x73B0;&#x4E3A;&#x7EBF;&#x7A0B;&#x5171;&#x4EAB;&#x7684;?</p>
+<p align="center">
+    <img src="./runtime_area.png" width="55%">
+</p>
+
+<h2 id="&#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x533A;&#x57DF;"><a href="#&#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x533A;&#x57DF;" class="headerlink" title="&#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x533A;&#x57DF;"></a>&#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x533A;&#x57DF;</h2><p>&#x2018;Java&#x865A;&#x62DF;&#x673A;&#x89C4;&#x8303;&#x2019; &#x4E2D;&#x6240;&#x89C4;&#x5B9A;&#x7684;&#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x7684;&#x8FD0;&#x884C;&#x65F6;&#x6570;&#x636E;&#x533A;&#x57DF;&#x5305;&#x62EC;&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;, &#x865A;&#x62DF;&#x673A;&#x6808;&#x548C;&#x672C;&#x5730;&#x65B9;&#x6CD5;&#x6808;&#x4E09;&#x90E8;&#x5206;. &#x7136;&#x800C;, &#x5728;HotSpot&#x865A;&#x62DF;&#x673A;&#x4E2D;&#x865A;&#x62DF;&#x673A;&#x6808;&#x548C;&#x672C;&#x5730;&#x65B9;&#x6CD5;&#x6808;&#x88AB;&#x5408;&#x4E8C;&#x4E3A;&#x4E00;.</p>
+<h3 id="&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;"><a href="#&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;" class="headerlink" title="&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;"></a>&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;</h3><p>&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;&#x662F;Java&#x865A;&#x62DF;&#x673A;&#x4E2D;&#x6700;&#x7B80;&#x5355;&#x7684;&#x90E8;&#x5206;, &#x5B9E;&#x9645;&#x4E0A;&#x662F;&#x4E00;&#x5757;&#x8F83;&#x5C0F;&#x7684;&#x5185;&#x5B58;&#x7A7A;&#x95F4;, &#x7528;&#x4E8E;&#x5B58;&#x50A8;&#x5F53;&#x524D;&#x7EBF;&#x7A0B;&#x6B63;&#x5728;&#x6267;&#x884C;&#x7684;&#x5B57;&#x8282;&#x7801;&#x6307;&#x4EE4;&#x5730;&#x5740;. &#x5B57;&#x8282;&#x7801;&#x89E3;&#x91CA;&#x5668;&#x901A;&#x8FC7;&#x6539;&#x53D8;&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;&#x7684;&#x503C;&#x6765;&#x6307;&#x793A;&#x7EBF;&#x7A0B;&#x6240;&#x9700;&#x8981;&#x6267;&#x884C;&#x7684;&#x5B57;&#x8282;&#x7801;&#x6307;&#x4EE4;. &#x7A0B;&#x5E8F;&#x7684;&#x5206;&#x652F;, &#x5FAA;&#x73AF;, &#x8DF3;&#x8F6C;, &#x5F02;&#x5E38;&#x5904;&#x7406;, &#x7EBF;&#x7A0B;&#x6062;&#x590D;&#x7B49;&#x57FA;&#x7840;&#x529F;&#x80FD;&#x90FD;&#x4F9D;&#x8D56;&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;&#x6765;&#x5B8C;&#x6210;.</p>
+<blockquote class="colorquote info"><p>&#x8FD9;&#x91CC;&#x7684;&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;&#x662F;&#x5728;&#x62BD;&#x8C61;&#x7684;JVM&#x5C42;&#x4E0A;&#x7684;&#x5B57;&#x8282;&#x7801;&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;, &#x800C;&#x4E0D;&#x662F;CPU&#x4E0A;&#x7684;&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;. &#x82E5;&#x7EBF;&#x7A0B;&#x6B63;&#x5728;&#x6267;&#x884C;&#x7684;&#x662F;&#x4E00;&#x4E2A;Java&#x65B9;&#x6CD5;, &#x90A3;&#x4E48;&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;&#x8BB0;&#x5F55;&#x7684;&#x662F;&#x6B63;&#x5728;&#x6267;&#x884C;&#x7684;&#x865A;&#x62DF;&#x673A;&#x5B57;&#x8282;&#x7801;&#x6307;&#x4EE4;&#x5730;&#x5740;, &#x8FD9;&#x4E2A;&#x5B57;&#x8282;&#x7801;&#x6307;&#x4EE4;&#x5730;&#x5740;&#x53EF;&#x80FD;(&#x2018;&#x53EF;&#x80FD;&#x2019;&#x662F;&#x76F8;&#x5BF9;&#x4E8E;&#x6982;&#x5FF5;&#x6A21;&#x578B;&#x800C;&#x8A00;&#x7684;, &#x6BCF;&#x6B3E;&#x865A;&#x62DF;&#x673A;&#x7684;&#x5B9E;&#x73B0;&#x53EF;&#x80FD;&#x4E0D;&#x540C;)&#x662F;&#x5BF9;&#x5E94;&#x5B57;&#x8282;&#x7801;&#x5728;&#x65B9;&#x6CD5;&#x4E2D;&#x7684;&#x504F;&#x79FB;&#x91CF;, &#x4E5F;&#x53EF;&#x80FD;&#x662F;&#x8BE5;&#x5B57;&#x8282;&#x7801;&#x6307;&#x4EE4;&#x5728;&#x865A;&#x62DF;&#x5185;&#x5B58;&#x4E2D;&#x7684;&#x4F4D;&#x7F6E;. &#x82E5;&#x7EBF;&#x7A0B;&#x6B63;&#x5728;&#x6267;&#x884C;&#x7684;&#x662F;&#x4E00;&#x4E2A;&#x672C;&#x5730;&#x65B9;&#x6CD5;, &#x90A3;&#x4E48;&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;&#x4E3A;&#x7A7A;, &#x8FD9;&#x662F;&#x7531;&#x4E8E;&#x672C;&#x5730;&#x65B9;&#x6CD5;&#x7531;&#x64CD;&#x4F5C;&#x7CFB;&#x7EDF;&#x76F4;&#x63A5;&#x6267;&#x884C;, &#x5E76;&#x4E0D;&#x9700;&#x8981;JVM&#x5C42;&#x9762;&#x7684;&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;&#x6765;&#x6307;&#x793A;&#x9700;&#x8981;&#x6267;&#x884C;&#x7684;&#x6307;&#x4EE4;, &#x800C;CPU&#x5C42;&#x9762;&#x7684;&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;&#x4F1A;&#x8FDB;&#x884C;&#x76F8;&#x5E94;&#x7684;&#x5DE5;&#x4F5C;.</p>
+<p><strong>&#x503C;&#x7684;&#x6CE8;&#x610F;&#x7684;&#x662F;, &#x5F53;&#x7EBF;&#x7A0B;&#x6267;&#x884C;&#x5DF2;&#x7ECF;&#x7531;JIT&#x7F16;&#x8BD1;&#x5668;&#x7F16;&#x8BD1;&#x7684;Java&#x65B9;&#x6CD5;&#x65F6;, &#x7531;&#x4E8E;&#x5B57;&#x8282;&#x7801;&#x6307;&#x4EE4;&#x5DF2;&#x7ECF;&#x88AB;&#x7F16;&#x8BD1;&#x4E3A;&#x673A;&#x5668;&#x6307;&#x4EE4;, &#x56E0;&#x6B64;&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;&#x540C;&#x6267;&#x884C;&#x672C;&#x5730;&#x65B9;&#x6CD5;&#x65F6;&#x4E00;&#x6837;&#x4E3A;&#x7A7A;.</strong></p>
+</blockquote>
+<p>&#x5728; &#x2018;Java&#x865A;&#x62DF;&#x673A;&#x89C4;&#x8303;&#x2019; &#x4E2D;, &#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;&#x662F;&#x552F;&#x4E00;&#x4E00;&#x4E2A;&#x6CA1;&#x6709;&#x89C4;&#x5B9A;&#x5185;&#x5B58;&#x6EA2;&#x51FA;&#x5F02;&#x5E38;&#x7684;&#x8FD0;&#x884C;&#x65F6;&#x6570;&#x636E;&#x533A;&#x57DF;, &#x5728;HotSpot&#x865A;&#x62DF;&#x673A;&#x4E2D;&#x6B64;&#x5185;&#x5B58;&#x533A;&#x57DF;&#x4E5F;&#x4E0D;&#x5B58;&#x5728;&#x4EFB;&#x4F55;&#x5185;&#x5B58;&#x6EA2;&#x51FA;&#x5F02;&#x5E38;. &#x8FD9;&#x662F;&#x7531;&#x4E8E;&#x5B57;&#x8282;&#x7801;&#x6307;&#x4EE4;&#x5730;&#x5740;&#x7684;&#x5927;&#x5C0F;&#x662F;&#x56FA;&#x5B9A;&#x7684;, &#x5728;JVM&#x542F;&#x52A8;&#x65F6;&#x5373;&#x53EF;&#x5206;&#x914D;&#x8DB3;&#x591F;&#x7684;&#x5185;&#x5B58;&#x7A7A;&#x95F4;, &#x4FDD;&#x8BC1;&#x5176;&#x4E0D;&#x4F1A;&#x6EA2;&#x51FA;.</p>
+<p>&#x5C3D;&#x7BA1;&#x2019;Java&#x865A;&#x62DF;&#x673A;&#x89C4;&#x8303;&#x2019;&#x4E2D;&#x628A;&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;&#x89C4;&#x5B9A;&#x4E3A;&#x7EBF;&#x7A0B;&#x79C1;&#x6709;&#x7684;, &#x4F46;&#x8FD9;&#x662F;&#x5426;&#x5FC5;&#x987B;&#x53D6;&#x51B3;&#x4E8E;Java&#x865A;&#x62DF;&#x673A;&#x5BF9;Java&#x7EBF;&#x7A0B;&#x8C03;&#x5EA6;&#x7684;&#x5B9E;&#x73B0;. &#x5982;&#x679C;&#x7531;Java&#x865A;&#x62DF;&#x673A;&#x8D1F;&#x8D23;Java&#x7EBF;&#x7A0B;&#x7684;&#x8C03;&#x5EA6;, &#x90A3;&#x4E48;&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;&#x5E76;&#x4E0D;&#x4E00;&#x5B9A;&#x9700;&#x8981;&#x7EBF;&#x7A0B;&#x79C1;&#x6709;, &#x4E5F;&#x53EF;&#x4EE5;&#x4EC5;&#x4F7F;&#x7528;&#x4E00;&#x4E2A;&#x7EBF;&#x7A0B;&#x5171;&#x4EAB;&#x7684;&#x5168;&#x5C40;&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;, &#x5728;&#x7EBF;&#x7A0B;&#x5207;&#x6362;&#x65F6;Java&#x865A;&#x62DF;&#x673A;&#x52BF;&#x5FC5;&#x901A;&#x8FC7;&#x4E00;&#x5B9A;&#x7684;&#x6570;&#x636E;&#x7ED3;&#x6784;&#x4FDD;&#x5B58;&#x5F53;&#x524D;&#x7EBF;&#x7A0B;&#x7684;&#x8FD0;&#x884C;&#x72B6;&#x6001;, &#x82E5;&#x540C;&#x65F6;&#x4FDD;&#x5B58;&#x5168;&#x5C40;&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;&#x7684;&#x503C;, &#x5373;&#x53EF;&#x5728;&#x7EBF;&#x7A0B;&#x518D;&#x6B21;&#x8FD0;&#x884C;&#x65F6;&#x6062;&#x590D;&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;&#x7684;&#x503C;. &#x5982;&#x679C;Java&#x865A;&#x62DF;&#x673A;&#x5C06;Java&#x7EBF;&#x7A0B;&#x7684;&#x8C03;&#x5EA6;&#x4EA4;&#x7531;&#x64CD;&#x4F5C;&#x7CFB;&#x7EDF;, &#x90A3;&#x4E48;&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;&#x5FC5;&#x987B;&#x7EBF;&#x7A0B;&#x79C1;&#x6709;, &#x8FD9;&#x662F;&#x7531;&#x4E8E;&#x64CD;&#x4F5C;&#x7CFB;&#x7EDF;&#x5728;&#x7EBF;&#x7A0B;&#x8C03;&#x5EA6;&#x65F6;&#x5E76;&#x4E0D;&#x4F1A;&#x8BB0;&#x5F55;&#x5F53;&#x524D;Java&#x7EBF;&#x7A0B;&#x6240;&#x8FD0;&#x884C;&#x7684;&#x865A;&#x62DF;&#x673A;&#x5B57;&#x8282;&#x7801;&#x6307;&#x4EE4;&#x5730;&#x5740;, &#x56E0;&#x6B64;&#x5FC5;&#x987B;&#x7531;&#x7EBF;&#x7A0B;&#x81EA;&#x8EAB;&#x8BB0;&#x5F55;&#x5176;&#x6307;&#x4EE4;&#x5730;&#x5740;. HotSpot&#x865A;&#x62DF;&#x673A;&#x5728;&#x4E3B;&#x6D41;&#x5E73;&#x53F0;&#x4E0A;&#x7684;&#x5B9E;&#x73B0;&#x90FD;&#x7531;&#x64CD;&#x4F5C;&#x7CFB;&#x7EDF;&#x8C03;&#x5EA6;Java&#x7EBF;&#x7A0B;, &#x56E0;&#x6B64;&#x5BF9;&#x4E8E;&#x5728;&#x8FD9;&#x4E9B;&#x5E73;&#x53F0;&#x4E0A;&#x8FD0;&#x884C;&#x7684;HotSpot&#x865A;&#x62DF;&#x673A;, &#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;&#x5FC5;&#x987B;&#x662F;&#x7EBF;&#x7A0B;&#x79C1;&#x6709;&#x7684;.</p>
+<h3 id="&#x865A;&#x62DF;&#x673A;&#x6808;&#x548C;&#x672C;&#x5730;&#x65B9;&#x6CD5;&#x6808;"><a href="#&#x865A;&#x62DF;&#x673A;&#x6808;&#x548C;&#x672C;&#x5730;&#x65B9;&#x6CD5;&#x6808;" class="headerlink" title="&#x865A;&#x62DF;&#x673A;&#x6808;&#x548C;&#x672C;&#x5730;&#x65B9;&#x6CD5;&#x6808;"></a>&#x865A;&#x62DF;&#x673A;&#x6808;&#x548C;&#x672C;&#x5730;&#x65B9;&#x6CD5;&#x6808;</h3><p>&#x2018;Java&#x865A;&#x62DF;&#x673A;&#x89C4;&#x8303;&#x2019;&#x6240;&#x63CF;&#x8FF0;&#x7684;&#x865A;&#x62DF;&#x673A;&#x6808;&#x548C;&#x672C;&#x5730;&#x65B9;&#x6CD5;&#x6808;&#x7684;&#x529F;&#x80FD;&#x548C;&#x539F;&#x7406;&#x5341;&#x5206;&#x76F8;&#x4F3C;, &#x4E3B;&#x8981;&#x7684;&#x533A;&#x522B;&#x662F;&#x865A;&#x62DF;&#x673A;&#x6808;&#x4E3A;&#x865A;&#x62DF;&#x673A;&#x6267;&#x884C;Java&#x65B9;&#x6CD5;&#x670D;&#x52A1;, &#x800C;&#x672C;&#x5730;&#x65B9;&#x6CD5;&#x6808;&#x4E3A;&#x865A;&#x62DF;&#x673A;&#x6267;&#x884C;&#x672C;&#x5730;&#x65B9;&#x6CD5;&#x670D;&#x52A1;. &#x56E0;&#x6B64;, &#x5728;HotSpot&#x865A;&#x62DF;&#x673A;&#x4E2D;, &#x865A;&#x62DF;&#x673A;&#x6808;&#x548C;&#x672C;&#x5730;&#x65B9;&#x6CD5;&#x6808;&#x88AB;&#x5408;&#x4E8C;&#x4E3A;&#x4E00;. &#x672C;&#x6587;&#x4E5F;&#x5C06;&#x4E00;&#x5E76;&#x8BB2;&#x8FF0;&#x865A;&#x62DF;&#x673A;&#x6808;&#x548C;&#x672C;&#x5730;&#x65B9;&#x6CD5;&#x6808;, &#x5982;&#x65E0;&#x7279;&#x6B8A;&#x8BF4;&#x660E;&#x540E;&#x6587;&#x8BF4;&#x5230;&#x7684;&#x865A;&#x62DF;&#x673A;&#x6808;&#x5305;&#x62EC;&#x2019;Java&#x865A;&#x62DF;&#x673A;&#x89C4;&#x8303;&#x2019;&#x4E2D;&#x6240;&#x63CF;&#x8FF0;&#x7684;&#x865A;&#x62DF;&#x673A;&#x6808;&#x548C;&#x672C;&#x5730;&#x65B9;&#x6CD5;&#x6808;.</p>
+<h4 id="&#x8FD0;&#x884C;&#x65F6;&#x6808;&#x5E27;&#x7ED3;&#x6784;"><a href="#&#x8FD0;&#x884C;&#x65F6;&#x6808;&#x5E27;&#x7ED3;&#x6784;" class="headerlink" title="&#x8FD0;&#x884C;&#x65F6;&#x6808;&#x5E27;&#x7ED3;&#x6784;"></a>&#x8FD0;&#x884C;&#x65F6;&#x6808;&#x5E27;&#x7ED3;&#x6784;</h4><p>Java&#x865A;&#x62DF;&#x673A;&#x4EE5;&#x65B9;&#x6CD5;&#x4F5C;&#x4E3A;&#x6700;&#x57FA;&#x672C;&#x7684;&#x6267;&#x884C;&#x5355;&#x5143;, &#x6BCF;&#x4E00;&#x4E2A;&#x65B9;&#x6CD5;&#x4ECE;&#x88AB;&#x8C03;&#x7528;&#x5230;&#x6267;&#x884C;&#x5B8C;&#x6BD5;&#x7684;&#x8FC7;&#x7A0B;&#x5C31;&#x5BF9;&#x5E94;&#x7740;&#x4E00;&#x4E2A;&#x6808;&#x5E27;&#x5728;&#x865A;&#x62DF;&#x673A;&#x6808;&#x4E2D;&#x4ECE;&#x5165;&#x6808;&#x5230;&#x51FA;&#x6808;&#x7684;&#x8FC7;&#x7A0B;. &#x5728;&#x7EBF;&#x7A0B;&#x6267;&#x884C;&#x65F6;, &#x6BCF;&#x9047;&#x5230;&#x4E00;&#x6B21;&#x65B9;&#x6CD5;&#x8C03;&#x7528;, &#x865A;&#x62DF;&#x673A;&#x90FD;&#x4F1A;&#x521B;&#x5EFA;&#x4E00;&#x4E2A;&#x4E0E;&#x8C03;&#x7528;&#x65B9;&#x6CD5;&#x6240;&#x5BF9;&#x5E94;&#x7684;&#x6808;&#x5E27;, &#x5E76;&#x5C06;&#x5176;&#x538B;&#x5165;&#x865A;&#x62DF;&#x673A;&#x6808;. &#x865A;&#x62DF;&#x673A;&#x6808;&#x6808;&#x9876;&#x7684;&#x6808;&#x5E27;&#x5BF9;&#x5E94;&#x7740;&#x5F53;&#x524D;&#x7EBF;&#x7A0B;&#x6B63;&#x5728;&#x6267;&#x884C;&#x7684;&#x65B9;&#x6CD5;. &#x6808;&#x5E27;&#x662F;&#x865A;&#x62DF;&#x673A;&#x6808;&#x7684;&#x57FA;&#x672C;&#x5143;&#x7D20;, &#x56E0;&#x6B64;&#x6709;&#x5FC5;&#x8981;&#x8FDB;&#x884C;&#x6DF1;&#x5165;&#x4E86;&#x89E3;.</p>
+<p align="center">
+    <img src="./vm_stack.png" width="90%">
+</p>
+
+<p>&#x6BCF;&#x4E00;&#x4E2A;&#x6808;&#x5E27;&#x90FD;&#x5305;&#x542B;<strong>&#x5C40;&#x90E8;&#x53D8;&#x91CF;&#x8868;</strong>, <strong>&#x64CD;&#x4F5C;&#x6570;&#x6808;</strong>, <strong>&#x52A8;&#x6001;&#x8FDE;&#x63A5;</strong>, <strong>&#x65B9;&#x6CD5;&#x8FD4;&#x56DE;&#x5730;&#x5740;</strong>&#x53CA;<strong>&#x9644;&#x52A0;&#x4FE1;&#x606F;</strong>. &#x5176;&#x4E2D;&#x52A8;&#x6001;&#x8FDE;&#x63A5;, &#x65B9;&#x6CD5;&#x8FD4;&#x56DE;&#x5730;&#x5740;, &#x9644;&#x52A0;&#x4FE1;&#x606F;&#x4E00;&#x822C;&#x662F;&#x9759;&#x6001;&#x7684;&#x5C5E;&#x6027;, &#x79F0;&#x4E3A;&#x6808;&#x5E27;&#x4FE1;&#x606F;. &#x6808;&#x5E27;&#x4E2D;&#x5404;&#x4E2A;&#x90E8;&#x5206;&#x7684;&#x5177;&#x4F53;&#x4F5C;&#x7528;&#x53CA;&#x539F;&#x7406;&#x5982;&#x4E0B;.</p>
+<ul>
+<li><strong>&#x5C40;&#x90E8;&#x53D8;&#x91CF;&#x8868;:</strong> &#x5C40;&#x90E8;&#x53D8;&#x91CF;&#x8868;&#x662F;&#x4E00;&#x7EC4;&#x503C;&#x7684;&#x5B58;&#x50A8;&#x7A7A;&#x95F4;, &#x7528;&#x4E8E;&#x5B58;&#x653E;&#x65B9;&#x6CD5;&#x53C2;&#x6570;&#x548C;&#x65B9;&#x6CD5;&#x5185;&#x90E8;&#x5B9A;&#x4E49;&#x7684;&#x5C40;&#x90E8;&#x53D8;&#x91CF;. &#x5C40;&#x90E8;&#x53D8;&#x91CF;&#x8868;&#x7684;&#x5BB9;&#x91CF;&#x4EE5;&#x53D8;&#x91CF;&#x69FD;&#x4E3A;&#x6700;&#x5C0F;&#x5355;&#x4F4D;, &#x2018;Java&#x865A;&#x62DF;&#x673A;&#x89C4;&#x8303;&#x2019;&#x5E76;&#x6CA1;&#x6709;&#x660E;&#x786E;&#x89C4;&#x5B9A;&#x4E00;&#x4E2A;&#x53D8;&#x91CF;&#x69FD;&#x5B9E;&#x9645;&#x5360;&#x7528;&#x7684;&#x5185;&#x5B58;&#x7A7A;&#x95F4;&#x5927;&#x5C0F;, &#x53EA;&#x662F;&#x8BF4;&#x660E;&#x4E86;&#x6BCF;&#x4E2A;&#x53D8;&#x91CF;&#x69FD;&#x90FD;&#x5E94;&#x5F53;&#x80FD;&#x591F;&#x5B58;&#x653E;&#x4E00;&#x4E2A;boolean, byte, char, short, int, float, reference&#x6216;returnAddress&#x7C7B;&#x578B;&#x7684;&#x6570;&#x636E;. &#x5728;64&#x4F4D;&#x7684;HotSpot&#x865A;&#x62DF;&#x673A;&#x4E2D;long&#x548C;double&#x7C7B;&#x578B;&#x5360;&#x7528;&#x4E24;&#x4E2A;&#x53D8;&#x91CF;&#x69FD;, &#x800C;reference&#x7C7B;&#x578B;&#x53EA;&#x5360;&#x7528;&#x4E00;&#x4E2A;&#x53D8;&#x91CF;&#x69FD;.</li>
+<li><strong>&#x64CD;&#x4F5C;&#x6570;&#x6808;:</strong> &#x64CD;&#x4F5C;&#x6570;&#x6808;&#x7684;&#x5143;&#x7D20;&#x53EF;&#x4EE5;&#x662F;&#x4EFB;&#x610F;&#x7C7B;&#x578B;, 32&#x4F4D;&#x6570;&#x636E;&#x7C7B;&#x578B;&#x5360;&#x7528;&#x7684;&#x6808;&#x5BB9;&#x91CF;&#x4E3A;1, 64&#x4F4D;&#x6570;&#x636E;&#x7C7B;&#x578B;&#x5360;&#x7528;&#x7684;&#x6808;&#x5BB9;&#x91CF;&#x4E3A;2. &#x5728;&#x4E00;&#x4E2A;&#x65B9;&#x6CD5;&#x6B63;&#x5F0F;&#x5F00;&#x59CB;&#x6267;&#x884C;&#x4E4B;&#x524D;&#x5176;&#x5BF9;&#x5E94;&#x7684;&#x64CD;&#x4F5C;&#x6570;&#x6808;&#x662F;&#x7A7A;&#x7684;, &#x5728;&#x65B9;&#x6CD5;&#x6267;&#x884C;&#x8FC7;&#x7A0B;&#x4E2D;&#x4F1A;&#x6709;&#x5404;&#x79CD;&#x5B57;&#x8282;&#x7801;&#x6307;&#x4EE4;&#x5F80;&#x64CD;&#x4F5C;&#x6570;&#x6808;&#x4E2D;&#x5199;&#x5165;&#x6216;&#x63D0;&#x53D6;&#x5185;&#x5BB9;, &#x5373;&#x5165;&#x6808;&#x548C;&#x51FA;&#x6808;&#x64CD;&#x4F5C;. &#x4EE5;&#x6574;&#x6570;&#x52A0;&#x6CD5;&#x4E3A;&#x4F8B;, &#x5B57;&#x8282;&#x7801;&#x6307;&#x4EE4;iadd&#x5C06;&#x63D0;&#x53D6;&#x64CD;&#x4F5C;&#x6570;&#x6808;&#x6808;&#x9876;&#x7684;&#x4E24;&#x4E2A;&#x5143;&#x7D20;&#x8FDB;&#x884C;&#x76F8;&#x52A0;, &#x5E76;&#x5C06;&#x7ED3;&#x679C;&#x91CD;&#x65B0;&#x538B;&#x5165;&#x64CD;&#x4F5C;&#x6570;&#x6808;.</li>
+<li><strong>&#x52A8;&#x6001;&#x8FDE;&#x63A5;:</strong> &#x6BCF;&#x4E2A;&#x6808;&#x5E27;&#x90FD;&#x5305;&#x542B;&#x4E00;&#x4E2A;&#x6307;&#x5411;&#x8FD0;&#x884C;&#x65F6;&#x5E38;&#x91CF;&#x6C60;(&#x89C1;<a href="#&#x65B9;&#x6CD5;&#x533A;">&#x65B9;&#x6CD5;&#x533A;</a>)&#x4E2D;&#x8BE5;&#x6808;&#x5E27;&#x6240;&#x5C5E;&#x65B9;&#x6CD5;&#x7684;&#x5F15;&#x7528;, &#x6301;&#x6709;&#x8FD9;&#x4E2A;&#x5F15;&#x7528;&#x662F;&#x4E3A;&#x4E86;&#x652F;&#x6301;&#x65B9;&#x6CD5;&#x8C03;&#x7528;&#x8FC7;&#x7A0B;&#x4E2D;&#x7684;&#x52A8;&#x6001;&#x8FDE;&#x63A5;.</li>
+<li><strong>&#x65B9;&#x6CD5;&#x8FD4;&#x56DE;&#x5730;&#x5740;:</strong> &#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;&#x4E2D;&#x8BB0;&#x5F55;&#x4E86;&#x5F53;&#x524D;&#x65B9;&#x6CD5;&#x6B63;&#x5728;&#x8FD0;&#x884C;&#x7684;&#x5B57;&#x8282;&#x7801;&#x6307;&#x4EE4;&#x5730;&#x5740;, &#x5F53;&#x6B63;&#x5728;&#x8FD0;&#x884C;&#x7684;&#x65B9;&#x6CD5;(&#x79F0;&#x4E3B;&#x8C03;&#x65B9;&#x6CD5;)&#x8C03;&#x7528;&#x4E86;&#x53E6;&#x4E00;&#x4E2A;&#x65B9;&#x6CD5;(&#x79F0;&#x88AB;&#x8C03;&#x65B9;&#x6CD5;)&#x65F6;, &#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;&#x5C06;&#x8F6C;&#x800C;&#x8BB0;&#x5F55;&#x88AB;&#x8C03;&#x65B9;&#x6CD5;&#x6240;&#x6B63;&#x5728;&#x6267;&#x884C;&#x7684;&#x5B57;&#x8282;&#x7801;&#x6307;&#x4EE4;&#x5730;&#x5740;, &#x800C;&#x4E3B;&#x8C03;&#x65B9;&#x6CD5;&#x6240;&#x6267;&#x884C;&#x5230;&#x7684;&#x5B57;&#x8282;&#x7801;&#x6307;&#x4EE4;&#x5730;&#x5740;&#x5C06;&#x88AB;&#x8986;&#x76D6;. &#x56E0;&#x6B64;, &#x4E3B;&#x8C03;&#x65B9;&#x6CD5;&#x5FC5;&#x987B;&#x5C06;&#x5F53;&#x524D;&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;&#x7684;&#x503C;&#x8BB0;&#x5F55;&#x5230;&#x6808;&#x5E27;&#x4E2D;, &#x4EE5;&#x4FBF;&#x5F53;&#x88AB;&#x8C03;&#x65B9;&#x6CD5;&#x6210;&#x529F;&#x8FD4;&#x56DE;&#x540E;&#x7EE7;&#x7EED;&#x6267;&#x884C;&#x4E3B;&#x8C03;&#x65B9;&#x6CD5;&#x7684;&#x5269;&#x4F59;&#x6307;&#x4EE4;. &#x8FD9;&#x4E2A;&#x88AB;&#x8BB0;&#x5F55;&#x7684;&#x7A0B;&#x5E8F;&#x8BA1;&#x6570;&#x5668;&#x7684;&#x503C;&#x5373;&#x4E3A;&#x65B9;&#x6CD5;&#x8FD4;&#x56DE;&#x5730;&#x5740;.</li>
+<li><strong>&#x9644;&#x52A0;&#x4FE1;&#x606F;:</strong> &#x2018;Java&#x865A;&#x62DF;&#x673A;&#x89C4;&#x8303;&#x2019;&#x5141;&#x8BB8;&#x865A;&#x62DF;&#x673A;&#x5B9E;&#x73B0;&#x589E;&#x52A0;&#x989D;&#x5916;&#x7684;&#x63CF;&#x8FF0;&#x4FE1;&#x606F;, &#x4F8B;&#x5982;&#x4E0E;&#x8C03;&#x8BD5;, &#x6027;&#x80FD;&#x6536;&#x96C6;&#x76F8;&#x5173;&#x7684;&#x4FE1;&#x606F;. &#x5404;&#x6B3E;&#x865A;&#x62DF;&#x673A;&#x7684;&#x9644;&#x52A0;&#x4FE1;&#x606F;&#x5404;&#x6709;&#x4E0D;&#x540C;.</li>
+</ul>
+<p>&#x5B9E;&#x9645;&#x4E0A;, &#x5C40;&#x90E8;&#x53D8;&#x91CF;&#x8868;&#x548C;&#x64CD;&#x4F5C;&#x6570;&#x6808;&#x7684;&#x6700;&#x5927;&#x5BB9;&#x91CF;&#x5728;&#x4F7F;&#x7528;<code>javac</code>&#x7F16;&#x8BD1;&#x65F6;&#x5C31;&#x5DF2;&#x7ECF;&#x786E;&#x5B9A;, &#x7ED3;&#x679C;&#x4F1A;&#x5199;&#x5165;&#x6240;&#x751F;&#x6210;&#x7684;<code>.class</code>&#x6587;&#x4EF6;&#x4E2D;. &#x4EE5;&#x5982;&#x4E0B;&#x4EE3;&#x7801;&#x4E3A;&#x4F8B;.</p>
+<figure class="highlight java hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Test</span> </span>{</span><br><span class="line">  <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">test</span><span class="hljs-params">(<span class="hljs-keyword">int</span> a, <span class="hljs-keyword">long</span> b)</span> </span>{</span><br><span class="line">    <span class="hljs-keyword">return</span> a + <span class="hljs-number">1</span>;</span><br><span class="line">  }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>&#x4E0A;&#x8FF0;&#x4EE3;&#x7801;&#x5B9A;&#x4E49;&#x4E86;&#x4E00;&#x4E2A;&#x7B80;&#x5355;&#x7684;<code>Test</code>&#x7C7B;, &#x8BE5;&#x7C7B;&#x5305;&#x542B;&#x4E00;&#x4E2A;&#x5B9E;&#x4F8B;&#x65B9;&#x6CD5;<code>test</code>. &#x6839;&#x636E;&#x4E0A;&#x8FF0;&#x539F;&#x7406;&#x53EF;&#x4EE5;&#x63A8;&#x65AD;, &#x5728;64&#x4F4D;&#x7684;HotSpot&#x865A;&#x62DF;&#x673A;&#x4E2D;<code>test</code>&#x65B9;&#x6CD5;&#x7684;&#x5C40;&#x90E8;&#x53D8;&#x91CF;&#x8868;&#x6709;4&#x4E2A;&#x53D8;&#x91CF;&#x69FD;(&#x6BCF;&#x4E2A;&#x5B9E;&#x4F8B;&#x65B9;&#x6CD5;&#x90FD;&#x5305;&#x542B;&#x4E00;&#x4E2A;&#x9690;&#x5F62;&#x7684;&#x53C2;&#x6570;<code>this</code>, <code>test</code>&#x65B9;&#x6CD5;&#x5171;&#x6709;3&#x4E2A;&#x53C2;&#x6570;, &#x5176;&#x4E2D;&#x53C2;&#x6570;<code>this</code>&#x548C;<code>a</code>&#x5360;&#x4E00;&#x4E2A;&#x53D8;&#x91CF;&#x69FD;, &#x53C2;&#x6570;<code>b</code>&#x5360;&#x4E24;&#x4E2A;&#x53D8;&#x91CF;&#x69FD;, &#x5171;&#x5360;4&#x4E2A;&#x53D8;&#x91CF;&#x69FD;), &#x5176;&#x64CD;&#x4F5C;&#x6570;&#x6808;&#x7684;&#x6700;&#x5927;&#x6808;&#x5BB9;&#x91CF;&#x4E3A;2(&#x6267;&#x884C;<code>a + 1</code>&#x64CD;&#x4F5C;&#x65F6;&#x9700;&#x8981;&#x5C06;&#x53D8;&#x91CF;<code>a</code>&#x53CA;<code>1</code>&#x538B;&#x5165;&#x64CD;&#x4F5C;&#x6570;&#x6808;, &#x6240;&#x9700;&#x6808;&#x5BB9;&#x91CF;&#x4E3A;2). &#x6211;&#x4EEC;&#x53EF;&#x4EE5;&#x7528;<code>javap -verbose Test.class</code>&#x547D;&#x4EE4;&#x8FDB;&#x884C;&#x9A8C;&#x8BC1;, &#x6267;&#x884C;<code>javap</code>&#x547D;&#x4EE4;&#x540E;&#x53EF;&#x4EE5;&#x770B;&#x5230;&#x5982;&#x4E0B;&#x4FE1;&#x606F;(&#x4EC5;&#x622A;&#x53D6;&#x4E86;&#x4E0E;<code>test</code>&#x65B9;&#x6CD5;&#x76F8;&#x5173;&#x7684;&#x90E8;&#x5206;).</p>
+<figure class="highlight shell hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public int test(int, long);</span><br><span class="line">    descriptor: (IJ)I</span><br><span class="line">    flags: ACC_PUBLIC</span><br><span class="line">    Code:</span><br><span class="line">      stack=2, locals=4, args_size=3</span><br><span class="line">         0: iload_1</span><br><span class="line">         1: iconst_1</span><br><span class="line">         2: iadd</span><br><span class="line">         3: ireturn</span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line 5: 0</span><br></pre></td></tr></tbody></table></figure>
+
+<p>&#x5176;&#x4E2D;, <code>Code</code>&#x5C5E;&#x6027;&#x5185;&#x7684;<code>stack</code>&#x8868;&#x793A;&#x64CD;&#x4F5C;&#x6570;&#x6808;&#x7684;&#x6700;&#x5927;&#x5BB9;&#x91CF;, <code>locals</code>&#x8868;&#x793A;&#x5C40;&#x90E8;&#x53D8;&#x91CF;&#x8868;&#x6240;&#x5360;&#x7528;&#x7684;&#x53D8;&#x91CF;&#x69FD;&#x4E2A;&#x6570;, <code>args_size</code>&#x8868;&#x793A;&#x65B9;&#x6CD5;&#x7684;&#x53C2;&#x6570;&#x4E2A;&#x6570;.</p>
+<h4 id="&#x5185;&#x5B58;&#x6EA2;&#x51FA;&#x5F02;&#x5E38;"><a href="#&#x5185;&#x5B58;&#x6EA2;&#x51FA;&#x5F02;&#x5E38;" class="headerlink" title="&#x5185;&#x5B58;&#x6EA2;&#x51FA;&#x5F02;&#x5E38;"></a>&#x5185;&#x5B58;&#x6EA2;&#x51FA;&#x5F02;&#x5E38;</h4><p>&#x2018;Java&#x865A;&#x62DF;&#x673A;&#x89C4;&#x8303;&#x2019;&#x5BF9;&#x865A;&#x62DF;&#x673A;&#x6808;&#x548C;&#x672C;&#x5730;&#x65B9;&#x6CD5;&#x6808;&#x5B9A;&#x4E49;&#x4E86;&#x4E24;&#x7C7B;&#x5F02;&#x5E38;: &#x5982;&#x679C;&#x7EBF;&#x7A0B;&#x8BF7;&#x6C42;&#x7684;&#x6808;&#x6DF1;&#x5EA6;&#x5927;&#x4E8E;&#x865A;&#x62DF;&#x673A;&#x6240;&#x5141;&#x8BB8;&#x7684;&#x6700;&#x5927;&#x6DF1;&#x5EA6;, &#x5C06;&#x629B;&#x51FA;<code>StackOverflowError</code>&#x5F02;&#x5E38;; &#x5982;&#x679C;Java&#x865A;&#x62DF;&#x673A;&#x6808;&#x5BB9;&#x91CF;&#x53EF;&#x4EE5;&#x52A8;&#x6001;&#x6269;&#x5C55;, &#x5F53;&#x6808;&#x6269;&#x5C55;&#x65E0;&#x6CD5;&#x7533;&#x8BF7;&#x5230;&#x8DB3;&#x591F;&#x7684;&#x5185;&#x5B58;&#x65F6;&#x5C06;&#x629B;&#x51FA;<code>OutOfMemoryError</code>&#x5F02;&#x5E38;. &#x2018;Java&#x865A;&#x62DF;&#x673A;&#x89C4;&#x8303;&#x2019;&#x660E;&#x786E;&#x5141;&#x8BB8;&#x865A;&#x62DF;&#x673A;&#x81EA;&#x884C;&#x9009;&#x62E9;&#x662F;&#x5426;&#x652F;&#x6301;&#x6808;&#x7684;&#x52A8;&#x6001;&#x6269;&#x5C55;, HotSpot&#x865A;&#x62DF;&#x673A;&#x5E76;&#x4E0D;&#x652F;&#x6301;&#x6808;&#x6269;&#x5C55;, &#x56E0;&#x6B64;HotSpot&#x865A;&#x62DF;&#x673A;&#x4E2D;&#x7684;&#x865A;&#x62DF;&#x673A;&#x6808;&#x5728;&#x5927;&#x90E8;&#x5206;&#x60C5;&#x51B5;&#x4E0B;&#x53EA;&#x4F1A;&#x51FA;&#x73B0;<code>StackOverflowError</code>&#x5F02;&#x5E38;. &#x6211;&#x4EEC;&#x53EF;&#x901A;&#x8FC7;&#x5982;&#x4E0B;&#x4EE3;&#x7801;&#x8FDB;&#x884C;&#x63A2;&#x7A76;.</p>
+<p>&#x5728;HotSpot&#x865A;&#x62DF;&#x673A;&#x4E2D;, &#x865A;&#x62DF;&#x673A;&#x6808;&#x7684;&#x5927;&#x5C0F;&#x53EF;&#x7528;<code>-Xss</code>&#x8BBE;&#x5B9A;, &#x5728;64&#x4F4D;Linux&#x64CD;&#x4F5C;&#x7CFB;&#x7EDF;&#x4E0B;&#x5176;&#x9ED8;&#x8BA4;&#x503C;&#x4E3A;1M, &#x53EF;&#x8BBE;&#x5B9A;&#x7684;&#x6700;&#x5C0F;&#x503C;&#x4E3A;228k. </p>
+<h2 id="&#x7EBF;&#x7A0B;&#x5171;&#x4EAB;&#x533A;&#x57DF;"><a href="#&#x7EBF;&#x7A0B;&#x5171;&#x4EAB;&#x533A;&#x57DF;" class="headerlink" title="&#x7EBF;&#x7A0B;&#x5171;&#x4EAB;&#x533A;&#x57DF;"></a>&#x7EBF;&#x7A0B;&#x5171;&#x4EAB;&#x533A;&#x57DF;</h2><h3 id="&#x65B9;&#x6CD5;&#x533A;"><a href="#&#x65B9;&#x6CD5;&#x533A;" class="headerlink" title="&#x65B9;&#x6CD5;&#x533A;"></a>&#x65B9;&#x6CD5;&#x533A;</h3><h3 id="&#x5806;"><a href="#&#x5806;" class="headerlink" title="&#x5806;"></a>&#x5806;</h3></body></html>
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/Java/">#Java</a></span>
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/JVM/">#JVM</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop is-hidden-mobile article-nav-prev">
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2020/03/16/HBase%E6%9E%B6%E6%9E%84%E6%B7%B1%E5%85%A5%E5%89%96%E6%9E%90/">HBase架构深入剖析</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+<div class="sharebox">
+    
+<div class="sharethis-inline-share-buttons"></div>
+<script type='text/javascript' src='//platform-api.sharethis.com/js/sharethis.js#property=5e63913dd0c39800126ea9e7&amp;product=inline-share-buttons&amp;cms=sop' async='async'></script>
+
+</div>
+
+
+
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    
+<div id="valine-thread"></div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src='//cdn.jsdelivr.net/gh/AshinWang/SimpleValine@v0.1/SimpleValine.min.js'></script>
+<script>
+    new Valine({
+        el: '#valine-thread',
+        appId: 'yH4pXH6SVqWNsdXcF5TeQVmD-MdYXbMMI',
+        appKey: '1OIsff76fPfsFsiyhNUoJ0o5',
+        notify: true,
+        verify: false,
+        avatar: '',
+        placeholder: 'If you have any questions, please comment here!',
+        meta: ['nick', 'mail'],
+        visitor: true,
+        lang: 'en'
+    })
+</script>
+
+
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019-2020 Liebing Yu&nbsp;. 
+                <span id="busuanzi_container_site_uv"><span id="busuanzi_value_site_uv"></span> visitors, </span>
+                <span id="busuanzi_container_site_pv">visited <span id="busuanzi_value_site_pv"></span> times</span>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="xcTorres" href="https://xctorres.github.io/" target="_blank" rel="noopener">
+                    
+                    xcTorres
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Honly" href="https://guanhonly.github.io/" target="_blank" rel="noopener">
+                    
+                    Honly
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/" target="_blank" rel="noopener">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("en-AU");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+
+<script src="/js/script.js"></script>
+
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+    
+</body>
+</html>
