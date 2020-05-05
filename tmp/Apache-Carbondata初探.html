@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head>
+    <meta charset="utf-8">
+<title>Apache Carbondata初探 - Liebing Yu&#39;s Homepage</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="">
+
+
+
+<meta name="keywords" content="code">
+
+
+
+    <meta name="description" content="&amp;#x6982;&amp;#x89C8;What is CarbonData&amp;#x6839;&amp;#x636E;&amp;#x5B98;&amp;#x65B9;&amp;#x5B9A;&amp;#x4E49;, CarbonData&amp;#x662F;&amp;#x4E00;&amp;#x4E2A;&amp;#x5B8C;&amp;#x5168;&amp;#x7D22;&amp;#x5F15;&amp;#x7684;&amp;#x5217;&amp;#x5F0F;&amp;#x7684;, Hadoop&amp;#x539F;&amp;#">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Apache Carbondata初探">
+<meta property="og:url" content="http://yoursite.com/tmp/Apache-Carbondata%E5%88%9D%E6%8E%A2.html">
+<meta property="og:site_name" content="Liebing Yu&#39;s Homepage">
+<meta property="og:description" content="&amp;#x6982;&amp;#x89C8;What is CarbonData&amp;#x6839;&amp;#x636E;&amp;#x5B98;&amp;#x65B9;&amp;#x5B9A;&amp;#x4E49;, CarbonData&amp;#x662F;&amp;#x4E00;&amp;#x4E2A;&amp;#x5B8C;&amp;#x5168;&amp;#x7D22;&amp;#x5F15;&amp;#x7684;&amp;#x5217;&amp;#x5F0F;&amp;#x7684;, Hadoop&amp;#x539F;&amp;#">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/tmp/Apache-Carbondata&#x521D;&#x63A2;/2-1_1.png">
+<meta property="og:image" content="http://yoursite.com/tmp/Apache-Carbondata&#x521D;&#x63A2;/carbon_data_file_structure_new.png">
+<meta property="og:image" content="http://yoursite.com/tmp/Apache-Carbondata&#x521D;&#x63A2;/2-4_1.png">
+<meta property="article:published_time" content="2020-05-04T07:48:58.000Z">
+<meta property="article:modified_time" content="2020-05-05T03:58:31.199Z">
+<meta property="article:author" content="Liebing Yu">
+<meta property="article:tag" content="code">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/tmp/Apache-Carbondata&#x521D;&#x63A2;/2-1_1.png">
+
+
+
+
+
+<link rel="icon" href="/img/favicon.ico">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt="" height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/archives">Archives</a>
+            
+            <a class="navbar-item "
+               href="/categories">Categories</a>
+            
+            <a class="navbar-item "
+               href="/about">About</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#概览">1&nbsp;&nbsp;<b>概览</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#What-is-CarbonData">1.1&nbsp;&nbsp;What is CarbonData</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#Use-Cases">1.2&nbsp;&nbsp;Use Cases</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#CarbonData-table-structure">2&nbsp;&nbsp;<b>CarbonData table structure</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#File-Directory-Structure">2.1&nbsp;&nbsp;File Directory Structure</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#File-Content-details">2.2&nbsp;&nbsp;File Content details</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#CarbonData-file-format">2.2.1&nbsp;&nbsp;CarbonData file format</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#CarbonIndex-file-format">2.2.2&nbsp;&nbsp;CarbonIndex file format</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Index">3&nbsp;&nbsp;<b>Index</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#现有索引">3.1&nbsp;&nbsp;现有索引</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#如何支持时空数据">3.2&nbsp;&nbsp;如何支持时空数据</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#总结">4&nbsp;&nbsp;<b>总结</b></a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/LB-Yu" target="_blank" rel="noopener">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="知" href="https://www.zhihu.com/people/liebingyu" target="_blank" rel="noopener">
+                
+                知
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Apache Carbondata初探
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2020-05-04T07:48:58.000Z" itemprop="datePublished">May 4 2020</time>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            11 minutes read (About 1648 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <html><head></head><body><h1 id="&#x6982;&#x89C8;"><a href="#&#x6982;&#x89C8;" class="headerlink" title="&#x6982;&#x89C8;"></a>&#x6982;&#x89C8;</h1><h2 id="What-is-CarbonData"><a href="#What-is-CarbonData" class="headerlink" title="What is CarbonData"></a>What is CarbonData</h2><p>&#x6839;&#x636E;<a href="http://carbondata.apache.org/introduction.html" target="_blank" rel="noopener">&#x5B98;&#x65B9;&#x5B9A;&#x4E49;</a>, CarbonData&#x662F;&#x4E00;&#x4E2A;&#x5B8C;&#x5168;&#x7D22;&#x5F15;&#x7684;&#x5217;&#x5F0F;&#x7684;, Hadoop&#x539F;&#x751F;&#x7684;&#x6570;&#x636E;&#x5B58;&#x50A8;, &#x53EF;&#x7ED3;&#x5408;Spark SQL&#x8FDB;&#x884C;&#x7E41;&#x91CD;&#x7684;&#x5206;&#x6790;&#x5DE5;&#x4F5C;&#x548C;&#x8BE6;&#x7EC6;&#x67E5;&#x8BE2;. CarbonData&#x5141;&#x8BB8;&#x5BF9;PB&#x7EA7;&#x6570;&#x636E;&#x8FDB;&#x884C;&#x66F4;&#x5FEB;&#x7684;&#x4EA4;&#x4E92;&#x5F0F;&#x67E5;&#x8BE2;.</p>
+<p>&#x5B8F;&#x89C2;&#x4E0A;&#x6765;&#x8BF4;, Carbondata&#x4E3B;&#x8981;&#x505A;&#x4E86;&#x4EE5;&#x4E0B;&#x4E24;&#x4E2A;&#x5DE5;&#x4F5C;:</p>
+<ul>
+<li>&#x57FA;&#x4E8E;Hadoop HDFS&#x5EFA;&#x7ACB;&#x4E86;&#x4E00;&#x79CD;&#x65B0;&#x7684;&#x6570;&#x636E;&#x5B58;&#x50A8;&#x683C;&#x5F0F;, &#x5B83;&#x5728;HDFS&#x7684;&#x57FA;&#x7840;&#x4E4B;&#x4E0A;&#x589E;&#x52A0;&#x4E86;&#x8868;(&#x7C7B;&#x4F3C;&#x4E8E;&#x5173;&#x7CFB;&#x578B;&#x6570;&#x636E;&#x5E93;&#x4E2D;&#x7684;&#x8868;)&#x7684;&#x6982;&#x5FF5;, &#x5E76;&#x652F;&#x6301;&#x5BF9;&#x8868;&#x4E2D;&#x7684;&#x5217;&#x521B;&#x5EFA;&#x7D22;&#x5F15;;</li>
+<li>&#x96C6;&#x6210;Spark, Presto&#x548C;Hive&#x6267;&#x884C;&#x5F15;&#x64CE;, &#x4F7F;&#x8FD9;&#x4E9B;&#x6267;&#x884C;&#x5F15;&#x64CE;&#x80FD;&#x591F;&#x7406;&#x89E3;Carbondata&#x63D0;&#x4F9B;&#x7684;&#x6570;&#x636E;&#x5B58;&#x50A8;&#x683C;&#x5F0F;, &#x5728;&#x6B64;&#x57FA;&#x7840;&#x4E0A;&#x8FDB;&#x884C;&#x5FEB;&#x901F;&#x7684;&#x5206;&#x6790;&#x6216;&#x67E5;&#x8BE2;.</li>
+</ul>
+<p>&#x4E25;&#x683C;&#x6765;&#x8BF4;, Carbondata&#x5E76;&#x4E0D;&#x80FD;&#x79F0;&#x5F97;&#x4E0A;&#x662F;&#x6570;&#x636E;&#x5E93;, &#x5B83;&#x53EA;&#x80FD;&#x8BF4;&#x662F;&#x4E00;&#x4E2A;&#x6570;&#x636E;&#x5B58;&#x50A8;, &#x5B83;&#x5FC5;&#x987B;&#x501F;&#x52A9;&#x989D;&#x5916;&#x7684;&#x6267;&#x884C;&#x5F15;&#x64CE;&#x8FDB;&#x884C;&#x67E5;&#x8BE2;&#x548C;&#x5206;&#x6790;. &#x76F8;&#x5BF9;&#x4E8E;NoSQL&#x5B83;&#x7684;&#x4F18;&#x52BF;&#x4F53;&#x73B0;&#x5728;&#x5927;&#x6570;&#x636E;&#x91CF;&#x7684;&#x67E5;&#x8BE2;&#x548C;&#x5206;&#x6790;, &#x5BF9;&#x4E8E;&#x5C0F;&#x6570;&#x636E;&#x91CF;&#x7684;&#x70B9;&#x67E5;&#x8BE2;, &#x53D7;&#x9650;&#x4E8E;Spark SQL&#x7B49;&#x8FD9;&#x7C7B;&#x6267;&#x884C;&#x5F15;&#x64CE;&#x7684;&#x8BBE;&#x8BA1;, &#x5176;&#x6548;&#x7387;&#x6BD4;&#x4E0D;&#x4E0A;&#x6570;&#x636E;&#x5E93;.</p>
+<h2 id="Use-Cases"><a href="#Use-Cases" class="headerlink" title="Use Cases"></a>Use Cases</h2><p>Carbondata&#x9002;&#x7528;&#x4E8E;&#x5404;&#x79CD;&#x5206;&#x6790;&#x6027;&#x7684;&#x5DE5;&#x4F5C;&#x8D1F;&#x8F7D;, &#x5176;&#x54CD;&#x5E94;&#x5EF6;&#x65F6;&#x4E00;&#x822C;&#x5728;&#x79D2;&#x7EA7;. <a href="http://carbondata.apache.org/usecases.html" target="_blank" rel="noopener">&#x5B98;&#x65B9;&#x6587;&#x6863;</a>&#x7ED9;&#x51FA;&#x4E86;&#x51E0;&#x4E2A;&#x67E5;&#x8BE2;&#x573A;&#x666F;&#x7684;&#x6307;&#x6807;, &#x5728;&#x7535;&#x8BAF;&#x9886;&#x57DF;&#x548C;&#x667A;&#x6167;&#x57CE;&#x5E02;&#x9886;&#x57DF;&#x7684;&#x8BE6;&#x7EC6;&#x67E5;&#x8BE2;&#x54CD;&#x5E94;&#x65F6;&#x95F4;&#x90FD;&#x5728;&#x79D2;&#x7EA7;.</p>
+<p>Carbondata&#x7684;Github Repo&#x7ED9;&#x51FA;&#x4E86;&#x66F4;&#x8BE6;&#x7EC6;&#x7684;&#x5BF9;&#x6BD4;&#x6D4B;&#x8BD5;:</p>
+<ul>
+<li><a href="https://github.com/apache/carbondata/blob/master/docs/zh_cn/CarbonData%E5%85%B8%E5%9E%8B%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E6%98%8E%E7%BB%86%E6%95%B0%E6%8D%AE%E6%9F%A5%E8%AF%A2%EF%BC%9A%E7%82%B9%E6%9F%A5%2B%E8%BF%87%E6%BB%A4%E6%9D%A1%E4%BB%B6.md" target="_blank" rel="noopener">CarbonData&#x5178;&#x578B;&#x5E94;&#x7528;&#x573A;&#x666F;&#x4E4B;&#x660E;&#x7EC6;&#x6570;&#x636E;&#x67E5;&#x8BE2;&#xFF1A;&#x70B9;&#x67E5;+&#x8FC7;&#x6EE4;&#x6761;&#x4EF6;</a></li>
+<li><a href="https://github.com/apache/carbondata/blob/master/docs/zh_cn/CarbonData%E4%B8%8E%E5%95%86%E4%B8%9A%E5%88%97%E5%AD%98DB%E6%80%A7%E8%83%BD%E5%AF%B9%E6%AF%94.md" target="_blank" rel="noopener">CarbonData&#x4E0E;&#x5546;&#x4E1A;&#x5217;&#x5B58;DB&#x6027;&#x80FD;&#x5BF9;&#x6BD4;</a></li>
+</ul>
+<p>&#x4ECE;&#x4E2D;&#x53EF;&#x4EE5;&#x770B;&#x5230;&#x5176;&#x5178;&#x578B;&#x7684;&#x67E5;&#x8BE2;&#x54CD;&#x5E94;&#x65F6;&#x95F4;&#x4E00;&#x822C;&#x5728;&#x51E0;&#x79D2;&#x5230;&#x51E0;&#x5341;&#x79D2;.</p>
+<h1 id="CarbonData-table-structure"><a href="#CarbonData-table-structure" class="headerlink" title="CarbonData table structure"></a>CarbonData table structure</h1><p>CarbonData&#x4EE5;&#x8868;&#x4E3A;&#x5355;&#x4F4D;&#x7BA1;&#x7406;&#x6570;&#x636E;, &#x672C;&#x8282;&#x4ECB;&#x7ECD;CarbonData&#x5728;HDFS&#x4E0A;&#x5982;&#x4F55;&#x7EC4;&#x7EC7;&#x6570;&#x636E;.</p>
+<h2 id="File-Directory-Structure"><a href="#File-Directory-Structure" class="headerlink" title="File Directory Structure"></a>File Directory Structure</h2><p>CarbonData&#x5728;HDFS&#x4E0A;&#x7684;&#x76EE;&#x5F55;&#x7EC4;&#x7EC7;&#x5982;&#x4E0B;.</p>
+<p align="center">
+    <img src="./Apache-Carbondata&#x521D;&#x63A2;/2-1_1.png" width="60%">
+</p>
+
+<ol>
+<li>ModifiedTime.htmlt&#x4F7F;&#x7528;&#x6587;&#x4EF6;&#x7684;&#x4FEE;&#x6539;&#x65F6;&#x95F4;&#x5C5E;&#x6027;&#x8BB0;&#x5F55;&#x5143;&#x6570;&#x636E;&#x7684;&#x65F6;&#x95F4;&#x6233;. &#x5F53;create&#x6216;drop&#x8868;&#x65F6;, &#x6587;&#x4EF6;&#x7684;&#x4FEE;&#x6539;&#x65F6;&#x95F4;&#x5C06;&#x4F1A;&#x88AB;&#x66F4;&#x65B0;. &#x8FD9;&#x5BF9;&#x6240;&#x6709;&#x6570;&#x636E;&#x5E93;&#x90FD;&#x662F;&#x76F8;&#x540C;&#x7684;, &#x56E0;&#x6B64;&#x4E0E;&#x6570;&#x636E;&#x5E93;&#x6587;&#x4EF6;&#x5939;&#x5E76;&#x5217;;</li>
+<li>default&#x662F;&#x5305;&#x542B;&#x7528;&#x6237;&#x8868;&#x7684;&#x6570;&#x636E;&#x5E93;, &#x5728;&#x7528;&#x6237;&#x4E0D;&#x663E;&#x5F0F;&#x6307;&#x5B9A;&#x6570;&#x636E;&#x5E93;&#x65F6;&#x4F7F;&#x7528;. &#x5426;&#x5219;&#x7528;&#x6237;&#x6307;&#x5B9A;&#x7684;&#x6570;&#x636E;&#x5E93;&#x540D;&#x5373;&#x4E3A;&#x6587;&#x4EF6;&#x5939;&#x7684;&#x540D;&#x79F0;, user_table&#x662F;&#x7528;&#x6237;&#x521B;&#x5EFA;&#x7684;&#x8868;&#x7684;&#x540D;&#x5B57;;</li>
+<li>&#x5143;&#x6570;&#x636E;&#x76EE;&#x5F55;&#x5B58;&#x50A8;schema&#x6587;&#x4EF6;, tablestatus&#x548C;dictinary&#x6587;&#x4EF6;&#xFF08;&#x5305;&#x62EC;.dict, .dictmeta&#x548C;.sortindex&#xFF09;, &#x5171;&#x6709;&#x4E09;&#x79CD;&#x7C7B;&#x578B;&#x7684;&#x5143;&#x6570;&#x636E;&#x6570;&#x636E;&#x4FE1;&#x606F;&#x6587;&#x4EF6;.</li>
+<li>&#x6570;&#x636E;&#x548C;&#x7D22;&#x5F15;&#x6587;&#x4EF6;&#x5B58;&#x50A8;&#x5728;&#x540D;&#x4E3A;Fact&#x7684;&#x76EE;&#x5F55;&#x4E0B;. Fact&#x76EE;&#x5F55;&#x5177;&#x6709;Part0&#x5206;&#x533A;&#x76EE;&#x5F55;, &#x5176;&#x4E2D;0&#x662F;&#x5206;&#x533A;&#x53F7;.</li>
+<li>Part0&#x76EE;&#x5F55;&#x4E0B;&#x6709;&#x4E00;&#x4E2A;Segment_0&#x76EE;&#x5F55;, &#x5176;&#x4E2D;0&#x662F;&#x6BB5;&#x53F7;.</li>
+<li>Segment_0&#x76EE;&#x5F55;&#x4E2D;&#x6709;&#x4E24;&#x79CD;&#x6587;&#x4EF6;&#x7C7B;&#x578B;, carbondata&#x548C;carbonindex.</li>
+</ol>
+<h2 id="File-Content-details"><a href="#File-Content-details" class="headerlink" title="File Content details"></a>File Content details</h2><p>&#x8FD9;&#x91CC;&#x91CD;&#x70B9;&#x4ECB;&#x7ECD;CarbonData file&#x548C;CarbonIndex&#x7684;&#x5177;&#x4F53;&#x6587;&#x4EF6;&#x683C;&#x5F0F;.</p>
+<h3 id="CarbonData-file-format"><a href="#CarbonData-file-format" class="headerlink" title="CarbonData file format"></a>CarbonData file format</h3><p>CarbonData file&#x5305;&#x542B;File Header, &#x4E00;&#x7CFB;&#x5217;Blocklet&#x4EE5;&#x53CA;File Footer. &#x4E0B;&#x9762;&#x8FDB;&#x884C;&#x7B80;&#x5355;&#x4ECB;&#x7ECD;.</p>
+<p align="center">
+    <img src="./Apache-Carbondata&#x521D;&#x63A2;/carbon_data_file_structure_new.png" width="80%">
+</p>
+
+<ol>
+<li>File Header: &#x5305;&#x542B;CarbonData file&#x7248;&#x672C;&#x53F7;, column schema&#x5217;&#x8868;&#x53CA;column schema&#x7684;&#x66F4;&#x65B0;&#x65F6;&#x95F4;;</li>
+<li>Blocklet: &#x8BE5;&#x6570;&#x636E;&#x5757;&#x662F;CarbonData&#x6587;&#x4EF6;&#x4E2D;&#x7684;&#x6570;&#x636E;&#x96C6;(&#x6700;&#x65B0;&#x7684;V3&#x683C;&#x5F0F;, &#x9ED8;&#x8BA4;&#x5927;&#x5C0F;&#x4E3A;64MB), &#x6BCF;&#x4E2A;&#x6570;&#x636E;&#x5757;&#x5305;&#x542B;&#x6BCF;&#x5217;&#x7684;ColumnChunk, &#x5E76;&#x4E14;ColumnChunk&#x53EF;&#x80FD;&#x5305;&#x542B;&#x4E00;&#x4E2A;&#x6216;&#x591A;&#x4E2A;Column Pages.</li>
+<li>File Footer&#x8BB0;&#x5F55;&#x6587;&#x4EF6;&#x5185;&#x7684;&#x6BCF;&#x4E2A;&#x78B3;&#x6570;&#x636E;, &#x6240;&#x6709;Blocklet&#x7684;&#x5206;&#x5E03;&#x4FE1;&#x606F;&#x4EE5;&#x53CA;&#x7EDF;&#x8BA1;&#x76F8;&#x5173;&#x7684;&#x5143;&#x6570;&#x636E;&#x4FE1;&#x606F;(&#x6700;&#x5C0F;&#x6700;&#x5927;&#x503C;, &#x5F00;&#x59CB;&#x952E;/&#x7ED3;&#x675F;&#x952E;). File Footer&#x5305;&#x542B;B-tree&#x7D22;&#x5F15;, &#x5728;&#x67E5;&#x8BE2;&#x65F6;&#x53EF;&#x5C06;&#x5176;&#x8BFB;&#x5165;&#x5185;&#x5B58;&#x6784;&#x5EFA;&#x7D22;&#x5F15;.</li>
+</ol>
+<h3 id="CarbonIndex-file-format"><a href="#CarbonIndex-file-format" class="headerlink" title="CarbonIndex file format"></a>CarbonIndex file format</h3><p>CarbonIndex file&#x662F;&#x901A;&#x8FC7;CarbonData file&#x4E2D;File Footer&#x7684;BlockletIndex&#x90E8;&#x5206;&#x6784;&#x5EFA;&#x7684;. CarbonIndex file&#x4E0E;CarbonData file&#x662F;&#x4E00;&#x5BF9;&#x591A;&#x5173;&#x7CFB;. &#x5728;&#x67E5;&#x8BE2;&#x65F6;&#x53EF;&#x901A;&#x8FC7;CarbonIndex file&#x6784;&#x5EFA;&#x7D22;&#x5F15;.</p>
+<p align="center">
+    <img src="./Apache-Carbondata&#x521D;&#x63A2;/2-4_1.png" width="80%">
+</p>
+
+<h1 id="Index"><a href="#Index" class="headerlink" title="Index"></a>Index</h1><p>&#x5173;&#x4E8E;&#x7D22;&#x5F15;&#x90E8;&#x5206;&#x6587;&#x6863;&#x6BD4;&#x8F83;&#x6DF7;&#x4E71;, &#x4E5F;&#x6709;&#x7684;&#x5730;&#x65B9;&#x53EB;DataMap, &#x4ECE;&#x4EE3;&#x7801;&#x6765;&#x770B;&#x5E94;&#x8BE5;&#x5DF2;&#x7ECF;&#x6539;&#x6210;Index&#x4E86;.</p>
+<h2 id="&#x73B0;&#x6709;&#x7D22;&#x5F15;"><a href="#&#x73B0;&#x6709;&#x7D22;&#x5F15;" class="headerlink" title="&#x73B0;&#x6709;&#x7D22;&#x5F15;"></a>&#x73B0;&#x6709;&#x7D22;&#x5F15;</h2><p>CarbonData&#x76EE;&#x524D;&#x6709;3&#x79CD;&#x7D22;&#x5F15;.</p>
+<ol>
+<li>secondary-index: &#x4E8C;&#x7EA7;&#x7D22;&#x5F15;&#x8868;&#x5C06;&#x5C0F;&#x5757;&#x4F5C;&#x4E3A;&#x7D22;&#x5F15;&#x4FDD;&#x5B58;, &#x5E76;&#x4F5C;&#x4E3A;&#x5B50;&#x8868;&#x8FDB;&#x884C;&#x7BA1;&#x7406;;</li>
+<li>lucene: &#x7528;&#x4E8E;&#x5BF9;&#x6587;&#x672C;&#x5217;&#x8FDB;&#x884C;&#x7D22;&#x5F15;;</li>
+<li>bloomfilter: &#x7528;&#x4E8E;&#x9AD8;&#x7EF4;&#x5217;&#x548C;&#x5730;&#x7406;&#x7A7A;&#x95F4;&#x5217;.</li>
+</ol>
+<h2 id="&#x5982;&#x4F55;&#x652F;&#x6301;&#x65F6;&#x7A7A;&#x6570;&#x636E;"><a href="#&#x5982;&#x4F55;&#x652F;&#x6301;&#x65F6;&#x7A7A;&#x6570;&#x636E;" class="headerlink" title="&#x5982;&#x4F55;&#x652F;&#x6301;&#x65F6;&#x7A7A;&#x6570;&#x636E;"></a>&#x5982;&#x4F55;&#x652F;&#x6301;&#x65F6;&#x7A7A;&#x6570;&#x636E;</h2><p>&#x4ECE;&#x4E0A;&#x8FF0;&#x7D22;&#x5F15;&#x6765;&#x770B;, CarbonData&#x96BE;&#x4EE5;&#x76F4;&#x63A5;&#x5B58;&#x50A8;&#x65F6;&#x7A7A;&#x6570;&#x636E;, &#x8981;&#x5728;CarbonData&#x4E0A;&#x652F;&#x6301;&#x65F6;&#x7A7A;&#x6570;&#x636E;&#x5B58;&#x50A8;, &#x53EF;&#x80FD;&#x6709;&#x4EE5;&#x4E0B;&#x51E0;&#x4E2A;&#x65B9;&#x9762;&#x9700;&#x8981;&#x5B8C;&#x6210;(&#x4E0D;&#x4E00;&#x5B9A;&#x5168;&#x90E8;&#x9700;&#x8981;).</p>
+<ol>
+<li>&#x57FA;&#x672C;&#x6570;&#x636E;&#x7C7B;&#x578B;&#x652F;&#x6301;: CarbonData&#x5BF9;&#x6570;&#x636E;&#x7684;&#x903B;&#x8F91;&#x7EC4;&#x7EC7;&#x4E0E;&#x5173;&#x7CFB;&#x578B;&#x6570;&#x636E;&#x5E93;&#x57FA;&#x672C;&#x4E00;&#x81F4;, &#x9700;&#x8981;&#x63D0;&#x524D;&#x5B9A;&#x4E49;&#x8868;&#x7684;&#x6A21;&#x5F0F;, &#x4E14;&#x6A21;&#x5F0F;&#x4E0D;&#x80FD;&#x52A8;&#x6001;&#x66F4;&#x6539;. &#x56E0;&#x6B64;&#x5982;&#x679C;&#x9700;&#x8981;&#x5B58;&#x50A8;&#x65F6;&#x7A7A;&#x6570;&#x636E;, &#x53EF;&#x80FD;&#x9700;&#x8981;&#x50CF;MySQL Spatial, PostGIS&#x4E00;&#x6837;&#x589E;&#x52A0;&#x57FA;&#x672C;&#x65F6;&#x7A7A;&#x51E0;&#x4F55;&#x7C7B;&#x578B;&#x7684;&#x652F;&#x6301;, &#x8FD9;&#x6837;&#x624D;&#x80FD;&#x4E3A;&#x65F6;&#x7A7A;&#x51E0;&#x4F55;&#x7C7B;&#x578B;&#x6240;&#x5728;&#x7684;&#x5217;&#x5EFA;&#x7ACB;&#x65F6;&#x7A7A;&#x7D22;&#x5F15;. &#x5F53;&#x7136;&#x5BF9;&#x57FA;&#x672C;&#x6570;&#x636E;&#x7C7B;&#x578B;&#x7684;&#x652F;&#x6301;&#x662F;&#x5173;&#x7CFB;&#x578B;&#x6570;&#x636E;&#x5E93;&#x7684;&#x601D;&#x7EF4;, &#x4E5F;&#x53EF;&#x4EE5;&#x6309;&#x952E;&#x503C;&#x5B58;&#x50A8;&#x7684;&#x601D;&#x7EF4;, &#x589E;&#x52A0;&#x4E00;&#x5217;&#x7528;&#x4E8E;&#x7F16;&#x7801;&#x65F6;&#x7A7A;&#x4FE1;&#x606F;(&#x5728;&#x8FD9;&#x91CC;&#x53EF;&#x80FD;&#x5B57;&#x7B26;&#x4E32;&#x6BD4;&#x8F83;&#x5408;&#x9002;), &#x8FD9;&#x6837;&#x76F4;&#x63A5;&#x5BF9;&#x7F16;&#x7801;&#x5217;&#x8FDB;&#x884C;&#x7D22;&#x5F15;&#x5373;&#x53EF;.</li>
+<li>&#x7D22;&#x5F15;&#x652F;&#x6301;: &#x76EE;&#x524D;&#x7684;&#x7D22;&#x5F15;&#x662F;&#x57FA;&#x4E8E;B-tree&#x7684;&#x7D22;&#x5F15;, &#x5982;&#x679C;&#x91C7;&#x7528;&#x589E;&#x52A0;&#x7F16;&#x7801;&#x5217;&#x7684;&#x65B9;&#x5F0F;&#x53EF;&#x80FD;&#x53EF;&#x4EE5;&#x76F4;&#x63A5;&#x4F7F;&#x7528;, &#x5982;&#x679C;&#x589E;&#x52A0;&#x57FA;&#x672C;&#x6570;&#x636E;&#x7C7B;&#x578B;, &#x90A3;&#x4E48;&#x8FD8;&#x9700;&#x8981;&#x6269;&#x5C55;&#x989D;&#x5916;&#x7684;&#x7D22;&#x5F15;.</li>
+<li>&#x4E0A;&#x5C42;&#x8BBF;&#x95EE;&#x652F;&#x6301;: &#x76EE;&#x524D;CarbonData&#x652F;&#x6301;&#x6BD4;&#x8F83;&#x5B8C;&#x5584;&#x7684;&#x8BBF;&#x95EE;&#x5F15;&#x64CE;&#x662F;Spark SQL, &#x8981;&#x589E;&#x52A0;&#x5BF9;&#x65F6;&#x7A7A;&#x6570;&#x636E;&#x7684;&#x8BBF;&#x95EE;, &#x53EF;&#x80FD;&#x8FD8;&#x9700;&#x8981;&#x5728;Spark SQL&#x5C42;&#x9762;&#x8FDB;&#x884C;&#x6269;&#x5C55;, &#x652F;&#x6301;&#x57FA;&#x672C;&#x7684;&#x65F6;&#x7A7A;&#x8303;&#x56F4;, &#x8FD1;&#x90BB;&#x67E5;&#x8BE2;.</li>
+</ol>
+<p>&#x6B64;&#x5916;, &#x5BF9;&#x4E8E;&#x7B80;&#x5355;&#x8981;&#x7D20;&#x5BF9;&#x8C61;, &#x4F7F;&#x7528;CarbonData&#x5B58;&#x50A8;&#x548C;&#x67E5;&#x8BE2;&#x7684;&#x5B9E;&#x73B0;&#x53EF;&#x80FD;&#x76F8;&#x5BF9;&#x7B80;&#x5355;. &#x5BF9;&#x4E8E;&#x79FB;&#x52A8;&#x5BF9;&#x8C61;&#x8F68;&#x8FF9;&#x7684;&#x5B58;&#x50A8;&#x4E5F;&#x9762;&#x4E34;&#x7740;&#x5728;NoSQL&#x4E2D;&#x7684;&#x95EE;&#x9898;, &#x7279;&#x522B;&#x662F;&#x5BF9;&#x4E8E;&#x9700;&#x8981;&#x5B9E;&#x65F6;&#x66F4;&#x65B0;&#x7684;&#x95EE;&#x9898;.</p>
+<h1 id="&#x603B;&#x7ED3;"><a href="#&#x603B;&#x7ED3;" class="headerlink" title="&#x603B;&#x7ED3;"></a>&#x603B;&#x7ED3;</h1><p>Apache CarbonData&#x5728;HDFS&#x4E0A;&#x8BBE;&#x8BA1;&#x4E86;&#x4E00;&#x79CD;&#x6587;&#x4EF6;&#x5B58;&#x50A8;&#x683C;&#x5F0F;(&#x7C7B;&#x4F3C;&#x4E8E;HBase&#x4E2D;&#x7684;HFile), &#x6B64;&#x5916;&#x5B83;&#x8FD8;&#x4E0E;&#x73B0;&#x6709;&#x7684;&#x6267;&#x884C;&#x5F15;&#x64CE;&#x8FDB;&#x884C;&#x4E86;&#x8026;&#x5408;, &#x5982;Spark SQL&#x7B49;, &#x975E;&#x5E38;&#x9002;&#x5408;&#x4F5C;&#x4E3A;OLAP&#x8FDB;&#x884C;&#x8D85;&#x5927;&#x89C4;&#x6A21;&#x7684;&#x67E5;&#x8BE2;&#x5206;&#x6790;, &#x4F46;&#x662F;&#x96BE;&#x4EE5;&#x5B9E;&#x73B0;&#x6BEB;&#x79D2;&#x7EA7;&#x54CD;&#x5E94;&#x7684;&#x70B9;&#x67E5;&#x8BE2;.</p>
+<p>&#x5728;CarbonData&#x4E0A;&#x589E;&#x52A0;&#x5BF9;&#x65F6;&#x7A7A;&#x6570;&#x636E;&#x7684;&#x5B58;&#x50A8;&#x66F4;&#x63A5;&#x8FD1;&#x4E8E;&#x5173;&#x7CFB;&#x578B;&#x6570;&#x636E;&#x5E93;&#x7684;&#x6A21;&#x5F0F;, &#x6240;&#x8981;&#x505A;&#x7684;&#x5DE5;&#x4F5C;&#x53EF;&#x80FD;&#x7C7B;&#x4F3C;&#x4E8E;PostGIS&#x4E4B;&#x4E8E;PostgreSQL.</p>
+</body></html>
+    
+    </div>
+    
+    
+</article>
+
+
+<div class="sharebox">
+    
+<div class="sharethis-inline-share-buttons"></div>
+<script type='text/javascript' src='//platform-api.sharethis.com/js/sharethis.js#property=5e63913dd0c39800126ea9e7&amp;product=inline-share-buttons&amp;cms=sop' async='async'></script>
+
+</div>
+
+
+
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    
+<div id="valine-thread"></div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src='//cdn.jsdelivr.net/gh/AshinWang/SimpleValine@v0.1/SimpleValine.min.js'></script>
+<script>
+    new Valine({
+        el: '#valine-thread',
+        appId: 'yH4pXH6SVqWNsdXcF5TeQVmD-MdYXbMMI',
+        appKey: '1OIsff76fPfsFsiyhNUoJ0o5',
+        notify: true,
+        verify: false,
+        avatar: '',
+        placeholder: 'If you have any questions, please comment here!',
+        meta: ['nick', 'mail'],
+        visitor: true,
+        lang: 'en'
+    })
+</script>
+
+
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019-2020 Liebing Yu&nbsp;. 
+                <span id="busuanzi_container_site_uv"><span id="busuanzi_value_site_uv"></span> visitors, </span>
+                <span id="busuanzi_container_site_pv">visited <span id="busuanzi_value_site_pv"></span> times</span>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="xcTorres" href="https://xctorres.github.io/" target="_blank" rel="noopener">
+                    
+                    xcTorres
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Honly" href="https://guanhonly.github.io/" target="_blank" rel="noopener">
+                    
+                    Honly
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/" target="_blank" rel="noopener">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("en-AU");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+
+<script src="/js/script.js"></script>
+
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+    
+</body>
+</html>
