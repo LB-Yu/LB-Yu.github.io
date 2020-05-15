@@ -18,18 +18,18 @@
 
 
 
-    <meta name="description" content="&amp;#x5728;&amp;#x8FD9;&amp;#x7BC7;&amp;#x535A;&amp;#x6587;&amp;#x4E2D;, &amp;#x6211;&amp;#x4EEC;&amp;#x5C06;&amp;#x6DF1;&amp;#x5165;&amp;#x63A2;&amp;#x7D22;Apache HBase&amp;#x7684;&amp;#x67B6;&amp;#x6784;, &amp;#x5176;&amp;#x4E2D;&amp;#x5305;&amp;#x542B;HBase Master, RegionServ">
+    <meta name="description" content="&amp;#x672C;&amp;#x6587;&amp;#x4ECD;&amp;#x5728;&amp;#x66F4;&amp;#x65B0;&amp;#x4E2D;! &amp;#x5728;&amp;#x8FD9;&amp;#x7BC7;&amp;#x535A;&amp;#x6587;&amp;#x4E2D;, &amp;#x6211;&amp;#x4EEC;&amp;#x5C06;&amp;#x6DF1;&amp;#x5165;&amp;#x63A2;&amp;#x7D22;Apache HBase&amp;#x7684;&amp;#x67B6;&amp;#x6784;">
 <meta property="og:type" content="article">
 <meta property="og:title" content="HBase架构深入剖析">
 <meta property="og:url" content="http://yoursite.com/2020/03/16/HBase%E6%9E%B6%E6%9E%84%E6%B7%B1%E5%85%A5%E5%89%96%E6%9E%90/index.html">
 <meta property="og:site_name" content="Liebing Yu&#39;s Homepage">
-<meta property="og:description" content="&amp;#x5728;&amp;#x8FD9;&amp;#x7BC7;&amp;#x535A;&amp;#x6587;&amp;#x4E2D;, &amp;#x6211;&amp;#x4EEC;&amp;#x5C06;&amp;#x6DF1;&amp;#x5165;&amp;#x63A2;&amp;#x7D22;Apache HBase&amp;#x7684;&amp;#x67B6;&amp;#x6784;, &amp;#x5176;&amp;#x4E2D;&amp;#x5305;&amp;#x542B;HBase Master, RegionServ">
+<meta property="og:description" content="&amp;#x672C;&amp;#x6587;&amp;#x4ECD;&amp;#x5728;&amp;#x66F4;&amp;#x65B0;&amp;#x4E2D;! &amp;#x5728;&amp;#x8FD9;&amp;#x7BC7;&amp;#x535A;&amp;#x6587;&amp;#x4E2D;, &amp;#x6211;&amp;#x4EEC;&amp;#x5C06;&amp;#x6DF1;&amp;#x5165;&amp;#x63A2;&amp;#x7D22;Apache HBase&amp;#x7684;&amp;#x67B6;&amp;#x6784;">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://yoursite.com/2020/03/16/HBase%E6%9E%B6%E6%9E%84%E6%B7%B1%E5%85%A5%E5%89%96%E6%9E%90/hbase_master.png">
 <meta property="og:image" content="http://yoursite.com/2020/03/16/HBase%E6%9E%B6%E6%9E%84%E6%B7%B1%E5%85%A5%E5%89%96%E6%9E%90/zookeeper.png">
 <meta property="og:image" content="http://yoursite.com/2020/03/16/HBase%E6%9E%B6%E6%9E%84%E6%B7%B1%E5%85%A5%E5%89%96%E6%9E%90/catalog_table.png">
 <meta property="article:published_time" content="2020-03-16T12:21:32.000Z">
-<meta property="article:modified_time" content="2020-03-24T13:00:29.024Z">
+<meta property="article:modified_time" content="2020-05-12T14:09:25.008Z">
 <meta property="article:author" content="Liebing Yu">
 <meta property="article:tag" content="Database">
 <meta property="article:tag" content="HBase">
@@ -100,7 +100,7 @@
                href="/categories">Categories</a>
             
             <a class="navbar-item "
-               href="/about">About</a>
+               href="/about">Biography</a>
             
         </div>
         
@@ -189,13 +189,14 @@
         <span class="column is-narrow">
             
             
-            13 minutes read (About 1923 words)
+            13 minutes read (About 1930 words)
         </span>
         
     </div>
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <html><head></head><body><p>&#x5728;&#x8FD9;&#x7BC7;&#x535A;&#x6587;&#x4E2D;, &#x6211;&#x4EEC;&#x5C06;&#x6DF1;&#x5165;&#x63A2;&#x7D22;<a href="https://hbase.apache.org/" target="_blank" rel="noopener">Apache HBase</a>&#x7684;&#x67B6;&#x6784;, &#x5176;&#x4E2D;&#x5305;&#x542B;HBase Master, RegionServer&#x7684;&#x8FD0;&#x884C;&#x673A;&#x5236;, &#x8BFB;/&#x5199;&#x8DEF;&#x5F84;, HDFS&#x6570;&#x636E;&#x590D;&#x5236;, HBase&#x5D29;&#x6E83;&#x6062;&#x590D;&#x7B49;&#x5185;&#x5BB9;.<br><a id="more"></a></p>
+        <html><head></head><body><p><strong>&#x672C;&#x6587;&#x4ECD;&#x5728;&#x66F4;&#x65B0;&#x4E2D;!</strong></p>
+<p>&#x5728;&#x8FD9;&#x7BC7;&#x535A;&#x6587;&#x4E2D;, &#x6211;&#x4EEC;&#x5C06;&#x6DF1;&#x5165;&#x63A2;&#x7D22;<a href="https://hbase.apache.org/" target="_blank" rel="noopener">Apache HBase</a>&#x7684;&#x67B6;&#x6784;, &#x5176;&#x4E2D;&#x5305;&#x542B;HBase Master, RegionServer&#x7684;&#x8FD0;&#x884C;&#x673A;&#x5236;, &#x8BFB;/&#x5199;&#x8DEF;&#x5F84;, HDFS&#x6570;&#x636E;&#x590D;&#x5236;, HBase&#x5D29;&#x6E83;&#x6062;&#x590D;&#x7B49;&#x5185;&#x5BB9;.<br><a id="more"></a></p>
 <h2 id="HBase&#x67B6;&#x6784;&#x7EC4;&#x6210;"><a href="#HBase&#x67B6;&#x6784;&#x7EC4;&#x6210;" class="headerlink" title="HBase&#x67B6;&#x6784;&#x7EC4;&#x6210;"></a>HBase&#x67B6;&#x6784;&#x7EC4;&#x6210;</h2><p>HBase&#x96C6;&#x7FA4;&#x5C5E;&#x4E8E;&#x4E3B;&#x4ECE;&#x67B6;&#x6784;, &#x96C6;&#x7FA4;&#x4E2D;&#x4E3B;&#x8981;&#x5B58;&#x5728;&#x4E09;&#x79CD;&#x4E0E;HBase&#x670D;&#x52A1;&#x76F8;&#x5173;&#x7684;&#x8FDB;&#x7A0B;. <strong>HBase Master</strong>&#x8FDB;&#x7A0B;&#x7528;&#x4E8E;region&#x5206;&#x914D;&#x53CA;DDL(&#x521B;&#x5EFA;, &#x5220;&#x9664;, &#x4FEE;&#x6539;&#x8868;)&#x64CD;&#x4F5C;. <strong>RegionServer</strong>&#x8FDB;&#x7A0B;&#x8D1F;&#x8D23;DML&#x64CD;&#x4F5C;, &#x5BA2;&#x6237;&#x7AEF;&#x8BBF;&#x95EE;&#x6570;&#x636E;&#x65F6;&#x5C06;&#x76F4;&#x63A5;&#x4E0E;RegionServer&#x901A;&#x4FE1;. <strong>Zookeeper</strong>&#x8FDB;&#x7A0B;&#x7528;&#x4E8E;&#x7EF4;&#x62A4;&#x96C6;&#x7FA4;&#x4E2D;&#x8282;&#x70B9;&#x7684;&#x6D3B;&#x52A8;&#x72B6;&#x6001;.</p>
 <p>&#x7531;&#x4E8E;HBase&#x5C06;&#x6570;&#x636E;&#x5B58;&#x50A8;&#x4E8E;HDFS&#x4E2D;, HBase&#x4E2D;&#x7684;&#x8FDB;&#x7A0B;&#x89D2;&#x8272;&#x4E0E;Hadoop&#x4E2D;&#x7684;&#x8FDB;&#x7A0B;&#x89D2;&#x8272;&#x5B58;&#x5728;&#x4E00;&#x5B9A;&#x7684;&#x5BF9;&#x5E94;&#x5173;&#x7CFB;. HBase&#x7684;RegionServer&#x901A;&#x5E38;&#x4F4D;&#x4E8E;Hadoop&#x7684;DataNode&#x4E0A;, RegionServer&#x6240;&#x7EF4;&#x62A4;&#x7684;region&#x4E2D;&#x7684;HFile&#x901A;&#x5E38;&#x5B58;&#x50A8;&#x5728;&#x5176;&#x6240;&#x5728;&#x7684;DataNode&#x4E0A;, &#x8FD9;&#x6837;&#x53EF;&#x4EE5;&#x4F7F;&#x6570;&#x636E;&#x672C;&#x5730;&#x5316;. &#x4F46;&#x662F;, &#x5F53;region&#x88AB;&#x79FB;&#x52A8;&#x540E;, &#x5728;region&#x53D1;&#x751F;compaction&#x4E4B;&#x524D;RegionServer&#x90FD;&#x4E0D;&#x4F1A;&#x5C06;&#x5176;&#x672C;&#x5730;&#x5316;.</p>
 <p>&#x4E0B;&#x9762;&#x672C;&#x6587;&#x5C06;&#x5C42;&#x5C42;&#x6DF1;&#x5165;, &#x9010;&#x4E00;&#x63A2;&#x8BA8;HBase&#x4E2D;&#x4E09;&#x79CD;&#x8FDB;&#x7A0B;&#x7684;&#x4F5C;&#x7528;&#x53CA;&#x8FD0;&#x884C;&#x673A;&#x5236;, &#x6700;&#x540E;&#x5BF9;HBase&#x4E2D;&#x8868;&#x7684;&#x6700;&#x5C0F;&#x5355;&#x5143;&#x5373;region&#x7684;&#x7EC4;&#x6210;&#x8FDB;&#x884C;&#x5256;&#x6790;.</p>
@@ -297,7 +298,7 @@
     <div class="columns is-mobile is-multiline article-nav">
         <span class="column is-12-mobile is-half-desktop  article-nav-prev">
             
-            <a href="/2020/04/22/%E6%B7%B1%E5%85%A5%E6%80%9D%E8%80%83Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA%E5%9F%9F/">深入思考Java虚拟机运行时数据区域</a>
+            <a href="/2020/04/22/%E6%B7%B1%E5%85%A5%E6%8E%A2%E7%B4%A2Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA%E5%9F%9F/">深入探索Java虚拟机运行时数据区域</a>
             
         </span>
         <span class="column is-12-mobile is-half-desktop  article-nav-next">
@@ -349,7 +350,7 @@
     <div class="container">
         <div class="columns content">
             <div class="column is-narrow has-text-centered">
-                &copy; 2019-2020 Liebing Yu&nbsp;. 
+                &copy; 2018-2020 Liebing Yu&nbsp;. 
                 <span id="busuanzi_container_site_uv"><span id="busuanzi_value_site_uv"></span> visitors, </span>
                 <span id="busuanzi_container_site_pv">visited <span id="busuanzi_value_site_pv"></span> times</span>
             </div>
