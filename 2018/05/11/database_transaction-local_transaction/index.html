@@ -2,7 +2,7 @@
 <html class="has-navbar-fixed-top">
 <head>
     <meta charset="utf-8">
-<title>数据库事务系列-本地事务模型基础 - Liebing Yu&#39;s Homepage</title>
+<title>数据库事务系列-本地事务模型基础 - Liebing&#39;s Homepage</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
@@ -21,22 +21,22 @@
     <meta name="description" content="&amp;#x4E8B;&amp;#x52A1;, &amp;#x6216;&amp;#x8005;&amp;#x66F4;&amp;#x4E25;&amp;#x683C;&amp;#x5730;&amp;#x8BF4;&amp;#x6570;&amp;#x636E;&amp;#x5E93;&amp;#x4E8B;&amp;#x52A1;, &amp;#x53EF;&amp;#x80FD;&amp;#x662F;&amp;#x6570;&amp;#x636E;&amp;#x5E93;&amp;#x7406;&amp;#x8BBA;&amp;#x4E2D;&amp;#x6700;&amp;#x9">
 <meta property="og:type" content="article">
 <meta property="og:title" content="数据库事务系列-本地事务模型基础">
-<meta property="og:url" content="http://yoursite.com/2018/05/11/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BA%8B%E5%8A%A1%E7%B3%BB%E5%88%97-%E6%9C%AC%E5%9C%B0%E4%BA%8B%E5%8A%A1%E6%A8%A1%E5%9E%8B%E5%9F%BA%E7%A1%80/index.html">
-<meta property="og:site_name" content="Liebing Yu&#39;s Homepage">
+<meta property="og:url" content="http://yoursite.com/2018/05/11/database_transaction-local_transaction/index.html">
+<meta property="og:site_name" content="Liebing&#39;s Homepage">
 <meta property="og:description" content="&amp;#x4E8B;&amp;#x52A1;, &amp;#x6216;&amp;#x8005;&amp;#x66F4;&amp;#x4E25;&amp;#x683C;&amp;#x5730;&amp;#x8BF4;&amp;#x6570;&amp;#x636E;&amp;#x5E93;&amp;#x4E8B;&amp;#x52A1;, &amp;#x53EF;&amp;#x80FD;&amp;#x662F;&amp;#x6570;&amp;#x636E;&amp;#x5E93;&amp;#x7406;&amp;#x8BBA;&amp;#x4E2D;&amp;#x6700;&amp;#x9">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://yoursite.com/2018/05/11/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BA%8B%E5%8A%A1%E7%B3%BB%E5%88%97-%E6%9C%AC%E5%9C%B0%E4%BA%8B%E5%8A%A1%E6%A8%A1%E5%9E%8B%E5%9F%BA%E7%A1%80/1111.png">
-<meta property="og:image" content="http://yoursite.com/2018/05/11/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BA%8B%E5%8A%A1%E7%B3%BB%E5%88%97-%E6%9C%AC%E5%9C%B0%E4%BA%8B%E5%8A%A1%E6%A8%A1%E5%9E%8B%E5%9F%BA%E7%A1%80/1112.png">
-<meta property="og:image" content="http://yoursite.com/2018/05/11/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BA%8B%E5%8A%A1%E7%B3%BB%E5%88%97-%E6%9C%AC%E5%9C%B0%E4%BA%8B%E5%8A%A1%E6%A8%A1%E5%9E%8B%E5%9F%BA%E7%A1%80/1113.png">
-<meta property="og:image" content="http://yoursite.com/2018/05/11/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BA%8B%E5%8A%A1%E7%B3%BB%E5%88%97-%E6%9C%AC%E5%9C%B0%E4%BA%8B%E5%8A%A1%E6%A8%A1%E5%9E%8B%E5%9F%BA%E7%A1%80/1114.png">
-<meta property="og:image" content="http://yoursite.com/2018/05/11/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BA%8B%E5%8A%A1%E7%B3%BB%E5%88%97-%E6%9C%AC%E5%9C%B0%E4%BA%8B%E5%8A%A1%E6%A8%A1%E5%9E%8B%E5%9F%BA%E7%A1%80/1115.png">
+<meta property="og:image" content="http://yoursite.com/2018/05/11/database_transaction-local_transaction/1111.png">
+<meta property="og:image" content="http://yoursite.com/2018/05/11/database_transaction-local_transaction/1112.png">
+<meta property="og:image" content="http://yoursite.com/2018/05/11/database_transaction-local_transaction/1113.png">
+<meta property="og:image" content="http://yoursite.com/2018/05/11/database_transaction-local_transaction/1114.png">
+<meta property="og:image" content="http://yoursite.com/2018/05/11/database_transaction-local_transaction/1115.png">
 <meta property="article:published_time" content="2018-05-11T14:32:57.000Z">
-<meta property="article:modified_time" content="2020-12-23T13:40:12.034Z">
+<meta property="article:modified_time" content="2021-07-20T14:54:50.223Z">
 <meta property="article:author" content="Liebing Yu">
 <meta property="article:tag" content="Transaction">
 <meta property="article:tag" content="Database">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://yoursite.com/2018/05/11/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BA%8B%E5%8A%A1%E7%B3%BB%E5%88%97-%E6%9C%AC%E5%9C%B0%E4%BA%8B%E5%8A%A1%E6%A8%A1%E5%9E%8B%E5%9F%BA%E7%A1%80/1111.png">
+<meta name="twitter:image" content="http://yoursite.com/2018/05/11/database_transaction-local_transaction/1111.png">
 
 
 
