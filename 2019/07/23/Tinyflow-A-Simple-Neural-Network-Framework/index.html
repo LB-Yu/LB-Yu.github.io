@@ -28,7 +28,7 @@
 <meta property="og:image" content="http://yoursite.com/2019/07/23/Tinyflow-A-Simple-Neural-Network-Framework/arch.png">
 <meta property="og:image" content="http://yoursite.com/2019/07/23/Tinyflow-A-Simple-Neural-Network-Framework/1d_kernel.png">
 <meta property="article:published_time" content="2019-07-23T04:00:00.000Z">
-<meta property="article:modified_time" content="2020-07-06T14:59:15.945Z">
+<meta property="article:modified_time" content="2021-12-21T11:48:48.436Z">
 <meta property="article:author" content="Liebing">
 <meta property="article:tag" content="AI System">
 <meta name="twitter:card" content="summary">
@@ -224,39 +224,42 @@
 <p>The Kernel of Softmax OP is relatively complex. We will use a CUDA thread to process a row of data in the matrix.<br></p><figure class="highlight c hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-function">__global__ <span class="hljs-keyword">void</span> <span class="hljs-title">matrix_softmax_kernel</span><span class="hljs-params">(<span class="hljs-keyword">int</span> nRow, <span class="hljs-keyword">int</span> nCol, <span class="hljs-keyword">float</span>* inputArr, <span class="hljs-keyword">float</span>* outputArr)</span> </span>{</span><br><span class="line">    <span class="hljs-keyword">int</span> y = blockIdx.x * blockDim.x + threadIdx.x;</span><br><span class="line">    <span class="hljs-keyword">if</span> (y &gt;= nRow) <span class="hljs-keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="hljs-keyword">float</span>* input = inputArr + y * nCol;</span><br><span class="line">    <span class="hljs-keyword">float</span>* output = outputArr + y * nCol;</span><br><span class="line"></span><br><span class="line">    <span class="hljs-keyword">float</span> maxval = *input;</span><br><span class="line">    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">1</span>; i &lt; nCol; ++i) {</span><br><span class="line">        maxval = <span class="hljs-built_in">max</span>(input[i], maxval);</span><br><span class="line">    }</span><br><span class="line">    <span class="hljs-keyword">float</span> sum = <span class="hljs-number">0</span>;</span><br><span class="line">    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; nCol; ++i) {</span><br><span class="line">        sum += expf(input[i] - maxval);</span><br><span class="line">    }</span><br><span class="line">    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; nCol; ++i) {</span><br><span class="line">        output[i] = expf(input[i] - maxval) / sum;</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><p></p>
 <h1 id="MLP-Model"><a href="#MLP-Model" class="headerlink" title="MLP Model"></a>MLP Model</h1><p>Based on the automatic differentiation framework we built and the OP with GPU acceleration, we can quickly build a MLP model. Below is the code how to build a 3-layer model.<br></p><figure class="highlight python hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">W1 = ad.Variable(name=<span class="hljs-string">&quot;W1&quot;</span>)</span><br><span class="line">W2 = ad.Variable(name=<span class="hljs-string">&quot;W2&quot;</span>)</span><br><span class="line">W3 = ad.Variable(name=<span class="hljs-string">&quot;W3&quot;</span>)</span><br><span class="line">b1 = ad.Variable(name=<span class="hljs-string">&quot;b1&quot;</span>)</span><br><span class="line">b2 = ad.Variable(name=<span class="hljs-string">&quot;b2&quot;</span>)</span><br><span class="line">b3 = ad.Variable(name=<span class="hljs-string">&quot;b3&quot;</span>)</span><br><span class="line">X = ad.Variable(name=<span class="hljs-string">&quot;X&quot;</span>)</span><br><span class="line">y_ = ad.Variable(name=<span class="hljs-string">&quot;y_&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment"># relu(X W1+b1)</span></span><br><span class="line">z1 = ad.matmul_op(X, W1)</span><br><span class="line">z2 = z1 + ad.broadcastto_op(b1, z1)</span><br><span class="line">z3 = ad.relu_op(z2)</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment"># relu(z3 W2+b2)</span></span><br><span class="line">z4 = ad.matmul_op(z3, W2)</span><br><span class="line">z5 = z4 + ad.broadcastto_op(b2, z4)</span><br><span class="line">z6 = ad.relu_op(z5)</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment"># softmax(z5 W2+b2)</span></span><br><span class="line">z7 = ad.matmul_op(z6, W3)</span><br><span class="line">y = z7 + ad.broadcastto_op(b3, z7)</span><br><span class="line"></span><br><span class="line">loss = ad.softmaxcrossentropy_op(y, y_)</span><br><span class="line"></span><br><span class="line">grad_W1, grad_W2, grad_W3, grad_b1, grad_b2, grad_b3 = ad.gradients(</span><br><span class="line">    loss, [W1, W2, W3, b1, b2, b3])</span><br><span class="line">executor = ad.Executor(</span><br><span class="line">    [loss, grad_W1, grad_W2, grad_W3, grad_b1, grad_b2, grad_b3, y],</span><br><span class="line">    ctx=executor_ctx)</span><br></pre></td></tr></tbody></table></figure><p></p>
 <h1 id="MLP-Model-for-MNIST"><a href="#MLP-Model-for-MNIST" class="headerlink" title="MLP Model for MNIST"></a>MLP Model for MNIST</h1><p>After we implement all the GPU operation we can see the significant performance gain. Below is the training result I ran on my personal computer with a single Quadro K620 GPU with 2G global memory.</p>
-<table align="center">
-    <tbody><tr>
-        <th style="border:2px solid #000000"></th>
-        <th style="border:2px solid #000000">Softmax Regression</th>
-        <th style="border:2px solid #000000">Multi-layer NN</th>
-    </tr>
-    <tr>
-        <th style="border:2px solid #000000">Epoch</th>
-        <td align="center" style="border:2px solid #000000">10</td>
-        <td align="center" style="border:2px solid #000000">10</td>
-    </tr>
-    <tr>
-        <th style="border:2px solid #000000">Numpy Accuracy</th>
-        <td align="center" style="border:2px solid #000000"> 92.23% </td>
-        <td align="center" style="border:2px solid #000000"> 97.17% </td>
-    </tr>
-    <tr>
-        <th style="border:2px solid #000000">Numpy Time</th>
-        <td align="center" style="border:2px solid #000000"> 2.0056s </td>
-        <td align="center" style="border:2px solid #000000"> 7.4211s </td>
-    </tr>
-    <tr>
-        <th style="border:2px solid #000000">GPU Accuracy</th>
-        <td align="center" style="border:2px solid #000000"> 92.23% </td>
-        <td align="center" style="border:2px solid #000000"> 97.09% </td>
-    </tr>
-    <tr>
-        <th style="border:2px solid #000000">GPU Time</th>
-        <td align="center" style="border:2px solid #000000"> 1.5424s </td>
-        <td align="center" style="border:2px solid #000000"> 2.9890s </td>
-    </tr>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Softmax Regression</th>
+<th>Multi-layer NN</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Epoch</td>
+<td>10</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Numpy Accuracy</td>
+<td>92.23%</td>
+<td>97.17%</td>
+</tr>
+<tr>
+<td>Numpy Time</td>
+<td>2.0056s</td>
+<td>7.4211s</td>
+</tr>
+<tr>
+<td>GPU Accuracy</td>
+<td>92.23%</td>
+<td>97.09%</td>
+</tr>
+<tr>
+<td>GPU Time</td>
+<td>1.5424s</td>
+<td>2.9890s</td>
+</tr>
 </tbody></table>
-We can find that GPU training can improve the efficiency of training, and the more complex the model is, the more obvious the effect is.</body></html>
+<p>We can find that GPU training can improve the efficiency of training, and the more complex the model is, the more obvious the effect is.</p>
+</body></html>
     
     </div>
     

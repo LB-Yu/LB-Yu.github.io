@@ -28,7 +28,7 @@
 <meta property="og:image" content="http://yoursite.com/2019/07/01/Logistic-Regression/sigmoid.png">
 <meta property="og:image" content="http://yoursite.com/2019/07/01/Logistic-Regression/forward.png">
 <meta property="article:published_time" content="2019-07-01T04:00:00.000Z">
-<meta property="article:modified_time" content="2020-07-06T14:56:28.591Z">
+<meta property="article:modified_time" content="2021-12-21T11:41:40.265Z">
 <meta property="article:author" content="Liebing">
 <meta property="article:tag" content="Algorithm">
 <meta name="twitter:card" content="summary">
@@ -245,29 +245,30 @@ $$ \frac{\partial z}{\partial w}=x    \ \ \ \     \frac{\partial z}{\partial b}=
 </ul>
 <h1 id="Implementation"><a href="#Implementation" class="headerlink" title="Implementation"></a>Implementation</h1><p>With the existing library we can implement LR very conveniently. But here we use pure python with numpy to achieve deeper understanding of LR. In order to follow the habit we use the same interface as sklearn.<br>With numpy we can easily implement sigmoid function.<br></p><figure class="highlight python hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">sigmoid</span><span class="hljs-params">(x)</span>:</span></span><br><span class="line">    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span> / (<span class="hljs-number">1</span> + np.exp(-x))</span><br></pre></td></tr></tbody></table></figure><br>The LR model can also be quickly implemented based on the above derivation.<br><figure class="highlight python hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">LogisticRegression</span>:</span></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self, learning_rate=<span class="hljs-number">0.01</span>, max_iter=<span class="hljs-number">200</span>)</span>:</span></span><br><span class="line">        self.learning_rate = learning_rate</span><br><span class="line">        self.max_iter = max_iter</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">fit</span><span class="hljs-params">(self, X, Y)</span>:</span></span><br><span class="line">        m, n = X.shape</span><br><span class="line">        self.w_ = np.zeros([n, <span class="hljs-number">1</span>])</span><br><span class="line">        self.b_ = <span class="hljs-number">0</span></span><br><span class="line">        self.cost_ = []</span><br><span class="line"></span><br><span class="line">        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(self.max_iter):</span><br><span class="line">            Y_hat = self.predict(X)</span><br><span class="line">            cost = -np.sum(Y * np.log(Y_hat) + (<span class="hljs-number">1</span> - Y) * np.log(<span class="hljs-number">1</span> - Y_hat)) / m</span><br><span class="line">            <span class="hljs-keyword">if</span> i != <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> i % <span class="hljs-number">10</span> == <span class="hljs-number">0</span>:</span><br><span class="line">                print(<span class="hljs-string">&quot;Step: &quot;</span> + str(i) + <span class="hljs-string">&quot;, Cost: &quot;</span> + str(cost))</span><br><span class="line">            self.cost_.append(cost)</span><br><span class="line">            self.w_ -= self.learning_rate * np.dot(X.T, Y_hat - Y) / m</span><br><span class="line">            self.b_ -= self.learning_rate * np.sum(Y_hat - Y) / m</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">predict</span><span class="hljs-params">(self, X)</span>:</span></span><br><span class="line">        <span class="hljs-keyword">return</span> sigmoid(np.dot(X, self.w_) + self.b_)</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">score</span><span class="hljs-params">(self, X, Y)</span>:</span></span><br><span class="line">        Y_hat = self.predict(X).reshape(<span class="hljs-number">-1</span>)</span><br><span class="line">        Y_predict = np.array([<span class="hljs-number">1</span> <span class="hljs-keyword">if</span> y &gt;= <span class="hljs-number">0.5</span> <span class="hljs-keyword">else</span> <span class="hljs-number">0</span> <span class="hljs-keyword">for</span> y <span class="hljs-keyword">in</span> Y_hat])</span><br><span class="line">        false_num = np.sum(Y_predict == Y.reshape(<span class="hljs-number">-1</span>))</span><br><span class="line">        <span class="hljs-keyword">return</span> false_num / len(X)</span><br></pre></td></tr></tbody></table></figure><p></p>
 <h1 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h1><p>In order to verify the correctness of the implementation. I experimented on the irsi dataset and the mnist dataset. The parameters and results of the experiment are as follows:</p>
-<table align="center">
-    <tbody><tr>
-        <th style="border:2px solid #000000"></th>
-        <th style="border:2px solid #000000">iris</th>
-        <th style="border:2px solid #000000">mnist</th>
-    </tr>
-    <tr>
-        <th style="border:2px solid #000000">learnig rate</th>
-        <td align="center" style="border:2px solid #000000">0.1</td>
-        <td align="center" style="border:2px solid #000000">0.01</td>
-    </tr>
-    <tr>
-        <th style="border:2px solid #000000">max iterate</th>
-        <td align="center" style="border:2px solid #000000"> 100 </td>
-        <td align="center" style="border:2px solid #000000"> 300 </td>
-    </tr>
-    <tr>
-        <th style="border:2px solid #000000">test accuracy</th>
-        <td align="center" style="border:2px solid #000000"> 100% </td>
-        <td align="center" style="border:2px solid #000000"> 99.86% </td>
-    </tr>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>iris</th>
+<th>mnist</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>learnig rate</td>
+<td>0.1</td>
+<td>0.01</td>
+</tr>
+<tr>
+<td>max iterate</td>
+<td>100</td>
+<td>300</td>
+</tr>
+<tr>
+<td>test accuracy</td>
+<td>100%</td>
+<td>99.86%</td>
+</tr>
 </tbody></table>
-
 <p>You can find the all the experimental code <a href="https://github.com/LB-Yu/publication/tree/master/lr" target="_blank" rel="noopener">here</a> and reproduce the experimental results.</p>
 </body></html>
     
