@@ -3,7 +3,7 @@ body, button, input, select, textarea {
   font-family: "Georgia", "Noto Serif", "STZhongsong", "Microsoft YaHei", serif; }
 
 a.tag.article-tag {
-  font-size: 0.9rem;
+  font-size: 1.06rem;
   text-decoration: none; }
 
 @media screen and (min-width: 1024px) {
@@ -52,12 +52,13 @@ a.tag.article-tag {
     margin: 0 0.3rem; }
 
 .article .article-entry {
+  font-size: 1.06rem;
   margin-bottom: 3rem; }
   .article .article-entry h1, .article .article-entry h2, .article .article-entry h3, .article .article-entry h4, .article .article-entry h5, .article .article-entry h6 {
     cursor: pointer;
     position: relative; }
     .article .article-entry h1:hover:before, .article .article-entry h2:hover:before, .article .article-entry h3:hover:before, .article .article-entry h4:hover:before, .article .article-entry h5:hover:before, .article .article-entry h6:hover:before {
-      content: '#';
+      content: '';
       position: absolute;
       right: 100%; }
   .article .article-entry a {
@@ -216,7 +217,8 @@ a.tag.article-tag {
     font-size: .9rem;
     color: darkgray; }
   .archive .article h6 {
-    margin: 0; }
+    margin: 0;
+    font-size: 1.06rem; }
     .archive .article h6 a {
       color: inherit;
       border-bottom: 1px dotted transparent; }
@@ -224,7 +226,7 @@ a.tag.article-tag {
         border-bottom-color: darkgray; }
 
 .footer {
-  font-size: .9rem;
+  font-size: 1.06rem;
   background: transparent; }
   .footer .content {
     padding-top: 2rem;
@@ -298,8 +300,9 @@ a.tag.article-tag {
         background: #f7f7f7; } }
 
 code, pre {
-  font-size: 0.85rem;
-  font-family: "Source Code Pro", monospace, "Microsoft YaHei"; }
+  font-size: 0.95rem;
+  font-family: "Source Code Pro", monospace, "Microsoft YaHei";
+  color: #30303c; }
 
 figure.highlight {
   padding: 0;
