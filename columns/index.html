@@ -18,20 +18,22 @@
 
 
 
-    <meta name="description" content=".newspaper {         column-count: 3;         column-gap: 40px;     }      .card {         &#x2F;* width: 300px;         height: 180px; *&#x2F;         border: 10px solid #FFF;         &#x2F;* border-bottom: 0">
+    <meta name="description" content=".card {   width: 250px;   box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.15), 0 6px 10px 0 rgba(0, 0, 0, 0.19);&#x2F;&#x2F;设置两层阴影   text-align: center;   vertical-align: middle;   border-radius: 5px; }      .card:hov">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Columns">
 <meta property="og:url" content="http://yoursite.com/columns/index.html">
 <meta property="og:site_name" content="Liebing&#39;s Blog">
-<meta property="og:description" content=".newspaper {         column-count: 3;         column-gap: 40px;     }      .card {         &#x2F;* width: 300px;         height: 180px; *&#x2F;         border: 10px solid #FFF;         &#x2F;* border-bottom: 0">
+<meta property="og:description" content=".card {   width: 250px;   box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.15), 0 6px 10px 0 rgba(0, 0, 0, 0.19);&#x2F;&#x2F;设置两层阴影   text-align: center;   vertical-align: middle;   border-radius: 5px; }      .card:hov">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://yoursite.com/columns/img/glink-column.jpg">
-<meta property="article:published_time" content="2022-04-21T10:38:19.149Z">
-<meta property="article:modified_time" content="2022-04-21T10:38:19.149Z">
+<meta property="og:image" content="http://yoursite.com/columns/img/a.jpg">
+<meta property="og:image" content="http://yoursite.com/columns/img/b.jpeg">
+<meta property="og:image" content="http://yoursite.com/columns/img/c.jpg">
+<meta property="article:published_time" content="2022-05-07T02:22:47.183Z">
+<meta property="article:modified_time" content="2022-05-07T02:22:47.183Z">
 <meta property="article:author" content="Liebing">
 <meta property="article:tag" content="code">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://yoursite.com/columns/img/glink-column.jpg">
+<meta name="twitter:image" content="http://yoursite.com/columns/img/a.jpg">
 
 
 
@@ -91,19 +93,25 @@
         <div class="navbar-menu navbar-start">
             
             <a class="navbar-item "
-               href="/timeline">Timeline</a>
+               href="/courses">课程</a>
             
             <a class="navbar-item "
-               href="/categories">Categories</a>
+               href="/archive">归档</a>
             
             <a class="navbar-item "
-               href="/tags">Tags</a>
+               href="/categories">分类</a>
             
             <a class="navbar-item "
-               href="/courses">CS</a>
+               href="/tags">标签</a>
             
             <a class="navbar-item "
-               href="/bio">Biography</a>
+               href="/friends">友链</a>
+            
+            <a class="navbar-item "
+               href="/photos">图库</a>
+            
+            <a class="navbar-item "
+               href="/about">关于</a>
             
         </div>
         
@@ -142,7 +150,7 @@
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2022-04-21T10:38:19.149Z" itemprop="datePublished">Apr 21 2022</time>
+            <time datetime="2022-05-07T02:22:47.183Z" itemprop="datePublished">May 7 2022</time>
         </span>
         
         
@@ -150,42 +158,70 @@
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
         <html><head><style>
-    .newspaper {
-        column-count: 3;
-        column-gap: 40px;
-    }
-
-    .card {
-        /* width: 300px;
-        height: 180px; */
-        border: 10px solid #FFF;
-        /* border-bottom: 0 none; */
-        background-color: #FFF;
-        box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, .15)
-    }
+.card {
+  width: 250px;
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.15), 0 6px 10px 0 rgba(0, 0, 0, 0.19);//设置两层阴影
+  text-align: center;
+  vertical-align: middle;
+  border-radius: 5px;
+}
 
     .card:hover {
-        box-shadow: 0 5px 5px 0 rgba(0, 0, 0, .25);
-        transition: all .5s ease-in-out;
+        box-shadow: 1px 10px 10px 1px rgba(0, 0, 0, .25);
+        transition: all .1s ease-in-out;
     }
 
-    .card-header {
-        text-align: center;
-    }
+.header {
+    background-color: #fefefe;
+    color: white;
+    padding: 10px;
+    padding-bottom: 0px;
+    font-size: 40px;
+}
 
-    .card-body, .card-footer {
-        text-align: left;
-    }
+.container {
+    padding: 10px;
+    padding-top: 0px;
+}
+
+#wrap{
+    display: flex;
+    justify-content: space-between;
+}
+
 </style>
 
 
-<meta name="generator" content="Hexo 4.2.0"></head><body><div class="newspaper">
-    <div>
-        <a href="./glink">
-            <img class="card" src="./img/glink-column.jpg">
-            Glink&#x539F;&#x7406;&#x4E0E;&#x5B9E;&#x8DF5;
-        </a>
-    </div>
+<meta name="generator" content="Hexo 4.2.0"></head><body><div id="wrap">
+<div class="card">
+  <div class="header">
+    <a href="./flink"><img src="./img/a.jpg"></a>
+  </div>
+
+  <div class="container">
+    <p>Apache Flink&#x539F;&#x7406;&#x4E0E;&#x5B9E;&#x8DF5;</p>
+  </div>
+</div>
+
+<div class="card">
+  <div class="header">
+    <a href="./calcite"><img src="./img/b.jpeg"></a>
+  </div>
+
+  <div class="container">
+    <p>Apache Calcite&#x539F;&#x7406;&#x4E0E;&#x5B9E;&#x8DF5;</p>
+  </div>
+</div>
+
+<div class="card">
+  <div class="header">
+    <a href="./paper"><img src="./img/c.jpg"></a>
+  </div>
+
+  <div class="container">
+    <p>&#x6570;&#x636E;&#x7CFB;&#x7EDF;&#x7ECF;&#x5178;&#x8BBA;&#x6587;&#x9605;&#x8BFB;</p>
+  </div>
+</div>
 </div></body></html>
     
     </div>
