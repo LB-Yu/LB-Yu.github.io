@@ -2,7 +2,7 @@
 <html class="has-navbar-fixed-top">
 <head>
     <meta charset="utf-8">
-<title>Apache Calcite原理与实践 - Liebing&#39;s Blog</title>
+<title>Apache Flink原理与实践 - Liebing&#39;s Blog</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
@@ -18,15 +18,13 @@
 
 
 
-    <meta name="description" content="Apache Calcite&amp;#x539F;&amp;#x7406;&amp;#x4E0E;&amp;#x5B9E;&amp;#x8DF5;&amp;#x672C;&amp;#x5408;&amp;#x96C6;&amp;#x662F;&amp;#x5BF9;&amp;#x7B14;&amp;#x8005;&amp;#x6240;&amp;#x5199;&amp;#x7684;Apache Calcite&amp;#x539F;&amp;#x7406;&amp;#x4E0E;&amp;#x5B9E;&amp;#x8DF5;&amp;#x7CFB;&amp;#x5">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Apache Calcite原理与实践">
-<meta property="og:url" content="http://yoursite.com/columns/calcite/index.html">
+    <meta property="og:type" content="website">
+<meta property="og:title" content="Apache Flink原理与实践">
+<meta property="og:url" content="http://yoursite.com/collections/flink/index.html">
 <meta property="og:site_name" content="Liebing&#39;s Blog">
-<meta property="og:description" content="Apache Calcite&amp;#x539F;&amp;#x7406;&amp;#x4E0E;&amp;#x5B9E;&amp;#x8DF5;&amp;#x672C;&amp;#x5408;&amp;#x96C6;&amp;#x662F;&amp;#x5BF9;&amp;#x7B14;&amp;#x8005;&amp;#x6240;&amp;#x5199;&amp;#x7684;Apache Calcite&amp;#x539F;&amp;#x7406;&amp;#x4E0E;&amp;#x5B9E;&amp;#x8DF5;&amp;#x7CFB;&amp;#x5">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-06-29T08:43:09.957Z">
-<meta property="article:modified_time" content="2022-06-29T08:43:09.957Z">
+<meta property="article:published_time" content="2022-05-07T02:21:29.241Z">
+<meta property="article:modified_time" content="2022-05-07T02:21:29.241Z">
 <meta property="article:author" content="Liebing">
 <meta property="article:tag" content="code">
 <meta name="twitter:card" content="summary">
@@ -89,7 +87,7 @@
         <div class="navbar-menu navbar-start">
             
             <a class="navbar-item "
-               href="/columns">合集</a>
+               href="/collections">合集</a>
             
             <a class="navbar-item "
                href="/courses">课程</a>
@@ -125,14 +123,6 @@
                 <div class="navbar-dropdown is-right">
                     
                     
-                    
-                    
-                    <a class="navbar-item" href="#Apache-Calcite原理与实践">1&nbsp;&nbsp;<b>Apache Calcite原理与实践</b></a>
-                    
-                    
-                    
-                    <a class="navbar-item" href="#目录">1.1&nbsp;&nbsp;目录</a>
-                    
                 </div>
             </div>
             
@@ -157,27 +147,28 @@
     <section class="section">
     <div class="container">
     <article class="article content gallery" itemscope itemprop="blogPost">
-    <!-- <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
-            Apache Calcite原理与实践
+            Apache Flink原理与实践
         
-    </h1> -->
+    </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <!-- <span class="column is-narrow">
-            <time datetime="2022-06-29T08:43:09.957Z" itemprop="datePublished">Jun 29 2022</time>
-        </span> -->
+        <span class="column is-narrow">
+            <time datetime="2022-05-07T02:21:29.241Z" itemprop="datePublished">May 7 2022</time>
+        </span>
         
+        
+        
+        <span id="/collections/flink/index.html" class="column is-narrow leancloud_visitors" data-flag-title="Apache Flink原理与实践">
+            VISITED
+            <i class="leancloud-visitors-count">...</i>
+            TIMES
+        </span>
         
     </div>
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <html><head></head><body><h1 id="Apache-Calcite&#x539F;&#x7406;&#x4E0E;&#x5B9E;&#x8DF5;"><a href="#Apache-Calcite&#x539F;&#x7406;&#x4E0E;&#x5B9E;&#x8DF5;" class="headerlink" title="Apache Calcite&#x539F;&#x7406;&#x4E0E;&#x5B9E;&#x8DF5;"></a>Apache Calcite&#x539F;&#x7406;&#x4E0E;&#x5B9E;&#x8DF5;</h1><p>&#x672C;&#x5408;&#x96C6;&#x662F;&#x5BF9;&#x7B14;&#x8005;&#x6240;&#x5199;&#x7684;Apache Calcite&#x539F;&#x7406;&#x4E0E;&#x5B9E;&#x8DF5;&#x7CFB;&#x5217;&#x535A;&#x5BA2;&#x7684;&#x6574;&#x7406;, &#x540E;&#x7EED;&#x82E5;&#x6709;&#x65B0;&#x53D1;&#x5E03;&#x7684;&#x76F8;&#x5173;&#x6587;&#x7AE0;&#x4E5F;&#x4F1A;&#x6536;&#x5F55;&#x8FDB;&#x6765;.</p>
-<h2 id="&#x76EE;&#x5F55;"><a href="#&#x76EE;&#x5F55;" class="headerlink" title="&#x76EE;&#x5F55;"></a>&#x76EE;&#x5F55;</h2><ul>
-<li><a href="https://liebing.org.cn/2022/05/02/2022/apache_calcite_overall/" target="_blank" rel="noopener">Apache Calcite&#x6574;&#x4F53;&#x67B6;&#x6784;&#x53CA;&#x5904;&#x7406;&#x6D41;&#x7A0B;</a></li>
-<li><a href="https://liebing.org.cn/2022/05/05/2022/apache_calcite_sql_parser/" target="_blank" rel="noopener">Apache Calcite SQL&#x89E3;&#x6790;&#x53CA;&#x8BED;&#x6CD5;&#x6269;&#x5C55;</a></li>
-<li><a href="https://liebing.org.cn/2022/05/12/2022/apache_calcite_sql_validator/" target="_blank" rel="noopener">Apache Calcite SQL&#x9A8C;&#x8BC1;</a></li>
-</ul>
-</body></html>
+        
     
     </div>
     
@@ -190,6 +181,15 @@
 <div class="sharethis-inline-share-buttons"></div>
 <script type='text/javascript' src='//platform-api.sharethis.com/js/sharethis.js#property=5e63913dd0c39800126ea9e7&amp;product=inline-share-buttons&amp;cms=sop' async='async'></script>
 
+</div>
+
+
+
+<div class="comments">
+    <p align="center">
+        <img src="/images/WeChat.jpg" width="25%">
+    </p>
+    <p align="center">关注笔者微信公众号获得最新文章推送</p>
 </div>
 
 
