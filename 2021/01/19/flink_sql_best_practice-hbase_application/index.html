@@ -18,17 +18,17 @@
 
 
 
-    <meta name="description" content="HBase&amp;#x4F5C;&amp;#x4E3A;&amp;#x8C37;&amp;#x6B4C;BigTable&amp;#x7684;&amp;#x5F00;&amp;#x6E90;&amp;#x5B9E;&amp;#x73B0;, &amp;#x662F;&amp;#x6784;&amp;#x5EFA;&amp;#x5728;HDFS&amp;#x4E0A;&amp;#x7684;&amp;#x5206;&amp;#x5E03;&amp;#x5F0F;&amp;#x952E;&amp;#x503C;&amp;#x6570;&amp;#x636E;&amp;#x5E">
+    <meta name="description" content="&amp;#x672C;&amp;#x6587;&amp;#x5DF2;&amp;#x6536;&amp;#x5F55;&amp;#x5728;&amp;#x5408;&amp;#x96C6;Apche Flink&amp;#x539F;&amp;#x7406;&amp;#x4E0E;&amp;#x5B9E;&amp;#x8DF5;&amp;#x4E2D;.   HBase&amp;#x4F5C;&amp;#x4E3A;&amp;#x8C37;&amp;#x6B4C;BigTable&amp;#x7684;&amp;#x5F00;&amp;#x6E90;&amp;#x5">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Flink SQL最佳实践 - HBase SQL Connector应用">
 <meta property="og:url" content="http://yoursite.com/2021/01/19/flink_sql_best_practice-hbase_application/index.html">
 <meta property="og:site_name" content="Liebing&#39;s Blog">
-<meta property="og:description" content="HBase&amp;#x4F5C;&amp;#x4E3A;&amp;#x8C37;&amp;#x6B4C;BigTable&amp;#x7684;&amp;#x5F00;&amp;#x6E90;&amp;#x5B9E;&amp;#x73B0;, &amp;#x662F;&amp;#x6784;&amp;#x5EFA;&amp;#x5728;HDFS&amp;#x4E0A;&amp;#x7684;&amp;#x5206;&amp;#x5E03;&amp;#x5F0F;&amp;#x952E;&amp;#x503C;&amp;#x6570;&amp;#x636E;&amp;#x5E">
+<meta property="og:description" content="&amp;#x672C;&amp;#x6587;&amp;#x5DF2;&amp;#x6536;&amp;#x5F55;&amp;#x5728;&amp;#x5408;&amp;#x96C6;Apche Flink&amp;#x539F;&amp;#x7406;&amp;#x4E0E;&amp;#x5B9E;&amp;#x8DF5;&amp;#x4E2D;.   HBase&amp;#x4F5C;&amp;#x4E3A;&amp;#x8C37;&amp;#x6B4C;BigTable&amp;#x7684;&amp;#x5F00;&amp;#x6E90;&amp;#x5">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://yoursite.com/2021/01/19/flink_sql_best_practice-hbase_application/example.png">
 <meta property="og:image" content="http://yoursite.com/2021/01/19/flink_sql_best_practice-hbase_application/rt_screen.png">
 <meta property="article:published_time" content="2021-01-19T14:34:09.000Z">
-<meta property="article:modified_time" content="2022-06-08T03:19:18.732Z">
+<meta property="article:modified_time" content="2022-10-08T14:15:40.016Z">
 <meta property="article:author" content="Liebing">
 <meta property="article:tag" content="Flink">
 <meta property="article:tag" content="Flink SQL">
@@ -211,7 +211,7 @@
         <span class="column is-narrow">
             
             
-            12 minutes read (About 1774 words)
+            12 minutes read (About 1799 words)
         </span>
         
         
@@ -224,7 +224,10 @@
     </div>
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <html><head></head><body><p>HBase&#x4F5C;&#x4E3A;&#x8C37;&#x6B4C;BigTable&#x7684;&#x5F00;&#x6E90;&#x5B9E;&#x73B0;, &#x662F;&#x6784;&#x5EFA;&#x5728;HDFS&#x4E0A;&#x7684;&#x5206;&#x5E03;&#x5F0F;&#x952E;&#x503C;&#x6570;&#x636E;&#x5E93;. &#x7531;&#x4E8E;&#x5177;&#x6709;&#x6781;&#x9AD8;&#x7684;&#x8BFB;&#x5199;&#x6027;&#x80FD;, HBase&#x5DF2;&#x7ECF;&#x5728;&#x5B9E;&#x65F6;&#x8BA1;&#x7B97;&#x9886;&#x57DF;&#x5F97;&#x5230;&#x4E86;&#x5E7F;&#x6CDB;&#x8FD0;&#x7528;. &#x968F;&#x7740;Flink&#x5728;&#x5B9E;&#x65F6;&#x8BA1;&#x7B97;&#x9886;&#x57DF;&#x7684;&#x666E;&#x53CA;, Flink&#x4E0E;HBase&#x7684;&#x7ED3;&#x5408;&#x5E94;&#x7528;&#x4E5F;&#x662F;&#x8D8B;&#x52BF;&#x4F7F;&#x7136;. &#x4ECE;Flink 1.9&#x5F00;&#x59CB;&#x5C31;&#x5728;SQL API&#x5C42;&#x9762;&#x589E;&#x52A0;&#x4E86;&#x5BF9;HBase Connector&#x7684;&#x652F;&#x6301;.</p>
+        <html><head></head><body><blockquote class="colorquote info"><p>&#x672C;&#x6587;&#x5DF2;&#x6536;&#x5F55;&#x5728;&#x5408;&#x96C6;<a href="https://liebing.org.cn/collections/flink/" target="_blank" rel="noopener">Apche Flink&#x539F;&#x7406;&#x4E0E;&#x5B9E;&#x8DF5;</a>&#x4E2D;.</p>
+</blockquote>
+
+<p>HBase&#x4F5C;&#x4E3A;&#x8C37;&#x6B4C;BigTable&#x7684;&#x5F00;&#x6E90;&#x5B9E;&#x73B0;, &#x662F;&#x6784;&#x5EFA;&#x5728;HDFS&#x4E0A;&#x7684;&#x5206;&#x5E03;&#x5F0F;&#x952E;&#x503C;&#x6570;&#x636E;&#x5E93;. &#x7531;&#x4E8E;&#x5177;&#x6709;&#x6781;&#x9AD8;&#x7684;&#x8BFB;&#x5199;&#x6027;&#x80FD;, HBase&#x5DF2;&#x7ECF;&#x5728;&#x5B9E;&#x65F6;&#x8BA1;&#x7B97;&#x9886;&#x57DF;&#x5F97;&#x5230;&#x4E86;&#x5E7F;&#x6CDB;&#x8FD0;&#x7528;. &#x968F;&#x7740;Flink&#x5728;&#x5B9E;&#x65F6;&#x8BA1;&#x7B97;&#x9886;&#x57DF;&#x7684;&#x666E;&#x53CA;, Flink&#x4E0E;HBase&#x7684;&#x7ED3;&#x5408;&#x5E94;&#x7528;&#x4E5F;&#x662F;&#x8D8B;&#x52BF;&#x4F7F;&#x7136;. &#x4ECE;Flink 1.9&#x5F00;&#x59CB;&#x5C31;&#x5728;SQL API&#x5C42;&#x9762;&#x589E;&#x52A0;&#x4E86;&#x5BF9;HBase Connector&#x7684;&#x652F;&#x6301;.</p>
 <p>&#x672C;&#x6587;&#x901A;&#x8FC7;&#x4E00;&#x4E2A;&#x5B9E;&#x9645;&#x7684;&#x5E94;&#x7528;&#x6848;&#x4F8B;&#x5BF9;Flink SQL&#x4E0E;HBase&#x7684;&#x7ED3;&#x5408;&#x5E94;&#x7528;&#x8FDB;&#x884C;&#x5B9E;&#x8DF5;, &#x6574;&#x4E2A;&#x8FC7;&#x7A0B;&#x53EA;&#x9700;&#x8981;&#x5728;SQL Client&#x4E2D;&#x7F16;&#x5199;SQL&#x8BED;&#x53E5;, &#x4E0D;&#x9700;&#x8981;&#x5199;&#x4EFB;&#x4F55;Java&#x6216;Scala&#x4EE3;&#x7801;. &#x672C;&#x6587;&#x6848;&#x4F8B;&#x4E3B;&#x8981;&#x5305;&#x542B;&#x4E24;&#x79CD;&#x573A;&#x666F;.</p>
 <ul>
 <li>&#x573A;&#x666F;&#x4E00;&#x662F;&#x5C06;Flink SQL&#x7684;&#x8BA1;&#x7B97;&#x7ED3;&#x679C;&#x5B9E;&#x65F6;&#x5199;&#x5165;HBase;</li>
