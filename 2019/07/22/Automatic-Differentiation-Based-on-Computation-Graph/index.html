@@ -2,7 +2,7 @@
 <html class="has-navbar-fixed-top">
 <head>
     <meta charset="utf-8">
-<title>Automatic Differentiation Based on Computation Graph - Liebing&#39;s Blog</title>
+<title>Automatic Differentiation Based on Computation Graph - Liebing&#39;s Homepage</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
@@ -22,13 +22,13 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Automatic Differentiation Based on Computation Graph">
 <meta property="og:url" content="http://yoursite.com/2019/07/22/Automatic-Differentiation-Based-on-Computation-Graph/index.html">
-<meta property="og:site_name" content="Liebing&#39;s Blog">
+<meta property="og:site_name" content="Liebing&#39;s Homepage">
 <meta property="og:description" content="Automatic differentiation (AD), also called algorithmic differentiation or simply &amp;#x201C;autodiff&amp;#x201D; is one of the basic algorithms hidden behind the deep learning framework such as tensorflow,">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://yoursite.com/2019/07/22/Automatic-Differentiation-Based-on-Computation-Graph/graph.png">
 <meta property="og:image" content="http://yoursite.com/2019/07/22/Automatic-Differentiation-Based-on-Computation-Graph/graph1.png">
 <meta property="article:published_time" content="2019-07-22T04:00:00.000Z">
-<meta property="article:modified_time" content="2022-04-29T13:41:01.783Z">
+<meta property="article:modified_time" content="2021-12-20T09:07:42.476Z">
 <meta property="article:author" content="Liebing">
 <meta property="article:tag" content="AI System">
 <meta name="twitter:card" content="summary">
@@ -92,25 +92,19 @@
         <div class="navbar-menu navbar-start">
             
             <a class="navbar-item "
-               href="/collections">合集</a>
+               href="/archives">Archives</a>
             
             <a class="navbar-item "
-               href="/courses">课程</a>
+               href="/categories">Cats</a>
             
             <a class="navbar-item "
-               href="/archive">归档</a>
+               href="/tags">Tags</a>
             
             <a class="navbar-item "
-               href="/categories">分类</a>
+               href="/courses">Courses</a>
             
             <a class="navbar-item "
-               href="/tags">标签</a>
-            
-            <a class="navbar-item "
-               href="/friends">友链</a>
-            
-            <a class="navbar-item "
-               href="/about">关于</a>
+               href="/bio">Bio</a>
             
         </div>
         
@@ -208,15 +202,6 @@
             21 minutes read (About 3154 words)
         </span>
         
-        
-        <span id="/2019/07/22/Automatic-Differentiation-Based-on-Computation-Graph/" class="column is-narrow leancloud_visitors" data-flag-title="Automatic Differentiation Based on Computation Graph">
-            VISITED
-                <i class="leancloud-visitors-count">
-                    <i class="fa fa-spinner fa-spin"></i>
-                </i>
-            TIMES
-        </span>
-        
     </div>
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
@@ -229,19 +214,19 @@
 <li>Symbolic differentiation using expression manipulation in computer algebra systems such as Mathematica, Maxima, and Maple;</li>
 <li>Automatic differentiation, also called algorithmic differentiation.</li>
 </ol>
-<p>Here, I will give a simple example to illustrate the difference between the first three methods of derivation. As for automatic differentiation, the details will be described in later sections. Suppose we need to calculate the gradient of $x=1$ for the function $ f(x)=x(1-2x)^2 $. The calculation process of different methods is as follows:</p>
+<p>Here, I will give a simple example to illustrate the difference between the first three methods of derivation. As for automatic differentiation, the details will be described in later sections. Suppose we need to calculate the gradient of <script type="math/tex">x=1</script> for the function <script type="math/tex">f(x)=x(1-2x)^2</script>. The calculation process of different methods is as follows:</p>
 <ul>
 <li>Method 1&#xFF1A;<script type="math/tex; mode=display">f(x)=x-4x^2+4x^3</script><script type="math/tex; mode=display">f'(x)=1-8x+12x^2</script><script type="math/tex; mode=display">f'(1)=5</script></li>
-<li>Method 2 ($ h $ can be any other minimum value):<script type="math/tex; mode=display">f'(x) \approx \frac{f(x-h)+f(x+h)}{2h}=\frac{f(1-0.00001)+f(1+0.00001)}{2*0.00001}=5.000003999999669</script></li>
+<li>Method 2 (<script type="math/tex">h</script> can be any other minimum value):<script type="math/tex; mode=display">f'(x) \approx \frac{f(x-h)+f(x+h)}{2h}=\frac{f(1-0.00001)+f(1+0.00001)}{2*0.00001}=5.000003999999669</script></li>
 <li>Method 3:<script type="math/tex; mode=display">f'(x)=(1-2x)^2 -4x(1-2x)</script><script type="math/tex; mode=display">f'(1)=5</script></li>
 </ul>
 <p>From this simple example we can see the shortcomings of the first three methods. Manual differentiation is time consuming and prone to error. Numerical differentiation is simple to implement but can be highly inaccurate and calculation consuming. Symbolic differentiation addresses the weaknesses of both the manual and numerical methods, but often results in complex and cryptic expressions plagued with the problem of &#x201C;expression swell&#x201D;.</p>
-<p>Although AD provide numerical values of derivatives and and it does so by using symbolic rules of differentiation, AD is either a type of numerical or symbolic differentiation. In order to implement the AD, we usually need to build a computation graph. Below is the computation graph of the example $ f(x_1, x_2)=log(x_1) + x_1x_2-sin(x_2) $.</p>
+<p>Although AD provide numerical values of derivatives and and it does so by using symbolic rules of differentiation, AD is either a type of numerical or symbolic differentiation. In order to implement the AD, we usually need to build a computation graph. Below is the computation graph of the example <script type="math/tex">f(x_1, x_2)=log(x_1) + x_1x_2-sin(x_2)</script>.</p>
 <p align="center">
     <img src="./graph.png" , width="50%">
 </p>
 
-<p>Based on computation graph, there are two methods to implement AD: <strong>forward mode</strong> and <strong>reverse mode</strong>. AD in forward mode is the conceptually most simple type. For writing convenience, let $ \dot{v_i}=\frac{\partial v_i}{\partial x_1} $. So we can calculate the gradients in forward mode.</p>
+<p>Based on computation graph, there are two methods to implement AD: <strong>forward mode</strong> and <strong>reverse mode</strong>. AD in forward mode is the conceptually most simple type. For writing convenience, let <script type="math/tex">\dot{v_i}=\frac{\partial v_i}{\partial x_1}</script>. So we can calculate the gradients in forward mode.</p>
 <table align="center">
     <tbody><tr>
         <th style="border:2px solid #000000">&#xA0;&#xA0;&#xA0;&#xA0;Forward Primal Trace&#xA0;&#xA0;&#xA0;</th>
@@ -274,7 +259,7 @@
     </tr>
 </tbody></table>
 
-<p>Reverse mode is similar to forward mode, except that the gradient needs to be calculated backwards. Let $\bar{v_i}=\frac{\partial y}{\partial v_i}$. We can calculate the gradients in reverse mode.</p>
+<p>Reverse mode is similar to forward mode, except that the gradient needs to be calculated backwards. Let <script type="math/tex">\bar{v_i}=\frac{\partial y}{\partial v_i}</script>. We can calculate the gradients in reverse mode.</p>
 <table align="center">
     <tbody><tr>
         <th style="border:2px solid #000000">&#xA0;&#xA0;&#xA0;&#xA0;Forward Primal Trace&#xA0;&#xA0;&#xA0;</th>
@@ -312,7 +297,7 @@
     </tr>
 </tbody></table>
 
-<p>The above two tables demonstrate AD based on forward mode and reverse mode, respectively. Only the gradient for $ x_1 $ is calculated in the tables, and the gradient calculation for $ x_2 $ is similar, I don&#x2019;t want to repeat it.</p>
+<p>The above two tables demonstrate AD based on forward mode and reverse mode, respectively. Only the gradient for <script type="math/tex">x_1</script> is calculated in the tables, and the gradient calculation for <script type="math/tex">x_2</script> is similar, I don&#x2019;t want to repeat it.</p>
 <h1 id="AD-algorithm"><a href="#AD-algorithm" class="headerlink" title="AD algorithm"></a>AD algorithm</h1><p>The idea of the reverse mode is closer to backpropagation and is easier to program. Therefore, in practice we usually use reverse mode to implemente AD. The pseudo-code of AD based on the reverse mode is as follows:</p>
 <figure class="highlight python hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">gradient</span><span class="hljs-params">(output_node)</span>:</span></span><br><span class="line">    node_to_grad = {}</span><br><span class="line">    node_to_grad[output_node] = <span class="hljs-number">1</span></span><br><span class="line">    <span class="hljs-comment"># Get the reverse order topological arrangement of the nodes in computation graph</span></span><br><span class="line">    reverse_topo_order = reversed(find_topo_sort(output_node))</span><br><span class="line">    <span class="hljs-keyword">for</span> node <span class="hljs-keyword">in</span> reverse_topo_order:</span><br><span class="line">        grad &lt;-- sum partial adjoints <span class="hljs-keyword">from</span> output edges of node</span><br><span class="line">        <span class="hljs-comment"># calculate the gradient of the inputs</span></span><br><span class="line">        input_grads &lt;-- node.op.gradient(node, grad)</span><br><span class="line">        add input_grads to node_to_grad</span><br><span class="line">    <span class="hljs-keyword">return</span> node_to_grad</span><br></pre></td></tr></tbody></table></figure>
 
@@ -321,14 +306,14 @@
     <img src="./graph1.png" width="50%">
 </p>
 
-<p>As shown in the computation graph above, the execution flow after calling function $ gradient(x_4) $ is as follows:</p>
+<p>As shown in the computation graph above, the execution flow after calling function <script type="math/tex">gradient(x_4)</script> is as follows:</p>
 <ul>
-<li>Changes in <code>node_to_grad</code> during execution (assume $ x_1=2 $):<ol>
-<li>$ x_4: \bar{x_4}=1 $;</li>
-<li>$ x_3: \bar{x_3}=\bar{x_4}x_2=e^2 $;</li>
-<li>$ x_2: \bar{x_2}^{(1)}=\bar{x_4}x_3=e^2+1 $;</li>
-<li>$ x_2: \bar{x_2}^{(2)}=\bar{x_3}=e^2 $;</li>
-<li>$ x_1: \bar{x_1}=\bar{x_2}x_2=(\bar{x_2}^{(1)} + \bar{x_2}^{(2)})x_2=e^2(2e^2+1) $.</li>
+<li>Changes in <code>node_to_grad</code> during execution (assume <script type="math/tex">x_1=2</script>):<ol>
+<li><script type="math/tex">x_4: \bar{x_4}=1</script>;</li>
+<li><script type="math/tex">x_3: \bar{x_3}=\bar{x_4}x_2=e^2</script>;</li>
+<li><script type="math/tex">x_2: \bar{x_2}^{(1)}=\bar{x_4}x_3=e^2+1</script>;</li>
+<li><script type="math/tex">x_2: \bar{x_2}^{(2)}=\bar{x_3}=e^2</script>;</li>
+<li><script type="math/tex">x_1: \bar{x_1}=\bar{x_2}x_2=(\bar{x_2}^{(1)} + \bar{x_2}^{(2)})x_2=e^2(2e^2+1)</script>.</li>
 </ol>
 </li>
 </ul>
@@ -403,19 +388,10 @@
 
 
 <div class="comments">
-    <p align="center">
-        <img src="/images/WeChat.jpg" width="25%">
-    </p>
-    <p align="center">关注笔者微信公众号获得最新文章推送</p>
-</div>
-
-
-
-<div class="comments">
     <h3 class="title is-4">Comments</h3>
     
 <div id="valine-thread"></div>
-<script src="//code.bdstatic.com/npm/leancloud-storage@4.12.2/dist/av-min.js"></script>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
 <script src='//cdn.jsdelivr.net/gh/AshinWang/SimpleValine@v0.1/SimpleValine.min.js'></script>
 <script>
     new Valine({
@@ -441,16 +417,9 @@
     <div class="container">
         <div class="columns content">
             <div class="column is-narrow has-text-centered">
-                &copy; 2018-2022 Liebing&nbsp;. 
-                <!-- <span id="busuanzi_container_site_uv"><span id="busuanzi_value_site_uv"></span> UV, </span>
-                <span id="busuanzi_container_site_pv"> <span id="busuanzi_value_site_pv"></span> PV</span> -->
-
-                <span id="busuanzi_value_site_pv">
-                    <i class="fa fa-spinner fa-spin"></i>
-                </span> PV |
-                <span id="busuanzi_value_site_uv">
-                    <i class="fa fa-spinner fa-spin"></i>
-                </span> UV
+                &copy; 2018-2021 Liebing&nbsp;. 
+                <span id="busuanzi_container_site_uv"><span id="busuanzi_value_site_uv"></span> UV, </span>
+                <span id="busuanzi_container_site_pv"> <span id="busuanzi_value_site_pv"></span> PV</span>
             </div>
             <div class="column is-hidden-mobile"></div>
 
@@ -473,28 +442,6 @@
     </div>
 
     <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-
-    <script src="https://code.jquery.com/jquery-latest.js"></script>
-    <!-- 不蒜子计数初始值纠正 -->
-    <script >
-        $(document).ready(function() {
-            var int = setInterval(fixCount, 500);  // 50ms周期检测函数
-            var initPV = 3569;  // 初始化首次数据
-            var initUV = 1215;
-            function fixCount() {                   
-                if ($("#busuanzi_container_site_pv").css("display") != "none") {
-                    $("#busuanzi_value_site_pv").html(parseInt($("#busuanzi_value_site_pv").html()) + initPV); // 加上初始数据 
-                    clearInterval(int); // 停止检测
-                } 
-                if ($("#busuanzi_container_site_uv").css("display") != "none") {
-                    $("#busuanzi_value_site_uv").html(parseInt($("#busuanzi_value_site_uv").html()) + initUV); // 加上初始数据 
-                    clearInterval(int); // 停止检测
-                }  
-            }
-        });
-    </script>
-
-
 
 </footer>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
