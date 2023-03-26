@@ -226,6 +226,7 @@
     
         <html><head></head><body><p>YARN(Yet Another Resource Negotiator)&#x662F;&#x4E00;&#x4E2A;&#x5206;&#x5E03;&#x5F0F;&#x7684;&#x8D44;&#x6E90;&#x8C03;&#x5EA6;&#x548C;&#x7BA1;&#x7406;&#x7CFB;&#x7EDF;, &#x8D1F;&#x8D23;&#x7BA1;&#x7406;&#x548C;&#x5206;&#x914D;&#x96C6;&#x7FA4;&#x7684;&#x8D44;&#x6E90;(&#x76EE;&#x524D;&#x4E3B;&#x8981;&#x662F;vcores&#x548C;memory), &#x5728;&#x4E00;&#x4E9B;&#x8D44;&#x6599;&#x4E2D;&#x5F62;&#x8C61;&#x5730;&#x628A;YARN&#x6BD4;&#x4F5C;&#x4E00;&#x4E2A;&#x5206;&#x5E03;&#x5F0F;&#x7684;&#x64CD;&#x4F5C;&#x7CFB;&#x7EDF;. YARN&#x5728;Hadoop 2.x&#x4E2D;&#x5F15;&#x5165;, &#x76EE;&#x524D;&#x5DF2;&#x7ECF;&#x6709;&#x6279;&#x5F0F;, &#x6D41;&#x5F0F;, &#x673A;&#x5668;&#x5B66;&#x4E60;&#x7B49;&#x591A;&#x79CD;&#x7C7B;&#x578B;&#x7684;&#x8BA1;&#x7B97;&#x6846;&#x67B6;&#x652F;&#x6301;&#x5728;YARN&#x4E0A;&#x8FD0;&#x884C;, &#x5982;Spark, Flink, Tensorflow&#x7B49;&#x6846;&#x67B6;&#x90FD;&#x5BF9;YARN&#x6709;&#x6210;&#x719F;&#x7684;&#x652F;&#x6301;. YARN&#x5DF2;&#x7ECF;&#x6210;&#x4E3A;&#x540D;&#x526F;&#x5176;&#x5B9E;&#x7684;&#x201D;&#x6570;&#x636E;&#x64CD;&#x4F5C;&#x7CFB;&#x7EDF;&#x201D;.</p>
 <a id="more"></a>
+
 <p align="center">
     <img src="./yarn_app.png" width="90%" height="90%">
 </p>
@@ -244,6 +245,7 @@
 </ol>
 <blockquote class="colorquote info"><p>&#x8FD9;&#x91CC;&#x7684;YARN application&#x662F;&#x6307;&#x8FD0;&#x884C;&#x5728;YARN&#x4E2D;&#x7684;&#x4E00;&#x4E2A;&#x5177;&#x4F53;&#x7684;&#x7A0B;&#x5E8F;, &#x4E5F;&#x6709;&#x5730;&#x65B9;&#x53EB;&#x505A;Job(&#x4F5C;&#x4E1A;), &#x4F46;&#x662F;&#x5728;Hadoop&#x5B98;&#x65B9;&#x6587;&#x6863;&#x4E2D;&#x53EB;&#x505A;YARN application, &#x6240;&#x4EE5;&#x8FD9;&#x91CC;&#x6CBF;&#x7528;&#x4E86;&#x8FD9;&#x79CD;&#x53EB;&#x6CD5;. &#x5B9E;&#x9645;&#x4E0A;&#x53EA;&#x8981;&#x4E0D;&#x4EA7;&#x751F;&#x6B67;&#x4E49;&#x8FD9;&#x4E24;&#x79CD;&#x53EB;&#x6CD5;&#x90FD;&#x662F;&#x53EF;&#x4EE5;&#x7684;.</p>
 </blockquote>
+
 <p>&#x5177;&#x4F53;&#x6765;&#x8BF4;, ResourceManager&#x5305;&#x542B;&#x4E24;&#x4E2A;&#x4E3B;&#x8981;&#x7684;&#x5185;&#x90E8;&#x7EC4;&#x4EF6;Scheduler&#x548C;ApplicationsManager.</p>
 <ol>
 <li>Scheduler&#x8D1F;&#x8D23;&#x4E3A;&#x8FD0;&#x884C;&#x7684;YARN application&#x5206;&#x914D;&#x8D44;&#x6E90;, &#x5B83;&#x6301;&#x6709;&#x96C6;&#x7FA4;&#x8D44;&#x6E90;&#x548C;&#x8C03;&#x5EA6;&#x961F;&#x5217;&#x4FE1;&#x606F;. Scheduler&#x662F;&#x4E00;&#x4E2A;&#x5355;&#x7EAF;&#x7684;&#x8C03;&#x5EA6;&#x5668;, &#x4E0D;&#x8D1F;&#x8D23;&#x76D1;&#x63A7;application&#x7684;&#x8FD0;&#x884C;&#x60C5;&#x51B5;&#x4EE5;&#x53CA;&#x5BB9;&#x9519;&#x4FDD;&#x8BC1;, &#x8FD9;&#x90E8;&#x5206;&#x529F;&#x80FD;&#x7531;ApplicationManager&#x63D0;&#x4F9B;. Scheduler&#x6846;&#x67B6;&#x63D0;&#x4F9B;&#x4E86;&#x53EF;&#x6269;&#x5C55;&#x7684;&#x63A5;&#x53E3;, Hadoop&#x76EE;&#x524D;&#x652F;&#x6301;CapacityScheduler&#x548C;FairScheduler, &#x5177;&#x4F53;&#x5728;<a href="#YARN-Scheduler">YARN Scheduler</a>&#x7AE0;&#x8282;&#x8BF4;&#x660E;.</li>
@@ -251,7 +253,6 @@
 </ol>
 <p>&#x5728;&#x4E00;&#x4E9B;&#x8D44;&#x6599;&#x4E2D;, &#x628A;Container&#x4E5F;&#x5F52;&#x4E3A;YARN&#x96C6;&#x7FA4;&#x7684;&#x7EC4;&#x4EF6;, &#x4E25;&#x683C;&#x6765;&#x8BF4;&#x662F;&#x4E0D;&#x51C6;&#x786E;&#x7684;. <strong>Container&#x662F;YARN&#x96C6;&#x7FA4;&#x8D44;&#x6E90;&#x8C03;&#x5EA6;&#x7684;&#x5355;&#x4F4D;, &#x5B83;&#x5C01;&#x88C5;&#x4E86;&#x67D0;&#x4E2A;&#x8282;&#x70B9;&#x4E0A;&#x591A;&#x4E2A;&#x7EF4;&#x5EA6;&#x7684;&#x8D44;&#x6E90;(vcores, memory).</strong> &#x63D0;&#x4EA4;&#x7ED9;YARN&#x96C6;&#x7FA4;&#x7684;Job&#x6700;&#x7EC8;&#x90FD;&#x4F1A;&#x5206;&#x914D;&#x5230;&#x5177;&#x4F53;&#x7684;&#x4E00;&#x4E2A;&#x6216;&#x591A;&#x4E2A;Container&#x4E2D;&#x8FD0;&#x884C;. &#x4F46;&#x662F;Container&#x5E76;&#x4E0D;&#x662F;&#x9884;&#x5148;&#x5206;&#x914D;&#x597D;&#x7684;, &#x800C;&#x662F;&#x6839;&#x636E;&#x63D0;&#x4EA4;&#x7ED9;YARN&#x96C6;&#x7FA4;&#x7684;Job&#x6240;&#x9700;&#x8D44;&#x6E90;&#x52A8;&#x6001;&#x5206;&#x914D;&#x7684;, &#x4E00;&#x65E6;Job&#x8FD0;&#x884C;&#x7ED3;&#x675F;, &#x5176;&#x5BF9;&#x5E94;&#x7684;Container&#x5C31;&#x4F1A;&#x9500;&#x6BC1;.</p>
 <h1 id="YARN&#x6838;&#x5FC3;&#x53C2;&#x6570;"><a href="#YARN&#x6838;&#x5FC3;&#x53C2;&#x6570;" class="headerlink" title="YARN&#x6838;&#x5FC3;&#x53C2;&#x6570;"></a>YARN&#x6838;&#x5FC3;&#x53C2;&#x6570;</h1><p>&#x4E0A;&#x4E00;&#x8282;&#x4ECE;&#x6982;&#x5FF5;&#x4E0A;&#x8BB2;&#x8FF0;&#x4E86;YARN&#x96C6;&#x7FA4;&#x7684;&#x7EC4;&#x6210;&#x90E8;&#x5206;&#x53CA;&#x5176;&#x4F5C;&#x7528;, &#x76F8;&#x5BF9;&#x6765;&#x8BF4;&#x6BD4;&#x8F83;&#x62BD;&#x8C61;. &#x8FD9;&#x4E00;&#x8282;&#x8BB2;&#x8FF0;YARN&#x96C6;&#x7FA4;&#x7684;&#x4E00;&#x4E9B;&#x6838;&#x5FC3;&#x914D;&#x7F6E;&#x53C2;&#x6570;, &#x901A;&#x8FC7;&#x8FD9;&#x4E9B;&#x53C2;&#x6570;&#x53EF;&#x4EE5;&#x8FDB;&#x4E00;&#x6B65;&#x4E86;&#x89E3;&#x4E0A;&#x8FF0;&#x7EC4;&#x4EF6;&#x5728;YARN&#x96C6;&#x7FA4;&#x4E2D;&#x7684;&#x7269;&#x7406;&#x5B58;&#x5728;&#x5F62;&#x5F0F;. &#x8FD9;&#x4E9B;&#x53C2;&#x6570;&#x540D;&#x548C;&#x9ED8;&#x8BA4;&#x503C;&#x90FD;&#x53EF;&#x4EE5;&#x5728;<a href="https://hadoop.apache.org/docs/stable/hadoop-yarn/hadoop-yarn-common/yarn-default.xml" target="_blank" rel="noopener">yarn-default.xml</a>&#x6587;&#x4EF6;&#x4E2D;&#x627E;&#x5230;. &#x5728;&#x96C6;&#x7FA4;&#x4E2D;&#x53EF;&#x4EE5;&#x5728;<code>$HADOOP_HOME/etc/hadoop/yarn-site.xml</code>&#x6587;&#x4EF6;&#x4E2D;&#x914D;&#x7F6E;&#x8FD9;&#x4E9B;&#x53C2;&#x6570;.</p>
-<div class="table-container">
 <table>
 <thead>
 <tr>
@@ -261,8 +262,7 @@
 <th>&#x4F5C;&#x7528;</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>ResourceManager</td>
 <td>yarn.resourcemanager.<br>scheduler.class</td>
 <td>org.apache.hadoop.<br>yarn.server.<br>resourcemanager.<br>scheduler.capacity.<br>CapacityScheduler</td>
@@ -316,9 +316,7 @@
 <td>4</td>
 <td>Container&#x6700;&#x5927;CPU&#x6838;&#x6570;</td>
 </tr>
-</tbody>
-</table>
-</div>
+</tbody></table>
 <h1 id="YARN-Scheduler"><a href="#YARN-Scheduler" class="headerlink" title="YARN Scheduler"></a>YARN Scheduler</h1><p>YARN Scheduler&#x662F;&#x51B3;&#x5B9A;YARN&#x96C6;&#x7FA4;&#x6269;&#x5C55;&#x6027;&#x7684;&#x91CD;&#x8981;&#x56E0;&#x7D20;, &#x5F88;&#x591A;&#x516C;&#x53F8;&#x5185;&#x90E8;&#x4E3A;&#x4E86;&#x5B9E;&#x73B0;&#x66F4;&#x9AD8;&#x6548;&#x7684;&#x8C03;&#x5EA6;&#x548C;&#x96C6;&#x7FA4;&#x8D44;&#x6E90;&#x4F7F;&#x7528;&#x7387;, &#x90FD;&#x5BF9;YARN&#x7684;&#x8C03;&#x5EA6;&#x7B56;&#x7565;&#x505A;&#x4E86;&#x5B9A;&#x5236;&#x5316;&#x7684;&#x66F4;&#x6539;, &#x8BE6;&#x7EC6;&#x7684;&#x5185;&#x5BB9;&#x53EF;&#x9605;&#x8BFB;&#x53C2;&#x8003;[4-5].</p>
 <p>&#x76EE;&#x524D;YARN&#x63D0;&#x4F9B;&#x4E86;FifoScheduler, CapacityScheduler&#x4EE5;&#x53CA;FairScheduler&#x4E09;&#x79CD;&#x7C7B;&#x578B;&#x7684;Sceduler, &#x5E76;&#x4E14;Hadoop 3.0&#x7814;&#x53D1;&#x4E86;<a href="https://issues.apache.org/jira/browse/YARN-5139" target="_blank" rel="noopener">Global Scheduling</a>&#x98A0;&#x8986;&#x4E86;&#x73B0;&#x6709;&#x7684;Scheduler&#x6846;&#x67B6;, &#x671F;&#x671B;&#x8FDB;&#x4E00;&#x6B65;&#x63D0;&#x5347;&#x5355;&#x96C6;&#x7FA4;&#x8C03;&#x5EA6;&#x6027;&#x80FD;. &#x76EE;&#x524D;, CapacityScheduler&#x548C;FairScheduler&#x5728;&#x751F;&#x4EA7;&#x73AF;&#x5883;&#x4E2D;&#x90FD;&#x6709;&#x4F7F;&#x7528;, &#x8FD9;&#x91CC;&#x4E3B;&#x8981;&#x4ECB;&#x7ECD;&#x8FD9;&#x4E24;&#x79CD;Scheduler, FifoScheduler&#x4E00;&#x822C;&#x4E0D;&#x4F1A;&#x5728;&#x751F;&#x4EA7;&#x73AF;&#x5883;&#x4E2D;&#x4F7F;&#x7528;.</p>
 <h2 id="CapacityScheduler"><a href="#CapacityScheduler" class="headerlink" title="CapacityScheduler"></a>CapacityScheduler</h2><p>CapacityScheduler&#x662F;&#x4E00;&#x79CD;&#x5BB9;&#x91CF;&#x8C03;&#x5EA6;&#x5668;, &#x5B83;&#x4F7F;YARN&#x96C6;&#x7FA4;&#x53EF;&#x4EE5;&#x4EE5;&#x53CB;&#x597D;&#x7684;&#x5F62;&#x5F0F;&#x63D0;&#x4F9B;&#x53EF;&#x5171;&#x4EAB;&#x7684;, &#x591A;&#x79DF;&#x6237;&#x7684;&#x5BF9;&#x5916;&#x670D;&#x52A1;. &#x540C;&#x65F6;&#x53EF;&#x4EE5;&#x6700;&#x5927;&#x5316;&#x96C6;&#x7FA4;&#x541E;&#x5410;&#x91CF;&#x548C;&#x4F7F;&#x7528;&#x6548;&#x7387;.</p>
@@ -341,6 +339,7 @@
 </ol>
 <blockquote class="colorquote info"><p>&#x961F;&#x5217;&#x8D44;&#x6E90;&#x4F7F;&#x7528;&#x7387; = &#x5DF2;&#x7ECF;&#x4F7F;&#x7528;&#x7684;&#x8D44;&#x6E90;&#x91CF; / &#x9664;&#x4EE5;&#x6700;&#x5C0F;&#x961F;&#x5217;&#x8D44;&#x6E90;&#x5BB9;&#x91CF;.<br>&#x5BF9;&#x4E8E;&#x975E;&#x53F6;&#x5B50;&#x961F;&#x5217;, &#x5B83;&#x7684;&#x5DF2;&#x4F7F;&#x7528;&#x8D44;&#x6E90;&#x91CF;&#x662F;&#x5404;&#x4E2A;&#x5B50;&#x961F;&#x5217;&#x5DF2;&#x4F7F;&#x7528;&#x8D44;&#x6E90;&#x91CF;&#x4E4B;&#x548C;.</p>
 </blockquote>
+
 <p>CapacityScheduler&#x6709;&#x4E24;&#x79CD;&#x8D44;&#x6E90;&#x6BD4;&#x8F83;&#x5668;&#x7528;&#x4EE5;&#x6BD4;&#x8F83;&#x4E24;&#x4E2A;&#x8D44;&#x6E90;&#x7684;&#x5927;&#x5C0F;(&#x6BD4;&#x5982;&#x6BD4;&#x8F83;&#x7528;&#x6237;&#x5F53;&#x524D;&#x4F7F;&#x7528;&#x7684;&#x8D44;&#x6E90;&#x91CF;&#x662F;&#x5426;&#x8D85;&#x8FC7;&#x4E86;&#x8BBE;&#x7F6E;&#x7684;&#x4E0A;&#x9650;&#x8D44;&#x6E90;&#x91CF;), &#x9ED8;&#x8BA4;&#x7684;DefaultResourceCalculator&#x53EA;&#x8003;&#x8651;&#x4E86;&#x5185;&#x5B58;&#x8D44;&#x6E90;. DominantResourceCalculator&#x91C7;&#x7528;&#x4E86;DRF(Dominant Resource Fairness)&#x6BD4;&#x8F83;&#x7B97;&#x6CD5;, &#x540C;&#x65F6;&#x8003;&#x8651;&#x5185;&#x5B58;&#x548C;CPU&#x4E24;&#x79CD;&#x8D44;&#x6E90;, &#x53EF;&#x901A;&#x8FC7;&#x53C2;&#x6570;<code>yarn.scheduler.capacity.resource-calculator</code>&#x8BBE;&#x7F6E;&#x8D44;&#x6E90;&#x6BD4;&#x8F83;&#x5668;.</p>
 <p>&#x4E0B;&#x9762;&#x4EE5;&#x4E00;&#x4E2A;&#x5177;&#x4F53;&#x6848;&#x4F8B;&#x8BF4;&#x660E;CapacityScheduler&#x5982;&#x4F55;&#x8FDB;&#x884C;&#x8C03;&#x5EA6;.</p>
 <p align="center">
@@ -354,7 +353,6 @@
 </ol>
 <p>&#x5173;&#x4E8E;CapacityScheduler&#x5728;&#x96C6;&#x7FA4;&#x4E2D;&#x7684;&#x8BE6;&#x7EC6;&#x914D;&#x7F6E;, &#x53EF;&#x9605;&#x8BFB;&#x53C2;&#x8003;[3].</p>
 <h2 id="FairScheduler"><a href="#FairScheduler" class="headerlink" title="FairScheduler"></a>FairScheduler</h2><p>FairScheduler&#x662F;&#x4E00;&#x79CD;&#x516C;&#x5E73;&#x8C03;&#x5EA6;&#x5668;, &#x5B83;&#x548C;CapacityScheduler&#x4E00;&#x6837;&#x652F;&#x6301;&#x5C42;&#x6B21;&#x961F;&#x5217;, &#x591A;&#x79DF;&#x6237;&#x4EE5;&#x53CA;&#x4F18;&#x5148;&#x7EA7;&#x8C03;&#x5EA6;. &#x5B83;&#x7684;&#x8D44;&#x6E90;&#x5206;&#x914D;&#x6D41;&#x7A0B;&#x4E0E;CapacityScheduler&#x4E00;&#x6837;, &#x5305;&#x542B;&#x9009;&#x62E9;&#x961F;&#x5217;, &#x9009;&#x62E9;Job&#x548C;&#x9009;&#x62E9;Container&#x4E09;&#x4E2A;&#x6B65;&#x9AA4;. &#x5F53;&#x7136;&#x4E24;&#x8005;&#x4E4B;&#x95F4;&#x4E5F;&#x5B58;&#x5728;&#x4E00;&#x4E9B;&#x533A;&#x522B;.</p>
-<div class="table-container">
 <table>
 <thead>
 <tr>
@@ -363,8 +361,7 @@
 <th>FairScheduler</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>&#x8C03;&#x5EA6;&#x7B56;&#x7565;</td>
 <td>&#x4F18;&#x5148;&#x9009;&#x7528;&#x8D44;&#x6E90;&#x4F7F;&#x7528;&#x7387;&#x4F4E;&#x7684;&#x961F;&#x5217;</td>
 <td>&#x4F18;&#x5148;&#x9009;&#x62E9;&#x8D44;&#x6E90;&#x7F3A;&#x989D;&#x6BD4;&#x4F8B;&#x5927;&#x7684;&#x961F;&#x5217;</td>
@@ -374,12 +371,10 @@
 <td>FIFO</td>
 <td>FIFO, Fair, DRF</td>
 </tr>
-</tbody>
-</table>
-</div>
+</tbody></table>
 <p>FairScheduler&#x5728;&#x9009;&#x62E9;&#x961F;&#x5217;&#x65F6;&#x7684;&#x8C03;&#x5EA6;&#x7B56;&#x7565;&#x662F;&#x4F18;&#x5148;&#x9009;&#x62E9;&#x8D44;&#x6E90;&#x7F3A;&#x989D;&#x6BD4;&#x4F8B;&#x5927;&#x7684;&#x961F;&#x5217;. &#x8D44;&#x6E90;&#x7F3A;&#x989D;&#x6BD4;&#x4F8B;&#x8BA1;&#x7B97;&#x65B9;&#x5F0F;&#x5982;&#x4E0B;:</p>
-<script type="math/tex; mode=display">缺额比例 = \frac{队列中Job实际所需资源-队列最大资源}{队列最大资源}</script><p>&#x5728;&#x6BCF;&#x4E2A;&#x961F;&#x5217;&#x4E2D;&#x8FDB;&#x884C;Job&#x8D44;&#x6E90;&#x5206;&#x914D;&#x65F6;, CapacityScheduler&#x53EA;&#x652F;&#x6301;FIFO, FairScheduler&#x652F;&#x6301;FIFO, Fair&#x548C;DRF. &#x82E5;&#x914D;&#x7F6E;&#x4E3A;FIFO&#x5219;FairScheduler&#x9000;&#x5316;&#x4E3A;CapacityScheduler. FairScheduler&#x7684;&#x9ED8;&#x8BA4;&#x5206;&#x914D;&#x65B9;&#x5F0F;&#x662F;Fair, &#x5B83;&#x91C7;&#x7528;&#x7684;&#x662F;&#x6700;&#x5927;&#x6700;&#x5C0F;&#x516C;&#x5E73;&#x7B97;&#x6CD5;, &#x652F;&#x6301;&#x52A0;&#x6743;, &#x4E14;&#x4EC5;&#x8003;&#x8651;&#x5185;&#x5B58;&#x8D44;&#x6E90;. &#x4E0B;&#x9762;&#x4EE5;&#x4E00;&#x4E2A;&#x5177;&#x4F53;&#x6848;&#x4F8B;&#x8BF4;&#x660E;&#x57FA;&#x4E8E;&#x6700;&#x5927;&#x6700;&#x5C0F;&#x516C;&#x5E73;&#x7B97;&#x6CD5;&#x7684;Fair&#x5206;&#x914D;&#x65B9;&#x5F0F;.</p>
-<div class="table-container">
+<p>$$ &#x7F3A;&#x989D;&#x6BD4;&#x4F8B; = \frac{&#x961F;&#x5217;&#x4E2D;Job&#x5B9E;&#x9645;&#x6240;&#x9700;&#x8D44;&#x6E90;-&#x961F;&#x5217;&#x6700;&#x5927;&#x8D44;&#x6E90;}{&#x961F;&#x5217;&#x6700;&#x5927;&#x8D44;&#x6E90;} $$</p>
+<p>&#x5728;&#x6BCF;&#x4E2A;&#x961F;&#x5217;&#x4E2D;&#x8FDB;&#x884C;Job&#x8D44;&#x6E90;&#x5206;&#x914D;&#x65F6;, CapacityScheduler&#x53EA;&#x652F;&#x6301;FIFO, FairScheduler&#x652F;&#x6301;FIFO, Fair&#x548C;DRF. &#x82E5;&#x914D;&#x7F6E;&#x4E3A;FIFO&#x5219;FairScheduler&#x9000;&#x5316;&#x4E3A;CapacityScheduler. FairScheduler&#x7684;&#x9ED8;&#x8BA4;&#x5206;&#x914D;&#x65B9;&#x5F0F;&#x662F;Fair, &#x5B83;&#x91C7;&#x7528;&#x7684;&#x662F;&#x6700;&#x5927;&#x6700;&#x5C0F;&#x516C;&#x5E73;&#x7B97;&#x6CD5;, &#x652F;&#x6301;&#x52A0;&#x6743;, &#x4E14;&#x4EC5;&#x8003;&#x8651;&#x5185;&#x5B58;&#x8D44;&#x6E90;. &#x4E0B;&#x9762;&#x4EE5;&#x4E00;&#x4E2A;&#x5177;&#x4F53;&#x6848;&#x4F8B;&#x8BF4;&#x660E;&#x57FA;&#x4E8E;&#x6700;&#x5927;&#x6700;&#x5C0F;&#x516C;&#x5E73;&#x7B97;&#x6CD5;&#x7684;Fair&#x5206;&#x914D;&#x65B9;&#x5F0F;.</p>
 <table>
 <thead>
 <tr>
@@ -388,8 +383,7 @@
 <th>&#x52A0;&#x6743;</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td></td>
 <td>&#x67D0;&#x961F;&#x5217;&#x4F9B;12&#x4E2A;&#x8D44;&#x6E90;, &#x5B58;&#x5728;4&#x4E2A;Job, &#x8D44;&#x6E90;&#x9700;&#x6C42;&#x5206;&#x522B;&#x662F;: Job1: 1, Job2: 2, Job 3: 6, Job4: 5.</td>
 <td>&#x67D0;&#x961F;&#x5217;&#x4F9B;16&#x4E2A;&#x8D44;&#x6E90;, &#x5B58;&#x5728;4&#x4E2A;Job, &#x8D44;&#x6E90;&#x9700;&#x6C42;&#x5206;&#x522B;&#x662F;: Job1: 4, Job2: 2, Job 3: 10, Job4: 4. &#x6BCF;&#x4E2A;Job&#x7684;&#x6743;&#x91CD;&#x662F;: Job1: 5, Job2: 8, Job3: 1, Job4: 2.</td>
@@ -409,9 +403,7 @@
 <td></td>
 <td>Job1: &#x5206;4 <br> Job2: &#x5206;2 <br> Job3: &#x5206;1 + &#x5206;2.33 + &#x5206;2.66 <br> Job4: &#x5206;4</td>
 </tr>
-</tbody>
-</table>
-</div>
+</tbody></table>
 <p>&#x5728;&#x6700;&#x5927;&#x6700;&#x5C0F;&#x516C;&#x5E73;&#x7B97;&#x6CD5;&#x4E2D;, &#x4F1A;&#x4E00;&#x76F4;&#x5206;&#x914D;&#x76F4;&#x5230;&#x961F;&#x5217;&#x4E2D;&#x6CA1;&#x6709;&#x7A7A;&#x95F2;&#x8D44;&#x6E90;&#x6216;&#x6240;&#x6709;Job&#x90FD;&#x83B7;&#x5F97;&#x6240;&#x9700;&#x8D44;&#x6E90;.</p>
 <p>&#x57FA;&#x4E8E;Fair&#x7B56;&#x7565;&#x7684;&#x8D44;&#x6E90;&#x5206;&#x914D;&#x53EA;&#x8003;&#x8651;&#x4E86;&#x5185;&#x5B58;, &#x5728;&#x4E00;&#x4E9B;&#x573A;&#x666F;&#x4E0B;, &#x9700;&#x8981;&#x8003;&#x8651;&#x591A;&#x4E2A;&#x7EF4;&#x5EA6;&#x8D44;&#x6E90;&#x7684;&#x516C;&#x5E73;&#x5206;&#x914D;, &#x6BD4;&#x5982;CPU, &#x5185;&#x5B58;&#x7B49;. FairSceduler&#x652F;&#x6301;DRF&#x5206;&#x914D;&#x7B56;&#x7565;, &#x53EF;&#x4EE5;&#x8003;&#x8651;&#x540C;&#x65F6;&#x8003;&#x8651;CPU&#x548C;&#x5185;&#x5B58;&#x4E24;&#x4E2A;&#x7EF4;&#x5EA6;. &#x5173;&#x4E8E;DRF&#x7B97;&#x6CD5;&#x53EF;&#x53C2;&#x8003;&#x8BBA;&#x6587;<a href="http://static.usenix.org/event/nsdi11/tech/full_papers/Ghodsi.pdf" target="_blank" rel="noopener">Dominant Resource Fairness: Fair Allocation of Multiple Resource Types</a>.</p>
 <p>&#x5173;&#x4E8E;FairScheduler&#x5728;&#x96C6;&#x7FA4;&#x4E2D;&#x7684;&#x8BE6;&#x7EC6;&#x914D;&#x7F6E;, &#x53EF;&#x9605;&#x8BFB;&#x53C2;&#x8003;[4].</p>

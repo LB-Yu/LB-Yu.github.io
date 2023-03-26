@@ -18,12 +18,12 @@
 
 
 
-    <meta name="description" content="&amp;#x672C;&amp;#x6587;&amp;#x5DF2;&amp;#x6536;&amp;#x5F55;&amp;#x5728;&amp;#x5408;&amp;#x96C6;&amp;#x6570;&amp;#x636E;&amp;#x7CFB;&amp;#x7EDF;&amp;#x7ECF;&amp;#x5178;&amp;#x8BBA;&amp;#x6587;&amp;#x9605;&amp;#x8BFB;&amp;#x4E2D;.  &amp;#x672C;&amp;#x6587;&amp;#x662F;&amp;#x5BF9;Databricks&amp;#x">
+    <meta name="description" content="&amp;#x672C;&amp;#x6587;&amp;#x5DF2;&amp;#x6536;&amp;#x5F55;&amp;#x5728;&amp;#x5408;&amp;#x96C6;&amp;#x6570;&amp;#x636E;&amp;#x7CFB;&amp;#x7EDF;&amp;#x7ECF;&amp;#x5178;&amp;#x8BBA;&amp;#x6587;&amp;#x9605;&amp;#x8BFB;&amp;#x4E2D;.   &amp;#x672C;&amp;#x6587;&amp;#x662F;&amp;#x5BF9;Databricks&amp;#">
 <meta property="og:type" content="article">
 <meta property="og:title" content="论文阅读 - Delta Lake: High-Performance ACID Table Storage over Cloud Object Stores">
 <meta property="og:url" content="http://yoursite.com/2022/06/29/2022/paper_read-delta_lake/index.html">
 <meta property="og:site_name" content="Liebing&#39;s Blog">
-<meta property="og:description" content="&amp;#x672C;&amp;#x6587;&amp;#x5DF2;&amp;#x6536;&amp;#x5F55;&amp;#x5728;&amp;#x5408;&amp;#x96C6;&amp;#x6570;&amp;#x636E;&amp;#x7CFB;&amp;#x7EDF;&amp;#x7ECF;&amp;#x5178;&amp;#x8BBA;&amp;#x6587;&amp;#x9605;&amp;#x8BFB;&amp;#x4E2D;.  &amp;#x672C;&amp;#x6587;&amp;#x662F;&amp;#x5BF9;Databricks&amp;#x">
+<meta property="og:description" content="&amp;#x672C;&amp;#x6587;&amp;#x5DF2;&amp;#x6536;&amp;#x5F55;&amp;#x5728;&amp;#x5408;&amp;#x96C6;&amp;#x6570;&amp;#x636E;&amp;#x7CFB;&amp;#x7EDF;&amp;#x7ECF;&amp;#x5178;&amp;#x8BBA;&amp;#x6587;&amp;#x9605;&amp;#x8BFB;&amp;#x4E2D;.   &amp;#x672C;&amp;#x6587;&amp;#x662F;&amp;#x5BF9;Databricks&amp;#">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://yoursite.com/2022/06/29/2022/paper_read-delta_lake/fig1.png">
 <meta property="og:image" content="http://yoursite.com/2022/06/29/2022/paper_read-delta_lake/fig2.png">
@@ -249,8 +249,10 @@
     
         <html><head></head><body><blockquote class="colorquote info"><p>&#x672C;&#x6587;&#x5DF2;&#x6536;&#x5F55;&#x5728;&#x5408;&#x96C6;<a href="https://liebing.org.cn/collections/paper/" target="_blank" rel="noopener">&#x6570;&#x636E;&#x7CFB;&#x7EDF;&#x7ECF;&#x5178;&#x8BBA;&#x6587;&#x9605;&#x8BFB;</a>&#x4E2D;.</p>
 </blockquote>
+
 <p>&#x672C;&#x6587;&#x662F;&#x5BF9;Databricks&#x7684;Delta Lake&#x8BBA;&#x6587;(<a href="https://dl.acm.org/doi/pdf/10.14778/3415478.3415560?casa_token=qzmf3vj3uJcAAAAA:kGR92cOmV5qHsYCv3bRvGKTqdYUM3g5tgpW_HukaIxahWRWlIzMsi6xVDr4GsDgaTKGqWvekZmgiw2c" target="_blank" rel="noopener">Delta Lake: High-Performance ACID Table Storage over Cloud Object Stores</a>)&#x7684;&#x9605;&#x8BFB;&#x603B;&#x7ED3;. <a href="https://delta.io/" target="_blank" rel="noopener">Delta Lake</a>&#x662F;<a href="https://liebing.org.cn/2022/04/20/2022/paper_read-lakehouse" target="_blank" rel="noopener">&#x524D;&#x6587;</a>&#x6240;&#x8BF4;&#x7684;Lakehouse&#x67B6;&#x6784;&#x4E2D;&#x7684;&#x6570;&#x636E;&#x6E56;&#x4E0A;&#x7684;&#x8868;&#x683C;&#x5B58;&#x50A8;&#x5B9E;&#x73B0;. &#x8BBA;&#x6587;&#x8BE6;&#x7EC6;&#x63CF;&#x8FF0;&#x4E86;Delta Lake&#x7684;&#x4EA7;&#x751F;&#x80CC;&#x666F;, &#x539F;&#x7406;&#x4EE5;&#x53CA;&#x7279;&#x5F81;. &#x9605;&#x8BFB;&#x8BBA;&#x6587;&#x4E0D;&#x4EC5;&#x53EF;&#x4EE5;&#x4E86;&#x89E3;Delta Lake&#x7684;&#x5B9E;&#x73B0;&#x539F;&#x7406;, &#x8FD8;&#x6709;&#x52A9;&#x4E8E;&#x4E86;&#x89E3;&#x5176;&#x4ED6;&#x8868;&#x683C;&#x5B58;&#x50A8;&#x5B9E;&#x73B0;, &#x5982;Apache Iceberg&#x548C;Apache Hudi.</p>
 <a id="more"></a>
+
 <p>&#x672C;&#x6587;&#x4E0D;&#x4F1A;&#x5BF9;&#x8BBA;&#x6587;&#x8FDB;&#x884C;&#x5B8C;&#x6574;&#x7684;&#x7FFB;&#x8BD1;, &#x800C;&#x662F;&#x6309;&#x5982;&#x4E0B;&#x4E3B;&#x7EBF;&#x5256;&#x6790;&#x8BBA;&#x6587;&#x7684;&#x6838;&#x5FC3;&#x89C2;&#x70B9;&#x548C;&#x5185;&#x5BB9;, &#x5E76;&#x7A7F;&#x63D2;&#x7B14;&#x8005;&#x7684;&#x89C1;&#x89E3;:</p>
 <ol>
 <li>Delta Lake&#x7684;&#x4EA7;&#x751F;&#x80CC;&#x666F;.</li>
