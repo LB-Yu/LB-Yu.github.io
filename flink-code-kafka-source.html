@@ -37,7 +37,7 @@
 <meta property="og:image" content="http://yoursite.com/flink-code-kafka-source/enum_failover.png">
 <meta property="og:image" content="http://yoursite.com/flink-code-kafka-source/reader_failover.png">
 <meta property="article:published_time" content="2023-05-21T02:00:00.000Z">
-<meta property="article:modified_time" content="2023-05-21T03:31:17.831Z">
+<meta property="article:modified_time" content="2023-05-23T14:08:42.129Z">
 <meta property="article:author" content="Liebing">
 <meta property="article:tag" content="Flink">
 <meta name="twitter:card" content="summary">
@@ -224,7 +224,7 @@
         <span class="column is-narrow">
             
             
-            21 minutes read (About 3190 words)
+            21 minutes read (About 3166 words)
         </span>
         
         
@@ -253,7 +253,7 @@
 <li><strong>&#x9700;&#x8981;&#x663E;&#x793A;&#x4F7F;&#x7528;Checkpoint Lock:</strong> &#x7531;&#x4E8E;Checkpoint Lock&#x662F;&#x975E;&#x516C;&#x5E73;&#x9501;, <code>SourceFunction</code>&#x53EF;&#x80FD;&#x957F;&#x671F;&#x6301;&#x6709;&#x800C;&#x5BFC;&#x81F4;Checkpoint&#x963B;&#x585E;. &#x53E6;&#x5916;&#x663E;&#x793A;&#x52A0;&#x9501;&#x7684;&#x65B9;&#x5F0F;&#x4E5F;&#x4E0D;&#x7B26;&#x5408;Flink&#x7B97;&#x5B50;Actor/Mailbox&#x98CE;&#x683C;&#x7684;&#x7EBF;&#x7A0B;&#x6A21;&#x578B;&#x8BBE;&#x8BA1;.</li>
 <li><strong>&#x6CA1;&#x6709;&#x7EDF;&#x4E00;&#x7684;&#x7EBF;&#x7A0B;&#x6A21;&#x578B;:</strong> &#x4E3A;&#x4E86;&#x907F;&#x514D;&#x963B;&#x585E;&#x4E3B;&#x7EBF;&#x7A0B;, Source&#x901A;&#x5E38;&#x9700;&#x8981;&#x5B9E;&#x73B0;IO&#x7EBF;&#x7A0B;&#x6765;&#x8FDB;&#x884C;&#x6570;&#x636E;&#x8BFB;&#x53D6;. &#x76EE;&#x524D;&#x7531;&#x4E8E;&#x7F3A;&#x4E4F;&#x7EDF;&#x4E00;&#x7684;&#x7EBF;&#x7A0B;&#x7BA1;&#x7406;, &#x63D0;&#x9AD8;&#x4E86;&#x5B9E;&#x73B0;&#x65B0;&#x7684;Source&#x7684;&#x95E8;&#x69DB;.</li>
 </ul>
-<p>&#x4ECE;&#x7ED3;&#x679C;&#x6765;&#x770B;, FLIP-27&#x4EE5;&#x53CA;&#x4E4B;&#x540E;&#x7684;[FLIP-182](<a href="https://cwiki.apache.org/confluence/display/FLINK/FLIP-182%3A+Support+watermark+alignment+of+FLIP-27+Sources" target="_blank" rel="noopener">FLIP-182: Support watermark alignment of FLIP-27 Sources - Apache Flink - Apache Software Foundation</a>)&#x548C;[FLIP-217](<a href="https://cwiki.apache.org/confluence/display/FLINK/FLIP-217%3A+Support+watermark+alignment+of+source+splits" target="_blank" rel="noopener">FLIP-217: Support watermark alignment of source splits - Apache Flink - Apache Software Foundation</a>)&#x5DF2;&#x7ECF;&#x57FA;&#x672C;&#x89E3;&#x51B3;&#x4E86;&#x4E0A;&#x8FF0;&#x95EE;&#x9898;. File, Kafka, Pulsar&#x7B49;&#x5E38;&#x89C1;&#x6570;&#x636E;&#x6E90;&#x7684;Connector&#x4E5F;&#x5DF2;&#x7ECF;&#x57FA;&#x4E8E;&#x65B0;&#x7684;&#x63A5;&#x53E3;&#x8FDB;&#x884C;&#x4E86;&#x91CD;&#x6784;.</p>
+<p>&#x4ECE;&#x7ED3;&#x679C;&#x6765;&#x770B;, FLIP-27&#x4EE5;&#x53CA;&#x4E4B;&#x540E;&#x7684;<a href="https://cwiki.apache.org/confluence/display/FLINK/FLIP-182%3A+Support+watermark+alignment+of+FLIP-27+Sources" target="_blank" rel="noopener">FLIP-182</a>&#x548C;<a href="https://cwiki.apache.org/confluence/display/FLINK/FLIP-217%3A+Support+watermark+alignment+of+source+splits" target="_blank" rel="noopener">FLIP-217</a>&#x5DF2;&#x7ECF;&#x57FA;&#x672C;&#x89E3;&#x51B3;&#x4E86;&#x4E0A;&#x8FF0;&#x95EE;&#x9898;. File, Kafka, Pulsar&#x7B49;&#x5E38;&#x89C1;&#x6570;&#x636E;&#x6E90;&#x7684;Connector&#x4E5F;&#x5DF2;&#x7ECF;&#x57FA;&#x4E8E;&#x65B0;&#x7684;&#x63A5;&#x53E3;&#x8FDB;&#x884C;&#x4E86;&#x91CD;&#x6784;.</p>
 <h1 id="&#x6838;&#x5FC3;&#x63A5;&#x53E3;"><a href="#&#x6838;&#x5FC3;&#x63A5;&#x53E3;" class="headerlink" title="&#x6838;&#x5FC3;&#x63A5;&#x53E3;"></a>&#x6838;&#x5FC3;&#x63A5;&#x53E3;</h1><p>&#x5728;FLIP-27&#x4E2D;, &#x6700;&#x6838;&#x5FC3;&#x7684;&#x4E24;&#x4E2A;&#x63A5;&#x53E3;&#x662F;<code>SplitEnumerator</code>&#x548C;<code>SourceReader</code>. &#x5176;&#x4E2D;:</p>
 <ul>
 <li><code>SplitEnumerator</code>&#x7528;&#x4E8E;&#x53D1;&#x73B0;Splits&#x5E76;&#x5C06;&#x5176;&#x5206;&#x914D;&#x7ED9;<code>SourceReader</code>.</li>
