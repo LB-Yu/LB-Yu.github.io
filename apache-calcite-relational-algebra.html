@@ -38,7 +38,7 @@
 <meta property="og:image" content="http://yoursite.com/apache-calcite-relational-algebra/rexNode.png">
 <meta property="og:image" content="http://yoursite.com/apache-calcite-relational-algebra/SqlToRelConverter.png">
 <meta property="article:published_time" content="2023-04-04T01:00:00.000Z">
-<meta property="article:modified_time" content="2023-05-01T08:23:47.617Z">
+<meta property="article:modified_time" content="2023-06-18T06:21:43.323Z">
 <meta property="article:author" content="Liebing">
 <meta property="article:tag" content="Apache Calcite">
 <meta name="twitter:card" content="summary">
@@ -302,13 +302,13 @@
 <td></td>
 <td>&#x6295;&#x5F71;(Project)</td>
 <td>$\Pi$</td>
-<td>&#x7B26;&#x53F7;: $\Pi_{x, y}(R)$<br>SQL: <code>SELECT x, y FROM R</code></td>
+<td>&#x7B26;&#x53F7;: $\Pi_{x, y}(R)$ <br> SQL: <code>SELECT x, y FROM R</code></td>
 </tr>
 <tr>
 <td></td>
 <td>&#x8D4B;&#x503C;(Assignment)</td>
 <td>$\gets$</td>
-<td>&#x7B26;&#x53F7;: $t \gets \Pi<em>{x, y}(\rho</em>{condition}(R))$<br>SQL: <code>CREATE VIEW t AS SELECT x, y FROM R WHERE condition</code></td>
+<td>&#x7B26;&#x53F7;: <script type="math/tex">t \gets \Pi_{x, y}(\sigma_{condition}(R))</script> <br>SQL: <code>CREATE VIEW t AS SELECT x, y FROM R WHERE condition</code></td>
 </tr>
 <tr>
 <td></td>
