@@ -1,6 +1,6 @@
 @charset "UTF-8";
 body, button, input, select, textarea {
-  font-family: "Georgia", "Noto Serif", "STZhongsong", "Microsoft YaHei", serif; }
+  font-family: "Georgia", "Noto Serif", "Hiragino Sans GB", "Heiti SC", "Verdana", "Microsoft YaHei", serif; }
 
 a.tag.article-tag {
   font-size: 1.06rem;
@@ -15,7 +15,8 @@ a.tag.article-tag {
 
 .navbar-main {
   border-bottom: 1px solid #dbdbdb;
-  transition: 0.1s ease-in; }
+  transition: 0.1s ease-in;
+  font-family: "Georgia", "Noto Serif", "STZhongSong", "Microsoft YaHei", serif; }
   .navbar-main .navbar-logo {
     font-size: 1.5rem;
     font-weight: 600; }
@@ -31,11 +32,19 @@ a.tag.article-tag {
   padding-top: 2rem;
   border-top: 1px solid #dbdbdb; }
 
-.article .article-title a,
+.article .article-title a {
+  font-weight: 600;
+  color: inherit;
+  border-bottom: 1px dotted transparent; }
+  .article .article-title a:hover {
+    border-bottom-color: black; }
+
+.article .article-title {
+  font-weight: 600; }
+
 .article .article-meta a {
   color: inherit;
   border-bottom: 1px dotted transparent; }
-  .article .article-title a:hover,
   .article .article-meta a:hover {
     border-bottom-color: black; }
 
@@ -53,10 +62,14 @@ a.tag.article-tag {
 
 .article .article-entry {
   font-size: 1.06rem;
+  font-weight: 300;
+  letter-spacing: 0.01rem;
+  word-spacing: 0em;
   margin-bottom: 3rem; }
   .article .article-entry h1, .article .article-entry h2, .article .article-entry h3, .article .article-entry h4, .article .article-entry h5, .article .article-entry h6 {
     cursor: pointer;
-    position: relative; }
+    position: relative;
+    font-weight: 900; }
     .article .article-entry h1:hover:before, .article .article-entry h2:hover:before, .article .article-entry h3:hover:before, .article .article-entry h4:hover:before, .article .article-entry h5:hover:before, .article .article-entry h6:hover:before {
       content: '';
       position: absolute;
@@ -194,6 +207,7 @@ a.tag.article-tag {
   margin-top: 3rem; }
 
 .comments {
+  font-family: "Georgia", "Noto Serif", "STZhongSong", "Microsoft YaHei", serif;
   margin-top: 3rem;
   padding-top: 3rem;
   border-top: 1px solid #dbdbdb; }
@@ -226,6 +240,7 @@ a.tag.article-tag {
         border-bottom-color: darkgray; }
 
 .footer {
+  font-family: "Georgia", "Noto Serif", "STZhongSong", "Microsoft YaHei", serif;
   font-size: 1.06rem;
   background: transparent; }
   .footer .content {
