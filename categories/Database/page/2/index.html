@@ -2,7 +2,7 @@
 <html class="has-navbar-fixed-top">
 <head>
     <meta charset="utf-8">
-<title>Liebing&#39;s Blog</title>
+<title>Category: Database - Liebing&#39;s Blog</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
@@ -20,7 +20,7 @@
 
     <meta property="og:type" content="website">
 <meta property="og:title" content="Liebing&#39;s Blog">
-<meta property="og:url" content="http://yoursite.com/page/5/index.html">
+<meta property="og:url" content="http://yoursite.com/categories/Database/page/2/index.html">
 <meta property="og:site_name" content="Liebing&#39;s Blog">
 <meta property="og:locale" content="en_US">
 <meta property="article:author" content="Liebing">
@@ -132,18 +132,25 @@
     </div>
 </nav>
 
-    <section class="section">
+    <section class="section section-heading">
+    <div class="container">
+        <div class="content">
+            <h5><i class="far fa-folder"></i>Database</h5>
+        </div>
+    </div>
+</section>
+<section class="section">
     <div class="container">
     
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
-            <a href="/hbase-filter.html" itemprop="url">HBase最佳实践 - HBase过滤器源码剖析及自定义过滤器</a>
+            <a href="/local-transaction.html" itemprop="url">数据库事务系列-本地事务模型基础</a>
         
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2020-03-06T14:15:20.000Z" itemprop="datePublished">Mar 6 2020</time>
+            <time datetime="2018-05-11T14:32:57.000Z" itemprop="datePublished">May 11 2018</time>
         </span>
         
         <span class="column is-narrow article-category">
@@ -155,188 +162,23 @@
         <span class="column is-narrow">
             
             
-            21 minutes read (About 3177 words)
+            27 minutes read (About 4075 words)
         </span>
         
         
     </div>
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <html><head></head><body><p>&#x672C;&#x6587;&#x9996;&#x5148;&#x7ED3;&#x5408;HBase&#x8FC7;&#x6EE4;&#x5668;&#x7684;&#x6E90;&#x7801;, &#x8BB2;&#x8FF0;HBase&#x8FC7;&#x6EE4;&#x5668;&#x62BD;&#x8C61;&#x57FA;&#x7C7B;Filter&#x4E2D;&#x5404;&#x4E2A;&#x51FD;&#x6570;&#x7684;&#x4F5C;&#x7528;. &#x6700;&#x7EC8;&#x7ED9;&#x51FA;&#x4E00;&#x4E2A;&#x7B80;&#x5355;&#x7684;&#x81EA;&#x5B9A;&#x4E49;&#x8FC7;&#x6EE4;&#x5668;&#x7684;&#x6848;&#x4F8B;, &#x5728;&#x6B64;&#x57FA;&#x7840;&#x4E0A;&#x5206;&#x6790;&#x4E86;Filter&#x4E2D;&#x5404;&#x4E2A;&#x65B9;&#x6CD5;&#x7684;&#x6267;&#x884C;&#x6D41;&#x7A0B;, &#x8BFB;&#x8005;&#x5728;&#x7406;&#x89E3;&#x8BE5;&#x6848;&#x4F8B;&#x7684;&#x57FA;&#x7840;&#x4E0A;&#x53EF;&#x4EE5;&#x7F16;&#x5199;&#x4EFB;&#x4F55;&#x4E2A;&#x6027;&#x5316;&#x7684;&#x8FC7;&#x6EE4;&#x5668;. &#x672C;&#x6587;&#x6D89;&#x53CA;&#x7684;&#x6E90;&#x7801;&#x57FA;&#x4E8E;HBase 1.4.x.</p></body></html>
+        <html><head></head><body><p><strong>&#x4E8B;&#x52A1;</strong>, &#x6216;&#x8005;&#x66F4;&#x4E25;&#x683C;&#x5730;&#x8BF4;<strong>&#x6570;&#x636E;&#x5E93;&#x4E8B;&#x52A1;</strong>, &#x53EF;&#x80FD;&#x662F;&#x6570;&#x636E;&#x5E93;&#x7406;&#x8BBA;&#x4E2D;&#x6700;&#x96BE;&#x7406;&#x89E3;&#x7684;&#x672F;&#x8BED;&#x4E4B;&#x4E00;. &#x8981;&#x771F;&#x6B63;&#x7406;&#x89E3;&#x4E8B;&#x52A1;&#x7684;&#x5185;&#x6DB5;&#x548C;&#x5176;&#x5916;&#x5EF6;, &#x6700;&#x91CD;&#x8981;&#x7684;&#x662F;&#x601D;&#x8003;&#x548C;&#x7406;&#x89E3;&#x4EE5;&#x4E0B;&#x95EE;&#x9898;:</p>
+<ul>
+<li>&#x4E3A;&#x4EC0;&#x4E48;&#x4F1A;&#x51FA;&#x73B0;&#x4E8B;&#x52A1;? &#x4E8B;&#x52A1;&#x662F;&#x4E00;&#x79CD;&#x81EA;&#x7136;&#x6CD5;&#x5219;&#x8FD8;&#x662F;&#x4EBA;&#x4E3A;&#x521B;&#x9020;&#x7684;?</li>
+<li>&#x4EC0;&#x4E48;&#x662F;&#x4E8B;&#x52A1;, &#x6216;&#x8005;&#x8BF4;&#x4E8B;&#x52A1;&#x7684;&#x5B9A;&#x4E49;&#x662F;&#x4EC0;&#x4E48;?</li>
+<li>&#x4E8B;&#x52A1;&#x6709;&#x4EC0;&#x4E48;&#x6837;&#x7684;&#x7279;&#x6027;? &#x80FD;&#x6EE1;&#x8DB3;&#x4EC0;&#x4E48;&#x6837;&#x7684;&#x5E94;&#x7528;&#x573A;&#x666F;?</li>
+<li>&#x4E8B;&#x52A1;&#x662F;&#x5426;&#x5B58;&#x5728;&#x52A3;&#x52BF;? &#x6709;&#x6CA1;&#x6709;&#x5F25;&#x8865;&#x65B9;&#x6CD5;?</li>
+</ul>
+<p>&#x8FD9;&#x7BC7;&#x535A;&#x6587;&#x5206;&#x4E3A;&#x4E09;&#x4E2A;&#x90E8;&#x5206;: &#x7B2C;&#x4E00;&#x90E8;&#x5206;&#x4ECB;&#x7ECD;&#x4E8B;&#x52A1;&#x7684;&#x5B9A;&#x4E49;; &#x7B2C;&#x4E8C;&#x90E8;&#x5206;&#x4ECB;&#x7ECD;&#x4E8B;&#x52A1;&#x7684;ACID&#x7279;&#x6027;; &#x7B2C;&#x4E09;&#x90E8;&#x5206;&#x4ECB;&#x7ECD;&#x4E0E;&#x4E8B;&#x52A1;&#x4E2D;&#x9694;&#x79BB;&#x6027;&#x76F8;&#x5173;&#x7684;&#x6982;&#x5FF5;, &#x4E3B;&#x8981;&#x5305;&#x62EC;&#x5E38;&#x89C1;&#x7684;4&#x4E2D;&#x9694;&#x79BB;&#x7EA7;&#x522B;. &#x8BFB;&#x8005;&#x9700;&#x8981;&#x6CE8;&#x610F;&#x7684;&#x662F;, &#x672C;&#x6587;&#x6240;&#x63CF;&#x8FF0;&#x7684;&#x4E8B;&#x52A1;&#x662F;&#x6307;&#x672C;&#x5730;&#x4E8B;&#x52A1;, &#x4E5F;&#x5C31;&#x662F;&#x6307;&#x5728;&#x5355;&#x4E00;&#x6570;&#x636E;&#x8282;&#x70B9;&#x4E2D;&#x5BF9;&#x5355;&#x4E00;&#x6570;&#x636E;&#x5E93;&#x8D44;&#x6E90;&#x7684;&#x8BBF;&#x95EE;&#x63A7;&#x5236;, &#x5206;&#x5E03;&#x5F0F;&#x4E8B;&#x52A1;&#x9700;&#x8981;&#x5728;&#x672C;&#x5730;&#x4E8B;&#x52A1;&#x7684;&#x57FA;&#x7840;&#x4E4B;&#x4E0A;&#x5F15;&#x5165;&#x989D;&#x5916;&#x7684;&#x534F;&#x8BAE;&#x548C;&#x534F;&#x8C03;&#x673A;&#x5236;, &#x672C;&#x6587;&#x5E76;&#x4E0D;&#x6D89;&#x53CA;. &#x6B64;&#x5916;, &#x672C;&#x6587;&#x6240;&#x63CF;&#x8FF0;&#x7684;&#x4E8B;&#x52A1;&#x662F;&#x6982;&#x5FF5;&#x5C42;&#x9762;&#x4E0A;&#x7684;, &#x5E76;&#x4E0D;&#x6D89;&#x53CA;&#x5177;&#x4F53;&#x7684;&#x5B9E;&#x73B0;&#x65B9;&#x6CD5;, &#x4E0D;&#x540C;&#x6570;&#x636E;&#x5E93;&#x7684;&#x4E8B;&#x52A1;&#x5B9E;&#x73B0;&#x65B9;&#x6CD5;&#x53EF;&#x80FD;&#x653E;&#x5728;&#x4E4B;&#x540E;&#x7684;&#x535A;&#x6587;&#x4E2D;&#x4ECB;&#x7ECD;. &#x603B;&#x7684;&#x6765;&#x8BF4;, &#x5173;&#x7CFB;&#x578B;&#x6570;&#x636E;&#x5E93;&#x90FD;&#x5B8C;&#x7F8E;&#x7684;&#x652F;&#x6301;&#x4E86;&#x672C;&#x6587;&#x6240;&#x63CF;&#x8FF0;&#x7684;&#x4E8B;&#x52A1;&#x6A21;&#x578B;.</p></body></html>
         <p class="article-more-link">
-            <a href="/hbase-filter.html#more">Read More</a>
-        </p>
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/byzantine-generals-problem.html" itemprop="url">拜占庭将军问题 (The Byzantine Generals Problem)</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2020-02-14T13:54:27.000Z" itemprop="datePublished">Feb 14 2020</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/categories/Distributed-System/">Distributed System</a>
-        </span>
-        
-        
-        <span class="column is-narrow">
-            
-            
-            17 minutes read (About 2573 words)
-        </span>
-        
-        
-    </div>
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <html><head></head><body><p>&#x62DC;&#x5360;&#x5EAD;&#x5C06;&#x519B;&#x95EE;&#x9898;(The Byzantine Generals Problem)&#x63D0;&#x4F9B;&#x4E86;&#x5BF9;<strong>&#x5206;&#x5E03;&#x5F0F;&#x5171;&#x8BC6;&#x95EE;&#x9898;</strong>&#x7684;&#x4E00;&#x79CD;&#x60C5;&#x666F;&#x5316;&#x63CF;&#x8FF0;, &#x7531;Leslie Lamport&#x7B49;&#x4EBA;&#x5728;1982&#x5E74;&#x9996;&#x6B21;&#x53D1;&#x8868;. &#x672C;&#x6587;&#x9996;&#x5148;&#x4EE5;&#x63D2;&#x56FE;&#x7684;&#x5F62;&#x5F0F;&#x63CF;&#x8FF0;&#x62DC;&#x5360;&#x5EAD;&#x5C06;&#x519B;&#x95EE;&#x9898;, &#x6700;&#x540E;&#x5728;&#x7406;&#x89E3;&#x62DC;&#x5360;&#x5EAD;&#x5C06;&#x519B;&#x95EE;&#x9898;&#x7684;&#x57FA;&#x7840;&#x4E0A;&#x5BF9;&#x73B0;&#x6709;&#x7684;&#x5206;&#x5E03;&#x5F0F;&#x5171;&#x8BC6;&#x7B97;&#x6CD5;&#x8FDB;&#x884C;&#x5206;&#x7C7B;.</p></body></html>
-        <p class="article-more-link">
-            <a href="/byzantine-generals-problem.html#more">Read More</a>
-        </p>
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/tinyflow.html" itemprop="url">Tinyflow - A Simple Neural Network Framework</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2019-07-23T04:00:00.000Z" itemprop="datePublished">Jul 23 2019</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/categories/Machine-Learning/">Machine Learning</a>
-        </span>
-        
-        
-        <span class="column is-narrow">
-            
-            
-            7 minutes read (About 1004 words)
-        </span>
-        
-        
-    </div>
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <html><head></head><body><p>In recent years, thanks to the rapid growth of computing power, deep learning has blossomed. The increase in computing power is largely due to the GPUs. As we all know, the current popular deep learning frameworks such as tensorfow, pytorch, mxnet, etc. all support GPU acceleration. In order to explore the implementation principles behind the deep learning framework, this blog post will attempt to build a simple deep learning framework - <a href="https://github.com/LB-Yu/tinyflow" target="_blank" rel="noopener">Tinyflow</a>. We will build a general automatic differentiation framework in which you can add any custom operator. To keep it simple, Tinyflow only implements the operators necessary for multilayer perceptron (MLP) models (such as <code>MatMulOp</code>, <code>ReluOp</code>, <code>SoftmaxCrossEntropyOp</code>), and of course it supports the addition of any other operators (such as <code>ConvOp</code>). At the bottom, we will use GPUs to accelerate matrix operations. Although compared to the mature deep learning framework, Tinyflow is very simple, but it does have the two core elements necessary for deep learning framework: automatic differentiation and GPU operation acceleration.</p></body></html>
-        <p class="article-more-link">
-            <a href="/tinyflow.html#more">Read More</a>
-        </p>
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/automatic-differentiation.html" itemprop="url">Automatic Differentiation Based on Computation Graph</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2019-07-22T04:00:00.000Z" itemprop="datePublished">Jul 22 2019</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/categories/Machine-Learning/">Machine Learning</a>
-        </span>
-        
-        
-        <span class="column is-narrow">
-            
-            
-            21 minutes read (About 3154 words)
-        </span>
-        
-        
-    </div>
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <html><head></head><body><p><strong>Automatic differentiation</strong> (AD), also called algorithmic differentiation or simply &#x201C;autodiff&#x201D; is one of the basic algorithms hidden behind the <strong>deep learning framework</strong> such as tensorflow, pytorch, mxnet, etc. It&#x2019;s AD technique that allows us to focus on the design of the model structure without paying much attention to the gradient calculations during model training. However, this blog post will focus on the <strong>principle</strong> and <strong>implementation</strong> of AD. Finally, we will implement an AD framework based on <strong>computational graphs</strong> and use it for logistic regression. You could find all the code <a href="https://github.com/LB-Yu/distributed_system_courses/tree/master/cse559w/assignment1" target="_blank" rel="noopener">here</a>.</p></body></html>
-        <p class="article-more-link">
-            <a href="/automatic-differentiation.html#more">Read More</a>
-        </p>
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/softmax-regression.html" itemprop="url">Softmax Regression (SR)</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2019-07-02T04:00:00.000Z" itemprop="datePublished">Jul 2 2019</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/categories/Machine-Learning/">Machine Learning</a>
-        </span>
-        
-        
-        <span class="column is-narrow">
-            
-            
-            8 minutes read (About 1187 words)
-        </span>
-        
-        
-    </div>
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <html><head></head><body><p>Softmax regression (SR) (or multinomial logistic regression) is a generalization of logistic regression to the case where we want to handle multiple classes. Same as the <a href="/2019/08/02/Logistic-Regression">blog</a> about LR, this blog will detail the <strong>modeling approach</strong>, <strong>loss function</strong>, <strong>forward and backward propagation</strong> of SR. In the end, I will use python with numpy to implement SR and give the use on data sets iris and mnist. You can find all the code <a href="https://github.com/LB-Yu/publication/tree/master/sr" target="_blank" rel="noopener">here</a>.</p></body></html>
-        <p class="article-more-link">
-            <a href="/softmax-regression.html#more">Read More</a>
+            <a href="/local-transaction.html#more">Read More</a>
         </p>
     
     </div>
@@ -354,22 +196,16 @@
         
 <nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
     <div class="pagination-previous">
-        <a href="/page/4/">Prev</a>
+        <a href="/categories/Database/">Prev</a>
     </div>
-    <div class="pagination-next">
-        <a href="/page/6/">Next</a>
+    <div class="pagination-next is-invisible is-hidden-mobile">
+        <a href="/categories/Database/page/3/">Next</a>
     </div>
     <ul class="pagination-list is-hidden-mobile">
         
-        <li><a class="pagination-link" href="/">1</a></li>
+        <li><a class="pagination-link" href="/categories/Database/">1</a></li>
         
-        <li><span class="pagination-ellipsis">&hellip;</span></li>
-        
-        <li><a class="pagination-link" href="/page/4/">4</a></li>
-        
-        <li><a class="pagination-link is-current" href="/page/5/">5</a></li>
-        
-        <li><a class="pagination-link" href="/page/6/">6</a></li>
+        <li><a class="pagination-link is-current" href="/categories/Database/page/2/">2</a></li>
         
     </ul>
 </nav>
