@@ -25,8 +25,8 @@
 <meta property="og:site_name" content="Liebing&#39;s Blog">
 <meta property="og:description" content="Apache Flink&amp;#x539F;&amp;#x7406;&amp;#x4E0E;&amp;#x5B9E;&amp;#x8DF5;&amp;#x672C;&amp;#x5408;&amp;#x96C6;&amp;#x662F;&amp;#x5BF9;&amp;#x7B14;&amp;#x8005;&amp;#x6240;&amp;#x5199;&amp;#x7684;Apache Flink&amp;#x539F;&amp;#x7406;&amp;#x4E0E;&amp;#x5B9E;&amp;#x8DF5;&amp;#x7CFB;&amp;#x5217;">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2023-11-18T13:33:46.213Z">
-<meta property="article:modified_time" content="2023-11-18T13:33:46.213Z">
+<meta property="article:published_time" content="2023-11-18T13:39:19.852Z">
+<meta property="article:modified_time" content="2023-11-18T13:39:19.852Z">
 <meta property="article:author" content="Liebing">
 <meta property="article:tag" content="code">
 <meta name="twitter:card" content="summary">
@@ -130,16 +130,24 @@
                     <a class="navbar-item" href="#Apache-Flink原理与实践">1&nbsp;&nbsp;<b>Apache Flink原理与实践</b></a>
                     
                     
-                    
-                    <a class="navbar-item" href="#目录">1.1&nbsp;&nbsp;目录</a>
-                    
+                    <hr class="navbar-divider">
                     
                     
-                    <a class="navbar-item" href="#Flink源码解析">1.1.1&nbsp;&nbsp;Flink源码解析</a>
+                    <a class="navbar-item" href="#Flink源码解析">2&nbsp;&nbsp;<b>Flink源码解析</b></a>
                     
                     
                     
-                    <a class="navbar-item" href="#Flink最佳实践">1.1.2&nbsp;&nbsp;Flink最佳实践</a>
+                    <a class="navbar-item" href="#Flink-SQL">2.1&nbsp;&nbsp;Flink SQL</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#Flink-Connector">2.2&nbsp;&nbsp;Flink Connector</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Flink最佳实践">3&nbsp;&nbsp;<b>Flink最佳实践</b></a>
                     
                 </div>
             </div>
@@ -172,7 +180,7 @@
     </h1> -->
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <!-- <span class="column is-narrow">
-            <time datetime="2023-11-18T13:33:46.213Z" itemprop="datePublished">Nov 18 2023</time>
+            <time datetime="2023-11-18T13:39:19.852Z" itemprop="datePublished">Nov 18 2023</time>
         </span> -->
         
         
@@ -180,13 +188,13 @@
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
         <html><head></head><body><h1 id="Apache-Flink&#x539F;&#x7406;&#x4E0E;&#x5B9E;&#x8DF5;"><a href="#Apache-Flink&#x539F;&#x7406;&#x4E0E;&#x5B9E;&#x8DF5;" class="headerlink" title="Apache Flink&#x539F;&#x7406;&#x4E0E;&#x5B9E;&#x8DF5;"></a>Apache Flink&#x539F;&#x7406;&#x4E0E;&#x5B9E;&#x8DF5;</h1><p>&#x672C;&#x5408;&#x96C6;&#x662F;&#x5BF9;&#x7B14;&#x8005;&#x6240;&#x5199;&#x7684;Apache Flink&#x539F;&#x7406;&#x4E0E;&#x5B9E;&#x8DF5;&#x7CFB;&#x5217;&#x535A;&#x5BA2;&#x7684;&#x6574;&#x7406;, &#x540E;&#x7EED;&#x82E5;&#x6709;&#x65B0;&#x53D1;&#x5E03;&#x7684;&#x76F8;&#x5173;&#x6587;&#x7AE0;&#x4E5F;&#x4F1A;&#x6536;&#x5F55;&#x8FDB;&#x6765;.</p>
-<h2 id="&#x76EE;&#x5F55;"><a href="#&#x76EE;&#x5F55;" class="headerlink" title="&#x76EE;&#x5F55;"></a>&#x76EE;&#x5F55;</h2><h3 id="Flink&#x6E90;&#x7801;&#x89E3;&#x6790;"><a href="#Flink&#x6E90;&#x7801;&#x89E3;&#x6790;" class="headerlink" title="Flink&#x6E90;&#x7801;&#x89E3;&#x6790;"></a>Flink&#x6E90;&#x7801;&#x89E3;&#x6790;</h3><h4 id="Flink-SQL"><a href="#Flink-SQL" class="headerlink" title="Flink SQL"></a>Flink SQL</h4><ul>
+<h1 id="Flink&#x6E90;&#x7801;&#x89E3;&#x6790;"><a href="#Flink&#x6E90;&#x7801;&#x89E3;&#x6790;" class="headerlink" title="Flink&#x6E90;&#x7801;&#x89E3;&#x6790;"></a>Flink&#x6E90;&#x7801;&#x89E3;&#x6790;</h1><h2 id="Flink-SQL"><a href="#Flink-SQL" class="headerlink" title="Flink SQL"></a>Flink SQL</h2><ul>
 <li><a href="/flink-sql-functions.html">Flink SQL&#x6E90;&#x7801; - SQL&#x51FD;&#x6570;&#x539F;&#x7406;&#x4E0E;&#x5B9E;&#x73B0;</a></li>
 </ul>
-<h4 id="Flink-Connector"><a href="#Flink-Connector" class="headerlink" title="Flink Connector"></a>Flink Connector</h4><ul>
+<h2 id="Flink-Connector"><a href="#Flink-Connector" class="headerlink" title="Flink Connector"></a>Flink Connector</h2><ul>
 <li><a href="/flink-code-kafka-source.html">Flink&#x6E90;&#x7801; - &#x4ECE;KafkaConnector&#x770B;Source&#x63A5;&#x53E3;&#x91CD;&#x6784;</a></li>
 </ul>
-<h3 id="Flink&#x6700;&#x4F73;&#x5B9E;&#x8DF5;"><a href="#Flink&#x6700;&#x4F73;&#x5B9E;&#x8DF5;" class="headerlink" title="Flink&#x6700;&#x4F73;&#x5B9E;&#x8DF5;"></a>Flink&#x6700;&#x4F73;&#x5B9E;&#x8DF5;</h3><ul>
+<h1 id="Flink&#x6700;&#x4F73;&#x5B9E;&#x8DF5;"><a href="#Flink&#x6700;&#x4F73;&#x5B9E;&#x8DF5;" class="headerlink" title="Flink&#x6700;&#x4F73;&#x5B9E;&#x8DF5;"></a>Flink&#x6700;&#x4F73;&#x5B9E;&#x8DF5;</h1><ul>
 <li><a href="/flink-watermark.html">Flink&#x6700;&#x4F73;&#x5B9E;&#x8DF5; - Watermark&#x539F;&#x7406;&#x53CA;&#x5B9E;&#x8DF5;&#x95EE;&#x9898;&#x89E3;&#x6790;</a></li>
 <li><a href="/flink-table-datastream-convert.html">Flink&#x6700;&#x4F73;&#x5B9E;&#x8DF5; - Table&#x4E0E;DataStream&#x4E92;&#x76F8;&#x8F6C;&#x6362;</a></li>
 <li><a href="/flink-sql-hbase.html">Flink SQL&#x6700;&#x4F73;&#x5B9E;&#x8DF5; - HBase SQL Connector&#x5E94;&#x7528;</a></li>
