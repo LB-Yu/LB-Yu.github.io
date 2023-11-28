@@ -317,7 +317,11 @@ a.tag.article-tag {
 code, pre {
   font-size: 0.95rem;
   font-family: "Source Code Pro", monospace, "Microsoft YaHei";
-  color: #30303c; }
+  color: #30303c;
+  background: #f1f3f5;
+  border: 1px solid #eee;
+  border-radius: 3px;
+  padding: .0em .0em .0em; }
 
 figure.highlight {
   padding: 0;
