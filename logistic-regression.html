@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head>
+    <meta charset="utf-8">
+<title>Logistic Regression (LR) - Liebing&#39;s Blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="baidu-site-verification" content="codeva-2Q9E1leVAG" />
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="">
+
+
+
+<meta name="keywords" content="code">
+
+
+
+    <meta name="description" content="Logistic regression (LR) is a binary classification algorithm for predicting discrete values (In general, the predicted result is 0 or 1). This blog will detail the modeling approach, loss function, f">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Logistic Regression (LR)">
+<meta property="og:url" content="http://yoursite.com/logistic-regression.html">
+<meta property="og:site_name" content="Liebing&#39;s Blog">
+<meta property="og:description" content="Logistic regression (LR) is a binary classification algorithm for predicting discrete values (In general, the predicted result is 0 or 1). This blog will detail the modeling approach, loss function, f">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/logistic-regression/sigmoid.png">
+<meta property="og:image" content="http://yoursite.com/logistic-regression/forward.png">
+<meta property="article:published_time" content="2019-07-01T04:00:00.000Z">
+<meta property="article:modified_time" content="2024-05-29T12:13:46.527Z">
+<meta property="article:author" content="Liebing">
+<meta property="article:tag" content="Algorithm">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/logistic-regression/sigmoid.png">
+
+
+
+
+
+<link rel="icon" href="/img/favicon.ico">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt="" height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/collections">合集</a>
+            
+            <a class="navbar-item "
+               href="/courses">课程</a>
+            
+            <a class="navbar-item "
+               href="/archive">归档</a>
+            
+            <a class="navbar-item "
+               href="/categories">分类</a>
+            
+            <a class="navbar-item "
+               href="/tags">标签</a>
+            
+            <a class="navbar-item "
+               href="/friends">友链</a>
+            
+            <a class="navbar-item "
+               href="/about">关于</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#Sigmoid-function">1&nbsp;&nbsp;<b>Sigmoid function</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Modeling-approach">2&nbsp;&nbsp;<b>Modeling approach</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Loss-function">3&nbsp;&nbsp;<b>Loss function</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Gradient-derivation">4&nbsp;&nbsp;<b>Gradient derivation</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Implementation">5&nbsp;&nbsp;<b>Implementation</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Example">6&nbsp;&nbsp;<b>Example</b></a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/LB-Yu" target="_blank" rel="noopener">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="知" href="https://www.zhihu.com/people/liebingyu" target="_blank" rel="noopener">
+                
+                知
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Logistic Regression (LR)
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2019-07-01T04:00:00.000Z" itemprop="datePublished">Jul 1 2019</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/Machine-Learning/">Machine Learning</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            7 minutes read (About 1043 words)
+        </span>
+        
+        
+        <span id="/logistic-regression.html" class="column is-narrow leancloud_visitors" data-flag-title="Logistic Regression (LR)">
+            VISITED
+                <i class="leancloud-visitors-count">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </i>
+            TIMES
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <html><head></head><body><p>Logistic regression (LR) is a binary classification algorithm for predicting discrete values (In general, the predicted result is 0 or 1). This blog will detail the <strong>modeling approach</strong>, <strong>loss function</strong>, <strong>forward and backward propagation</strong> of LR. In the end, I will use python with numpy to implement LR and give the use on data sets iris and mnist. You can find all the code <a href="https://github.com/LB-Yu/publication/tree/master/lr" target="_blank" rel="noopener">here</a>.</p>
+<a id="more"></a>
+
+<h1 id="Sigmoid-function"><a href="#Sigmoid-function" class="headerlink" title="Sigmoid function"></a>Sigmoid function</h1><p>Sigmoid function also called logistic function is an S-shaped function that &#x201C;squashes&#x201D; the variable into the range [0, 1]. The sigmoid function is defined by the following formula:<br>$$ \delta(x) = \frac{1}{1 + e^{-x}} $$</p>
+<p>The function image of the sigmoid function is an sigmoid curve.</p>
+<p align="center">
+    <img src="./logistic-regression/sigmoid.png" width="50%">
+</p>
+
+<p>In machine learning, we often use the derivative of the sigmoid function. So Let&#x2019;s first calculate the derivative of the sigmoid function:<br>$$ \delta&#x2019;(x) = \frac{e^{-x}}{(1+e^{-x})^2} = \frac{1}{1+e^{-x}} \cdot  \frac{1+e^{-x}-1}{1+e^{-x}} = \delta(x) \cdot (1-\delta(x))$$</p>
+<p>The sigmoid function has two common uses.</p>
+<ul>
+<li>Activation function as a neural network;</li>
+<li>Used for probabilistic modeling for binary classification.<br>In this blog, we mainly use the sigmoid function in binary classification.</li>
+</ul>
+<h1 id="Modeling-approach"><a href="#Modeling-approach" class="headerlink" title="Modeling approach"></a>Modeling approach</h1><p>In LR we use sigmoid function to model probability. Now suppose we have a binary classification problem, and we got a training set $ {(x_1, y_1), (x_2, y_2), &#x2026;, (x_m, y_m)} $ of $ m $ labeled examples, where the input features are $ x_i \in \Re^{[n, 1]} $. To solve this binary classification problem, we need to build a classification model and train the model with the existing <em>m</em> samples. If we choose the appropriate model and do the right training, then we can use the model we trained to predict the new sample to determine which category it belongs to. Based on our understanding of the sigmoid function, we can see that it is very suitable for solving binary classification problems. We can take the value of the sigmoid function as the probability that the sample belongs to a certain category. More formal, if $ y \in {0, 1} $. Then LR can be expressed as:<br>$$ P(y=1 | x;w,b)=\frac{1}{1+e^{-(w^Tx+b)}} $$<br>$$ P(y=0 | x;w,b)=1-p(y=1|x;w,b) $$</p>
+<p>Which $ w \in \Re ^ {[n, 1]} $ is the weight vector of the model, $ b \in \Re $ is the bias term. For the convenience of writing, let $ \hat{y}=P(y=1 | x;w,b) $.</p>
+<h1 id="Loss-function"><a href="#Loss-function" class="headerlink" title="Loss function"></a>Loss function</h1><p>Based on the LR model, we can derive its objective function by the maximum likelihood method. Our goal is to minimize the difference between the predicted and actual values of the model, which is equivalent to:<br>$$ maximize \ \ \ \ P(y=1|x;w,b)^y \cdot P(y=0|x;w,b)^{1-y} $$<br>$$ maximize \ \ \ \ P(y=1|x;w,b)^y \cdot (1-P(y=1|x;w,b))^{1-y} $$<br>$$ maximize \ \ \ \ \hat{y}^y \cdot (1-\hat{y})^{1-y} $$<br>$$ minimize \ \ \ \ -log[\hat{y}^y \cdot (1-\hat{y})^{1-y}] $$<br>$$ minimize \ \ \ \ -[y \cdot log\hat{y} + (1-y) \cdot log(1-\hat{y})] $$<br>So the loss function of LR is:<br>$$ \mathcal L(y, \hat{y})=-[y \cdot log\hat{y} + (1-y) \cdot log(1-\hat{y})] $$</p>
+<h1 id="Gradient-derivation"><a href="#Gradient-derivation" class="headerlink" title="Gradient derivation"></a>Gradient derivation</h1><p>In order to train the LR model, we need to update the gradient of the model&#x2019;s weight vector. Although the <a href="/2019/07/22/AI-System-Automatic-Differentiation/index.html">automatic differentiation</a> algorithm can help us automate this operation. In this blog I will still manually derive the gradient of the weight vector to deepen the understanding of LR.</p>
+<p>The forward propagation of the LR model is as follows:</p>
+<p align="center">
+    <img src="./logistic-regression/forward.png" width="50%">
+</p>
+
+<ul>
+<li>for one example:<br>$$ z=w^Tx+b $$<br>$$ \hat{y}=\delta{(z)} $$</li>
+<li>vectorization:<br>$$ Z=Xw+b $$<br>$$ \hat{Y}=\delta{(Z)} $$<br>Based on the chain rule we can easily find the gradient of any variable.</li>
+<li>for one example:<br>$$ \frac{\partial \mathcal L}{\partial \hat{y}}=-\frac{y}{\hat{y}} + \frac{1-y}{1-\hat{y}} $$<br>$$ \frac{\partial \hat{y}}{\partial z}=\hat{y}\cdot(1-\hat{y}) $$<br>$$ \frac{\partial z}{\partial w}=x    \ \ \ \     \frac{\partial z}{\partial b}=1 $$</li>
+</ul>
+<p>$$ \frac{\partial \mathcal L}{\partial w}=\frac{\partial \mathcal L}{\partial \hat{y}} \cdot \frac{\partial \hat{y}}{\partial z} \cdot \frac{\partial z}{\partial w}=x(\hat{y}-y) $$<br>$$ \frac{\partial \mathcal L}{\partial b}=\frac{\partial \mathcal L}{\partial \hat{y}} \cdot \frac{\partial \hat{y}}{\partial z} \cdot \frac{\partial z}{\partial b}=\hat{y}-y $$</p>
+<ul>
+<li>vectorization (<em>m</em> is the number of examples, <em>n</em> is the number of features):<br>$$ \frac{\partial \mathcal L}{\partial w}=\frac{1}{m}X^T(\hat{Y}-Y) \ \ \ \ X \in \Re^{[m, n]} \ \ \ \  Y, \hat{Y} \in \Re^{[m, 1]} $$<br>$$ \frac{\partial \mathcal L}{\partial b}=\frac{1}{m}\sum (\hat{Y}-Y) $$</li>
+</ul>
+<h1 id="Implementation"><a href="#Implementation" class="headerlink" title="Implementation"></a>Implementation</h1><p>With the existing library we can implement LR very conveniently. But here we use pure python with numpy to achieve deeper understanding of LR. In order to follow the habit we use the same interface as sklearn.<br>With numpy we can easily implement sigmoid function.<br></p><figure class="highlight python hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">sigmoid</span><span class="hljs-params">(x)</span>:</span></span><br><span class="line">    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span> / (<span class="hljs-number">1</span> + np.exp(-x))</span><br></pre></td></tr></tbody></table></figure><br>The LR model can also be quickly implemented based on the above derivation.<br><figure class="highlight python hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">LogisticRegression</span>:</span></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self, learning_rate=<span class="hljs-number">0.01</span>, max_iter=<span class="hljs-number">200</span>)</span>:</span></span><br><span class="line">        self.learning_rate = learning_rate</span><br><span class="line">        self.max_iter = max_iter</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">fit</span><span class="hljs-params">(self, X, Y)</span>:</span></span><br><span class="line">        m, n = X.shape</span><br><span class="line">        self.w_ = np.zeros([n, <span class="hljs-number">1</span>])</span><br><span class="line">        self.b_ = <span class="hljs-number">0</span></span><br><span class="line">        self.cost_ = []</span><br><span class="line"></span><br><span class="line">        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(self.max_iter):</span><br><span class="line">            Y_hat = self.predict(X)</span><br><span class="line">            cost = -np.sum(Y * np.log(Y_hat) + (<span class="hljs-number">1</span> - Y) * np.log(<span class="hljs-number">1</span> - Y_hat)) / m</span><br><span class="line">            <span class="hljs-keyword">if</span> i != <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> i % <span class="hljs-number">10</span> == <span class="hljs-number">0</span>:</span><br><span class="line">                print(<span class="hljs-string">&quot;Step: &quot;</span> + str(i) + <span class="hljs-string">&quot;, Cost: &quot;</span> + str(cost))</span><br><span class="line">            self.cost_.append(cost)</span><br><span class="line">            self.w_ -= self.learning_rate * np.dot(X.T, Y_hat - Y) / m</span><br><span class="line">            self.b_ -= self.learning_rate * np.sum(Y_hat - Y) / m</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">predict</span><span class="hljs-params">(self, X)</span>:</span></span><br><span class="line">        <span class="hljs-keyword">return</span> sigmoid(np.dot(X, self.w_) + self.b_)</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">score</span><span class="hljs-params">(self, X, Y)</span>:</span></span><br><span class="line">        Y_hat = self.predict(X).reshape(<span class="hljs-number">-1</span>)</span><br><span class="line">        Y_predict = np.array([<span class="hljs-number">1</span> <span class="hljs-keyword">if</span> y &gt;= <span class="hljs-number">0.5</span> <span class="hljs-keyword">else</span> <span class="hljs-number">0</span> <span class="hljs-keyword">for</span> y <span class="hljs-keyword">in</span> Y_hat])</span><br><span class="line">        false_num = np.sum(Y_predict == Y.reshape(<span class="hljs-number">-1</span>))</span><br><span class="line">        <span class="hljs-keyword">return</span> false_num / len(X)</span><br></pre></td></tr></tbody></table></figure><p></p>
+<h1 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h1><p>In order to verify the correctness of the implementation. I experimented on the irsi dataset and the mnist dataset. The parameters and results of the experiment are as follows:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>iris</th>
+<th>mnist</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>learnig rate</td>
+<td>0.1</td>
+<td>0.01</td>
+</tr>
+<tr>
+<td>max iterate</td>
+<td>100</td>
+<td>300</td>
+</tr>
+<tr>
+<td>test accuracy</td>
+<td>100%</td>
+<td>99.86%</td>
+</tr>
+</tbody></table>
+<p>You can find the all the experimental code <a href="https://github.com/LB-Yu/publication/tree/master/lr" target="_blank" rel="noopener">here</a> and reproduce the experimental results.</p>
+</body></html>
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/Algorithm/">#Algorithm</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/softmax-regression.html">Softmax Regression (SR)</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/local-transaction.html">数据库事务系列-本地事务模型基础</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+<div class="sharebox">
+    
+<div class="sharethis-inline-share-buttons"></div>
+<script type='text/javascript' src='//platform-api.sharethis.com/js/sharethis.js#property=5e63913dd0c39800126ea9e7&amp;product=inline-share-buttons&amp;cms=sop' async='async'></script>
+
+</div>
+
+
+
+<div class="comments">
+    <p align="center">
+        本博客所有文章除特别声明外, 均采用<a href="https://creativecommons.org/licenses/by-nc-sa/3.0/cn/" target="_blank" rel="noopener">CC BY-NC-SA 3.0 CN</a>许可协议. 转载请注明出处!
+    </p>
+
+    <br><br>
+
+    <p align="center">
+        <img src="/images/WeChat.jpg" width="25%">
+    </p>
+    <p align="center">关注笔者微信公众号获得最新文章推送</p>
+</div>
+
+
+
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    
+<div id="valine-thread"></div>
+<script src="//code.bdstatic.com/npm/leancloud-storage@4.12.2/dist/av-min.js"></script>
+<script src='//cdn.jsdelivr.net/gh/AshinWang/SimpleValine@v0.1/SimpleValine.min.js'></script>
+<script>
+    new Valine({
+        el: '#valine-thread',
+        appId: 'v4Ich4NMxLXYhCkPcb1OmVPR-gzGzoHsz',
+        appKey: 'b5fiVY3XvcAwzJ06YR8rFCAj',
+        notify: true,
+        verify: false,
+        avatar: '',
+        placeholder: 'If you have any questions, please comment here!',
+        meta: ['nick', 'mail'],
+        visitor: true,
+        lang: 'en'
+    })
+</script>
+
+
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2018-2024 Liebing&nbsp;. 
+                <!-- <span id="busuanzi_container_site_uv"><span id="busuanzi_value_site_uv"></span> UV, </span>
+                <span id="busuanzi_container_site_pv"> <span id="busuanzi_value_site_pv"></span> PV</span> -->
+
+                View
+                <span id="busuanzi_value_site_pv" data-num="1000">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </span> times by
+                <span id="busuanzi_value_site_uv">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </span> visitors.
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="一行代码, 点滴生活!" href="">
+                    
+                    一行代码, 点滴生活!
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+    <script src="https://code.jquery.com/jquery-latest.js"></script>
+    <!-- 不蒜子计数初始值纠正 -->
+    <script >
+        $(document).ready(function() {
+            var int = setInterval(fixCount, 500);  // 50ms周期检测函数
+            var initPV = 3569;  // 初始化首次数据
+            var initUV = 1215;
+            function fixCount() {                   
+                if ($("#busuanzi_container_site_pv").css("display") != "none") {
+                    $("#busuanzi_value_site_pv").html(parseInt($("#busuanzi_value_site_pv").html()) + initPV); // 加上初始数据 
+                    clearInterval(int); // 停止检测
+                } 
+                if ($("#busuanzi_container_site_uv").css("display") != "none") {
+                    $("#busuanzi_value_site_uv").html(parseInt($("#busuanzi_value_site_uv").html()) + initUV); // 加上初始数据 
+                    clearInterval(int); // 停止检测
+                }  
+            }
+        });
+    </script>
+
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/" target="_blank" rel="noopener">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("en-AU");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+
+<script src="/js/script.js"></script>
+
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+    
+</body>
+</html>

@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head>
+    <meta charset="utf-8">
+<title>Flink源码 - RPC原理与实现 - Liebing&#39;s Blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="baidu-site-verification" content="codeva-2Q9E1leVAG" />
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="">
+
+
+
+<meta name="keywords" content="code">
+
+
+
+    <meta name="description" content="&amp;#x672C;&amp;#x6587;&amp;#x5DF2;&amp;#x6536;&amp;#x5F55;&amp;#x5728;&amp;#x5408;&amp;#x96C6;Apche Flink&amp;#x539F;&amp;#x7406;&amp;#x4E0E;&amp;#x5B9E;&amp;#x8DF5;&amp;#x4E2D;.   Flink&amp;#x4F5C;&amp;#x4E3A;&amp;#x4E00;&amp;#x4E2A;&amp;#x5206;&amp;#x5E03;&amp;#x5F0F;&amp;#x8BA1;&amp;#x7">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flink源码 - RPC原理与实现">
+<meta property="og:url" content="http://yoursite.com/flink-code-rpc.html">
+<meta property="og:site_name" content="Liebing&#39;s Blog">
+<meta property="og:description" content="&amp;#x672C;&amp;#x6587;&amp;#x5DF2;&amp;#x6536;&amp;#x5F55;&amp;#x5728;&amp;#x5408;&amp;#x96C6;Apche Flink&amp;#x539F;&amp;#x7406;&amp;#x4E0E;&amp;#x5B9E;&amp;#x8DF5;&amp;#x4E2D;.   Flink&amp;#x4F5C;&amp;#x4E3A;&amp;#x4E00;&amp;#x4E2A;&amp;#x5206;&amp;#x5E03;&amp;#x5F0F;&amp;#x8BA1;&amp;#x7">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/flink-code-rpc/RpcEndpoint.png">
+<meta property="og:image" content="http://yoursite.com/flink-code-rpc/interface_process.png">
+<meta property="og:image" content="http://yoursite.com/flink-code-rpc/actor_model.png">
+<meta property="og:image" content="http://yoursite.com/flink-code-rpc/Actor.png">
+<meta property="og:image" content="http://yoursite.com/flink-code-rpc/Actor_create.png">
+<meta property="og:image" content="http://yoursite.com/flink-code-rpc/rpc_invoke.png">
+<meta property="article:published_time" content="2024-05-01T02:00:00.000Z">
+<meta property="article:modified_time" content="2024-05-29T12:13:46.478Z">
+<meta property="article:author" content="Liebing">
+<meta property="article:tag" content="Flink">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/flink-code-rpc/RpcEndpoint.png">
+
+
+
+
+
+<link rel="icon" href="/img/favicon.ico">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt="" height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/collections">合集</a>
+            
+            <a class="navbar-item "
+               href="/courses">课程</a>
+            
+            <a class="navbar-item "
+               href="/archive">归档</a>
+            
+            <a class="navbar-item "
+               href="/categories">分类</a>
+            
+            <a class="navbar-item "
+               href="/tags">标签</a>
+            
+            <a class="navbar-item "
+               href="/friends">友链</a>
+            
+            <a class="navbar-item "
+               href="/about">关于</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#使用案例">1&nbsp;&nbsp;<b>使用案例</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#接口详解">2&nbsp;&nbsp;<b>接口详解</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#基于Akka的RPC实现">3&nbsp;&nbsp;<b>基于Akka的RPC实现</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#Akka简介">3.1&nbsp;&nbsp;Akka简介</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#Actor实现">3.2&nbsp;&nbsp;Actor实现</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#基于Actor的RPC调用流程">3.3&nbsp;&nbsp;基于Actor的RPC调用流程</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#总结">4&nbsp;&nbsp;<b>总结</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#参考">5&nbsp;&nbsp;<b>参考</b></a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/LB-Yu" target="_blank" rel="noopener">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="知" href="https://www.zhihu.com/people/liebingyu" target="_blank" rel="noopener">
+                
+                知
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Flink源码 - RPC原理与实现
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2024-05-01T02:00:00.000Z" itemprop="datePublished">May 1 2024</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/Distributed-System/">Distributed System</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            11 minutes read (About 1577 words)
+        </span>
+        
+        
+        <span id="/flink-code-rpc.html" class="column is-narrow leancloud_visitors" data-flag-title="Flink源码 - RPC原理与实现">
+            VISITED
+                <i class="leancloud-visitors-count">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </i>
+            TIMES
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <html><head></head><body><blockquote class="colorquote info"><p>&#x672C;&#x6587;&#x5DF2;&#x6536;&#x5F55;&#x5728;&#x5408;&#x96C6;<a href="/collections/flink/">Apche Flink&#x539F;&#x7406;&#x4E0E;&#x5B9E;&#x8DF5;</a>&#x4E2D;.</p>
+</blockquote>
+
+<p>Flink&#x4F5C;&#x4E3A;&#x4E00;&#x4E2A;&#x5206;&#x5E03;&#x5F0F;&#x8BA1;&#x7B97;&#x7CFB;&#x7EDF;, &#x5176;&#x7EC4;&#x4EF6;&#x95F4;&#x7684;&#x901A;&#x4FE1;&#x662F;&#x7531;RPC&#x5B9E;&#x73B0;&#x7684;. &#x4E3A;&#x65B9;&#x4FBF;&#x4F7F;&#x7528;, Flink&#x62BD;&#x8C61;&#x4E86;&#x4E00;&#x5957;RPC&#x6846;&#x67B6;, &#x5E76;&#x63D0;&#x4F9B;&#x4E86;&#x57FA;&#x4E8E;Akka&#x7684;&#x5B9E;&#x73B0;. &#x672C;&#x6587;&#x9996;&#x5148;&#x4ECB;&#x7ECD;Flink RPC&#x6846;&#x67B6;&#x7684;&#x6574;&#x4F53;&#x8BBE;&#x8BA1;, &#x4E4B;&#x540E;&#x4ECB;&#x7ECD;&#x5176;&#x57FA;&#x4E8E;Akka&#x7684;&#x5B9E;&#x73B0;. &#x7406;&#x89E3;Flink&#x7684;RPC&#x5B9E;&#x73B0;&#x662F;&#x7406;&#x89E3;&#x5176;&#x5E95;&#x5C42;&#x7EC4;&#x4EF6;&#x4E4B;&#x95F4;&#x901A;&#x4FE1;&#x539F;&#x7406;&#x7684;&#x57FA;&#x7840;.</p>
+<a id="more"></a>
+
+<blockquote>
+<p>&#x7531;&#x4E8E;Akka&#x5C06;&#x8BB8;&#x53EF;&#x534F;&#x8BAE;&#x4ECE;Apache 2.0&#x6539;&#x4E3A;&#x4E86;Business Source License (BSL) v1.1, &#x4E3A;&#x4E86;&#x907F;&#x514D;&#x5546;&#x4E1A;&#x98CE;&#x9669;, <a href="https://issues.apache.org/jira/browse/FLINK-32468" target="_blank" rel="noopener">FLINK-32468</a>&#x6682;&#x65F6;&#x5C06;Akka&#x66FF;&#x6362;&#x4E3A;&#x4E86;Apache Pekko(Fork&#x81EA;Akka 2.6.x), &#x5DF2;&#x7ECF;&#x5728;Flink 1.18&#x4E2D;&#x53D1;&#x5E03;, &#x7531;&#x4E8E;Pekko&#x6E90;&#x81EA;Akka, &#x56E0;&#x6B64;&#x672C;&#x6587;&#x5728;&#x4ECB;&#x7ECD;&#x65F6;&#x4E0D;&#x4F5C;&#x533A;&#x5206;. &#x8FDC;&#x671F;&#x770B;&#x793E;&#x533A;&#x6709;&#x8BA1;&#x5212;&#x5C06;Akka&#x66FF;&#x6362;&#x4E3A;gRPC(<a href="https://issues.apache.org/jira/browse/FLINK-29281" target="_blank" rel="noopener">FLINK-29281</a>).</p>
+</blockquote>
+<p>Flink&#x62BD;&#x8C61;&#x4E86;&#x4E00;&#x5957;RPC&#x63A5;&#x53E3;, &#x57FA;&#x4E8E;&#x8FD9;&#x5957;&#x63A5;&#x53E3;&#x53EF;&#x4EE5;&#x6709;&#x4E0D;&#x540C;&#x7684;&#x5E95;&#x5C42;&#x5B9E;&#x73B0;, &#x4F8B;&#x5982;&#x5F53;&#x524D;&#x57FA;&#x4E8E;Akka&#x7684;&#x5B9E;&#x73B0;, &#x4EE5;&#x53CA;<a href="https://issues.apache.org/jira/browse/FLINK-29281" target="_blank" rel="noopener">&#x8BA1;&#x5212;&#x4E2D;</a>&#x57FA;&#x4E8E;gRPC&#x7684;&#x5B9E;&#x73B0;. Flink&#x7684;RPC&#x5B9E;&#x73B0;&#x90FD;&#x5728;&#x72EC;&#x7ACB;&#x7684;<a href="https://github.com/apache/flink/tree/master/flink-rpc" target="_blank" rel="noopener">flink-rpc</a>&#x6A21;&#x5757;&#x4E0B;, &#x5982;&#x679C;&#x6709;&#x9700;&#x8981;&#x5B8C;&#x5168;&#x53EF;&#x4EE5;&#x5F15;&#x7528;&#x76F8;&#x5173;&#x4F9D;&#x8D56;&#x5E76;&#x5728;&#x5176;&#x4ED6;&#x9879;&#x76EE;&#x4E2D;&#x4F7F;&#x7528;.</p>
+<h1 id="&#x4F7F;&#x7528;&#x6848;&#x4F8B;"><a href="#&#x4F7F;&#x7528;&#x6848;&#x4F8B;" class="headerlink" title="&#x4F7F;&#x7528;&#x6848;&#x4F8B;"></a>&#x4F7F;&#x7528;&#x6848;&#x4F8B;</h1><p>&#x5728;&#x8FDB;&#x4E00;&#x6B65;&#x4ECB;&#x7ECD;Flink RPC&#x63A5;&#x53E3;&#x4E4B;&#x524D;, &#x6211;&#x4EEC;&#x5148;&#x901A;&#x8FC7;&#x4E00;&#x4E2A;&#x7B80;&#x5355;&#x7684;RPC&#x8FDC;&#x7A0B;&#x8C03;&#x7528;&#x6848;&#x4F8B;&#x6765;&#x5C55;&#x793A;&#x4E00;&#x4E0B;Flink RPC&#x63A5;&#x53E3;&#x7684;&#x4F7F;&#x7528;&#x65B9;&#x6CD5;. &#x5B8C;&#x6574;&#x4EE3;&#x7801;&#x53EF;&#x89C1;<a href="https://github.com/LB-Yu/data-systems-learning/tree/master/rpc-learning/flink/src/main/java/org/apache/flink/runtime/rpc/pekko" target="_blank" rel="noopener">&#x6B64;&#x5904;</a>.</p>
+<ol>
+<li><p>&#x5B9A;&#x4E49;&#x670D;&#x52A1;&#x63A5;&#x53E3;.<br></p><figure class="highlight java hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">HelloGateway</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">RpcGateway</span> </span>{</span><br><span class="line">    <span class="hljs-function">String <span class="hljs-title">hello</span><span class="hljs-params">()</span></span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><p></p>
+</li>
+<li><p>&#x5B9A;&#x4E49;&#x670D;&#x52A1;&#x7AEF;&#x7EC4;&#x4EF6;.<br></p><figure class="highlight java hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">HelloRpcEndpoint</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">RpcEndpoint</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">HelloGateway</span> </span>{</span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">HelloRpcEndpoint</span><span class="hljs-params">(RpcService rpcService)</span> </span>{</span><br><span class="line">        <span class="hljs-keyword">super</span>(rpcService);</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="hljs-meta">@Override</span></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">hello</span><span class="hljs-params">()</span> </span>{</span><br><span class="line">        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Hello&quot;</span>;</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><p></p>
+</li>
+<li><p>&#x542F;&#x52A8;&#x670D;&#x52A1;&#x7AEF;&#x7EC4;&#x4EF6;.<br></p><figure class="highlight java hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">rpcService1 =</span><br><span class="line">        PekkoRpcServiceUtils.createRemoteRpcService(</span><br><span class="line">                <span class="hljs-keyword">new</span> Configuration(),</span><br><span class="line">                <span class="hljs-string">&quot;localhost&quot;</span>,</span><br><span class="line">                <span class="hljs-string">&quot;0&quot;</span>,</span><br><span class="line">                <span class="hljs-keyword">null</span>,</span><br><span class="line">                Optional.empty());</span><br><span class="line">HelloRpcEndpoint helloRpcEndpoint = <span class="hljs-keyword">new</span> HelloRpcEndpoint(rpcService1);</span><br><span class="line">helloRpcEndpoint.start();</span><br></pre></td></tr></tbody></table></figure><p></p>
+</li>
+<li><p>&#x5BA2;&#x6237;&#x7AEF;&#x8FDB;&#x884C;&#x8FDC;&#x7A0B;&#x8C03;&#x7528;.<br></p><figure class="highlight java hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">rpcService2 =</span><br><span class="line">        PekkoRpcServiceUtils.createRemoteRpcService(</span><br><span class="line">                <span class="hljs-keyword">new</span> Configuration(),</span><br><span class="line">                <span class="hljs-string">&quot;localhost&quot;</span>,</span><br><span class="line">                <span class="hljs-string">&quot;0&quot;</span>,</span><br><span class="line">                <span class="hljs-keyword">null</span>,</span><br><span class="line">                Optional.empty());</span><br><span class="line">HelloGateway helloGateway =</span><br><span class="line">        rpcService2.connect(</span><br><span class="line">	            helloRpcEndpoint.getAddress(), HelloGateway<span class="hljs-class">.<span class="hljs-keyword">class</span>).<span class="hljs-title">get</span>()</span>;</span><br><span class="line">String result = helloGateway.hello();</span><br><span class="line">System.out.println(result);</span><br></pre></td></tr></tbody></table></figure><p></p>
+</li>
+</ol>
+<p>&#x4ECE;&#x4E0A;&#x8FF0;&#x6848;&#x4F8B;&#x53EF;&#x4EE5;&#x770B;&#x5230;, Flink&#x7684;RPC&#x6846;&#x67B6;&#x63D0;&#x4F9B;&#x4E86;&#x975E;&#x5E38;&#x9AD8;&#x7EA7;&#x7684;&#x62BD;&#x8C61;, &#x5BA2;&#x6237;&#x7AEF;&#x62FF;&#x5230;&#x670D;&#x52A1;&#x63A5;&#x53E3;&#x540E;&#x7684;&#x8FDC;&#x7A0B;&#x8C03;&#x7528;&#x5C31;&#x8DDF;&#x672C;&#x5730;&#x65B9;&#x6CD5;&#x8C03;&#x7528;&#x4E00;&#x6837;. &#x9700;&#x8981;&#x8BF4;&#x660E;&#x7684;&#x662F;, &#x672C;&#x4F8B;&#x4E2D;&#x7684;&#x5BA2;&#x6237;&#x7AEF;&#x548C;&#x670D;&#x52A1;&#x7AEF;&#x533A;&#x5206;&#x53EA;&#x662F;&#x4E3A;&#x4E86;&#x65B9;&#x4FBF;&#x63CF;&#x8FF0;, &#x5B9E;&#x9645;&#x4E0A;&#x5728;Flink&#x4E2D;JabManager&#x4E2D;&#x7684;&#x5404;&#x4E2A;&#x7EC4;&#x4EF6;&#x548C;TaskManager&#x5728;&#x901A;&#x4FE1;&#x89D2;&#x8272;&#x4E0A;&#x662F;&#x5BF9;&#x7B49;&#x7684;, &#x5E76;&#x6CA1;&#x6709;&#x4E25;&#x683C;&#x7684;&#x5BA2;&#x6237;&#x7AEF;&#x548C;&#x670D;&#x52A1;&#x7AEF;&#x533A;&#x5206;, &#x6216;&#x8005;&#x8BF4;&#x5BA2;&#x6237;&#x7AEF;&#x548C;&#x670D;&#x52A1;&#x7AEF;&#x7684;&#x89D2;&#x8272;&#x4F1A;&#x53D1;&#x751F;&#x8F6C;&#x53D8;, &#x8C01;&#x53D1;&#x9001;&#x8BF7;&#x6C42;&#x8C01;&#x5C31;&#x662F;&#x5BA2;&#x6237;&#x7AEF;.</p>
+<h1 id="&#x63A5;&#x53E3;&#x8BE6;&#x89E3;"><a href="#&#x63A5;&#x53E3;&#x8BE6;&#x89E3;" class="headerlink" title="&#x63A5;&#x53E3;&#x8BE6;&#x89E3;"></a>&#x63A5;&#x53E3;&#x8BE6;&#x89E3;</h1><p><code>RpcEndpoint</code>, <code>RpcService</code>, <code>RpcGateway</code>&#x548C;<code>RpcServer</code>&#x662F;Flink RPC&#x6846;&#x67B6;&#x4E2D;&#x7684;&#x6838;&#x5FC3;&#x62BD;&#x8C61;&#x63A5;&#x53E3;.</p>
+<p><code>RpcEndpoint</code>&#x4EE3;&#x8868;&#x4E00;&#x4E2A;&#x53EF;&#x63D0;&#x4F9B;RPC&#x670D;&#x52A1;&#x7684;&#x7EC4;&#x4EF6;, &#x5B83;&#x6301;&#x6709;&#x5176;&#x6240;&#x5C5E;&#x7684;<code>RpcService</code>&#x5F15;&#x7528;, &#x5728;Flink&#x4E2D;&#x5176;&#x5B9E;&#x73B0;&#x7C7B;&#x5982;&#x4E0B;. JobManager&#x4E2D;&#x7684;<code>ResourceManager</code>, <code>Dispatcher</code>&#x548C;<code>JobMaster</code>&#x7EC4;&#x4EF6;&#x4EE5;&#x53CA;TaskManager&#x4E2D;&#x7684;<code>TaskExecutor</code>&#x90FD;&#x662F;<code>RpcEndpoint</code>&#x7EC4;&#x4EF6;.</p>
+<p align="center">
+    <img src="./flink-code-rpc/RpcEndpoint.png" width="100%">
+</p>
+
+<p><code>RpcService</code>&#x662F;RPC&#x670D;&#x52A1;&#x7684;&#x5E95;&#x5C42;&#x5B9E;&#x73B0;, &#x4E00;&#x4E2A;<code>RpcService</code>&#x53EF;&#x670D;&#x52A1;&#x4E8E;&#x591A;&#x4E2A;<code>RpcEndpoint</code>, &#x4F8B;&#x5982;JobManager&#x4E2D;&#x7684;<code>ResourceManager</code>, <code>Dispatcher</code>&#x548C;<code>JobMaster</code>&#x5C31;&#x5171;&#x7528;&#x4E00;&#x4E2A;<code>RpcService</code>. <code>RpcService</code>&#x53EF;&#x901A;&#x8FC7;<code>connect()</code>&#x8FDE;&#x63A5;&#x5230;&#x53E6;&#x4E00;&#x4E2A;<code>RpcService</code>.</p>
+<p><code>RpcGateway</code>&#x662F;&#x6240;&#x6709;RPC&#x670D;&#x52A1;&#x7684;&#x62BD;&#x8C61;&#x63A5;&#x53E3;, &#x7528;&#x6237;&#x53EF;&#x7EE7;&#x627F;<code>RpcGateway</code>&#x5E76;&#x6269;&#x5C55;&#x66F4;&#x591A;&#x63A5;&#x53E3;. &#x901A;&#x5E38;&#x60C5;&#x51B5;&#x4E0B;, <code>RpcEndpoint</code>&#x4F1A;&#x7EE7;&#x627F;<code>RpcGateway</code>&#x5E76;&#x5B9E;&#x73B0;&#x5177;&#x4F53;&#x7684;&#x65B9;&#x6CD5;. <code>RpcServer</code>&#x4E5F;&#x7EE7;&#x627F;&#x4E86;<code>RpcGateway</code>, &#x5B83;&#x53EF;&#x4EE5;&#x770B;&#x505A;&#x662F;<code>RpcGateway</code>&#x7684;&#x4EE3;&#x7406;, &#x5B9E;&#x9645;&#x4E0A;<code>RpcService.connect()</code>&#x65B9;&#x6CD5;&#x8FD4;&#x56DE;&#x7684;&#x90FD;&#x662F;<code>RpcServer</code>, &#x5728;&#x8C03;&#x7528;<code>RpcGateway</code>&#x7684;&#x5B9E;&#x73B0;&#x65B9;&#x6CD5;&#x65F6;, &#x90FD;&#x7531;<code>RpcServer</code>&#x4EE3;&#x7406;&#x5B9E;&#x73B0;, &#x8FD9;&#x6837;&#x5373;&#x53EF;&#x6839;&#x636E;&#x8C03;&#x7528;&#x65B9;&#x4E0E;&#x88AB;&#x8C03;&#x7528;&#x65B9;&#x7684;&#x5173;&#x7CFB;&#x9009;&#x62E9;&#x8FDC;&#x7A0B;&#x8C03;&#x7528;&#x6216;&#x672C;&#x5730;&#x8C03;&#x7528;.</p>
+<blockquote>
+<p>&#x8FD9;&#x91CC;&#x8BFB;&#x8005;&#x53EF;&#x80FD;&#x4F1A;&#x6709;&#x4E00;&#x4E9B;&#x7591;&#x60D1;, &#x6709;&#x4E86;<code>RpcGateway</code>&#x4E3A;&#x4EC0;&#x4E48;&#x8FD8;&#x9700;&#x8981;<code>RpcServer</code>? &#x8FD9;&#x662F;&#x7531;&#x4E8E;<code>RpcGateway</code>&#x53EA;&#x662F;&#x4E00;&#x4E2A;&#x666E;&#x901A;&#x7684;Java&#x63A5;&#x53E3;, &#x5176;&#x65B9;&#x6CD5;&#x90FD;&#x662F;&#x672C;&#x5730;&#x5B9E;&#x73B0;, &#x5982;&#x679C;<code>RpcService.connect()</code>&#x8FD4;&#x56DE;&#x7684;&#x662F;<code>RpcGateway</code>&#x5B9E;&#x4F8B;, &#x90A3;&#x4E48;&#x5E76;&#x4E0D;&#x80FD;&#x5B9E;&#x73B0;RPC&#x8C03;&#x7528;. <code>RpcServer</code>&#x901A;&#x8FC7;&#x52A8;&#x6001;&#x4EE3;&#x7406;&#x5305;&#x88C5;&#x4E86;<code>RpcGateway</code>&#x7684;&#x65B9;&#x6CD5;, &#x4ECE;&#x800C;&#x5B9E;&#x73B0;RPC&#x8C03;&#x7528;.</p>
+</blockquote>
+<p>&#x4E0A;&#x8FF0;&#x63A5;&#x53E3;&#x5728;Flink&#x4E2D;&#x4F7F;&#x7528;&#x65F6;&#x7684;&#x8054;&#x52A8;&#x5173;&#x7CFB;&#x5982;&#x4E0B;&#x56FE;&#x6240;&#x793A;.</p>
+<ul>
+<li><code>RpcSystem</code>&#x662F;&#x4E00;&#x4E2A;&#x5DE5;&#x5382;&#x63A5;&#x53E3;, &#x5177;&#x4F53;&#x5B9E;&#x73B0;&#x7531;<code>RpcSystemLoader</code>&#x52A0;&#x8F7D;&#x5F97;&#x5230;. &#x5B83;&#x521B;&#x5EFA;&#x7684;<code>RpcServiceBuilder</code>&#x53EF;&#x542F;&#x52A8;&#x4E00;&#x4E2A;<code>RpcService</code>;</li>
+<li><code>RpcEndpoint</code>&#x4F1A;&#x6301;&#x6709;&#x4E00;&#x4E2A;<code>RpcService</code>, &#x5728;&#x521D;&#x59CB;&#x5316;&#x65F6;&#x4F1A;&#x6839;&#x636E;&#x4F20;&#x5165;&#x7684;<code>RpcService</code>&#x542F;&#x52A8;&#x4E00;&#x4E2A;<code>RpcServer</code>&#x7528;&#x4E8E;&#x4E3A;&#x5F53;&#x524D;<code>RpcEndpoint</code>&#x63D0;&#x4F9B;RPC&#x670D;&#x52A1;;</li>
+<li>&#x901A;&#x8FC7;<code>RpcService</code>&#x53EF;&#x8FDE;&#x63A5;&#x5230;&#x672C;&#x5730;&#x6216;&#x8FDC;&#x7A0B;<code>RpcService</code>&#x4E2D;&#x5BF9;&#x5E94;&#x7684;<code>RpcServer</code>&#x670D;&#x52A1;.</li>
+</ul>
+<p align="center">
+    <img src="./flink-code-rpc/interface_process.png" width="70%">
+</p>
+
+<h1 id="&#x57FA;&#x4E8E;Akka&#x7684;RPC&#x5B9E;&#x73B0;"><a href="#&#x57FA;&#x4E8E;Akka&#x7684;RPC&#x5B9E;&#x73B0;" class="headerlink" title="&#x57FA;&#x4E8E;Akka&#x7684;RPC&#x5B9E;&#x73B0;"></a>&#x57FA;&#x4E8E;Akka&#x7684;RPC&#x5B9E;&#x73B0;</h1><h2 id="Akka&#x7B80;&#x4ECB;"><a href="#Akka&#x7B80;&#x4ECB;" class="headerlink" title="Akka&#x7B80;&#x4ECB;"></a>Akka&#x7B80;&#x4ECB;</h2><p>Akka&#x662F;Actor&#x6A21;&#x578B;&#x7684;&#x4E00;&#x79CD;&#x5B9E;&#x73B0;, Actor&#x6A21;&#x578B;&#x662F;&#x4E00;&#x79CD;&#x901A;&#x7528;&#x7684;&#x6D88;&#x606F;&#x4F20;&#x9012;&#x7F16;&#x7A0B;&#x6A21;&#x578B;, &#x5728;&#x5206;&#x5E03;&#x5F0F;&#x7CFB;&#x7EDF;&#x6784;&#x5EFA;&#x4E2D;&#x88AB;&#x5E7F;&#x6CDB;&#x8FD0;&#x7528;. Actor&#x7684;&#x6838;&#x5FC3;&#x601D;&#x60F3;&#x662F;&#x72EC;&#x7ACB;&#x7EF4;&#x62A4;&#x9694;&#x79BB;&#x72B6;&#x6001;, &#x5E76;&#x57FA;&#x4E8E;&#x6D88;&#x606F;&#x4F20;&#x9012;&#x5B9E;&#x73B0;&#x5F02;&#x6B65;&#x901A;&#x4FE1;. Actor&#x901A;&#x5E38;&#x5305;&#x542B;&#x4EE5;&#x4E0B;&#x7279;&#x5F81;:</p>
+<ul>
+<li>&#x6BCF;&#x4E2A;Actor&#x6301;&#x6709;&#x4E00;&#x4E2A;&#x90AE;&#x7BB1;(&#x5373;&#x961F;&#x5217;), &#x7528;&#x4E8E;&#x5B58;&#x50A8;&#x6D88;&#x606F;;</li>
+<li>&#x6BCF;&#x4E2A;Actor&#x53EF;&#x4EE5;&#x53D1;&#x9001;&#x6D88;&#x606F;&#x81F3;&#x4EFB;&#x4F55;Actor;</li>
+<li>&#x6BCF;&#x4E2A;Actor&#x53EF;&#x4EE5;&#x901A;&#x8FC7;&#x5904;&#x7406;&#x6D88;&#x606F;&#x6765;&#x66F4;&#x65B0;&#x5185;&#x90E8;&#x72B6;&#x6001;, &#x5BF9;&#x4E8E;&#x5916;&#x90E8;&#x800C;&#x8A00;, Actor&#x7684;&#x72B6;&#x6001;&#x662F;&#x9694;&#x79BB;&#x7684;.</li>
+</ul>
+<p align="center">
+    <img src="./flink-code-rpc/actor_model.png" width="70%">
+</p>
+
+<p>&#x5728;Akka&#x4E2D;, &#x7528;&#x6237;&#x53EF;&#x7EE7;&#x627F;<code>Actor</code>, &#x4ECE;&#x800C;&#x5B9E;&#x73B0;&#x81EA;&#x5B9A;&#x4E49;&#x7684;&#x6D88;&#x606F;&#x5904;&#x7406;&#x903B;&#x8F91;.</p>
+<h2 id="Actor&#x5B9E;&#x73B0;"><a href="#Actor&#x5B9E;&#x73B0;" class="headerlink" title="Actor&#x5B9E;&#x73B0;"></a>Actor&#x5B9E;&#x73B0;</h2><p>Flink RPC&#x57FA;&#x4E8E;Akka&#x7684;&#x5B9E;&#x73B0;&#x4E2D;, &#x6269;&#x5C55;&#x4E86;&#x591A;&#x79CD;&#x7C7B;&#x578B;&#x7684;<code>Actor</code>, &#x5176;&#x7EE7;&#x627F;&#x5173;&#x7CFB;&#x5982;&#x4E0B;&#x56FE;&#x6240;&#x793A;.</p>
+<p align="center">
+    <img src="./flink-code-rpc/Actor.png" width="60%">
+</p>
+
+<p>&#x5176;&#x4E2D;:</p>
+<ul>
+<li><code>SupervisorActor</code>&#x7528;&#x4E8E;&#x542F;&#x52A8;<code>PekkoRpcActor</code>, &#x5E76;&#x76D1;&#x63A7;&#x5176;&#x4F55;&#x65F6;&#x7EC8;&#x6B62;.</li>
+<li><code>PekkoRpcActor</code>&#x7528;&#x4E8E;&#x771F;&#x6B63;&#x5904;&#x7406;RPC&#x8C03;&#x7528;.</li>
+<li><code>DeadLettersActor</code>&#x7528;&#x4E8E;&#x5904;&#x7406;<code>DeadLetter</code>(&#x5373;&#x53D1;&#x9001;&#x7ED9;&#x5DF2;&#x7ECF;&#x505C;&#x6B62;&#x7684;<code>Actor</code>&#x7684;&#x6D88;&#x606F;).</li>
+</ul>
+<p align="center">
+    <img src="./flink-code-rpc/Actor_create.png" width="70%">
+</p>
+
+<h2 id="&#x57FA;&#x4E8E;Actor&#x7684;RPC&#x8C03;&#x7528;&#x6D41;&#x7A0B;"><a href="#&#x57FA;&#x4E8E;Actor&#x7684;RPC&#x8C03;&#x7528;&#x6D41;&#x7A0B;" class="headerlink" title="&#x57FA;&#x4E8E;Actor&#x7684;RPC&#x8C03;&#x7528;&#x6D41;&#x7A0B;"></a>&#x57FA;&#x4E8E;Actor&#x7684;RPC&#x8C03;&#x7528;&#x6D41;&#x7A0B;</h2><p>&#x4E0A;&#x6587;&#x5DF2;&#x7ECF;&#x8BF4;&#x5230;, <code>RpcService.connect()</code>&#x65B9;&#x6CD5;&#x8FD4;&#x56DE;&#x7684;&#x90FD;&#x662F;<code>RpcServer</code>, <code>PekkoInvocationHandler</code>&#x662F;&#x57FA;&#x4E8E;Akka&#x7684;&#x5B9E;&#x73B0;. &#x5BF9;&#x4E8E;<code>RpcGateway</code>&#x7684;&#x8C03;&#x7528;&#x90FD;&#x4F1A;&#x88AB;&#x4EE3;&#x7406;&#x5230;<code>PekkoInvocationHandler.invoke()</code>&#x4E2D;, <code>PekkoInvocationHandler</code>&#x5728;&#x521B;&#x5EFA;&#x65F6;&#x5C31;&#x6301;&#x6709;&#x4E00;&#x4E2A;<code>Actor</code>&#x7684;&#x5F15;&#x7528;, &#x5728;&#x8C03;&#x7528;&#x65F6;&#x5373;&#x53EF;&#x4E0E;&#x8BE5;<code>Actor</code>&#x901A;&#x4FE1;, <code>PekkoRpcActor</code>&#x4F1A;&#x901A;&#x8FC7;&#x52A8;&#x6001;&#x4EE3;&#x7406;&#x8C03;&#x7528;<code>RpcEnpoint</code>&#x4E2D;&#x7684;&#x5177;&#x4F53;&#x5B9E;&#x73B0;&#x65B9;&#x6CD5;, &#x5E76;&#x5C06;&#x7ED3;&#x679C;&#x8FD4;&#x56DE;.</p>
+<p align="center">
+    <img src="./flink-code-rpc/rpc_invoke.png" width="70%">
+</p>
+
+<h1 id="&#x603B;&#x7ED3;"><a href="#&#x603B;&#x7ED3;" class="headerlink" title="&#x603B;&#x7ED3;"></a>&#x603B;&#x7ED3;</h1><p>&#x672C;&#x6587;&#x901A;&#x8FC7;&#x4E00;&#x4E2A;&#x793A;&#x4F8B;&#x76F4;&#x89C2;&#x7684;&#x4ECB;&#x7ECD;&#x4E86;Flink RPC&#x7684;&#x4F7F;&#x7528;&#x65B9;&#x6CD5;. &#x4E4B;&#x540E;&#x4ECB;&#x7ECD;&#x4E86;&#x51E0;&#x4E2A;&#x6838;&#x5FC3;&#x63A5;&#x53E3;&#x7684;&#x542B;&#x4E49;, &#x4EE5;&#x53CA;&#x57FA;&#x4E8E;Akka&#x7684;&#x5B9E;&#x73B0;. &#x4ECE;&#x6574;&#x4F53;&#x4E0A;&#x770B;, Flink&#x7684;RPC&#x6846;&#x67B6;&#x662F;&#x6BD4;&#x8F83;&#x4F18;&#x96C5;&#x7684;&#x5B9E;&#x73B0;, &#x5176;&#x4E2D;&#x4F7F;&#x7528;&#x4E86;&#x591A;&#x79CD;&#x8BBE;&#x8BA1;&#x6A21;&#x5F0F;, &#x9664;&#x4E86;&#x7406;&#x89E3;Flink&#x7684;&#x5E95;&#x5C42;&#x901A;&#x4FE1;&#x65B9;&#x5F0F;, &#x4E5F;&#x503C;&#x5F97;&#x6211;&#x4EEC;&#x4ECE;&#x4E2D;&#x5B66;&#x4E60;&#x6846;&#x67B6;&#x7684;&#x8BBE;&#x8BA1;&#x65B9;&#x6CD5;.</p>
+<h1 id="&#x53C2;&#x8003;"><a href="#&#x53C2;&#x8003;" class="headerlink" title="&#x53C2;&#x8003;"></a>&#x53C2;&#x8003;</h1><p>[1] <a href="https://cwiki.apache.org/confluence/pages/viewpage.action?pageId=65147077" target="_blank" rel="noopener">FLIP-6: Flink Deployment and Process Model - Standalone, Yarn, Mesos, Kubernetes, etc.</a><br>[2] <a href="https://issues.apache.org/jira/browse/FLINK-4346" target="_blank" rel="noopener">[FLINK-4346] Implement basic RPC abstraction</a><br>[3] <a href="https://zhuanlan.zhihu.com/p/108494653" target="_blank" rel="noopener">Spark&#x4E0E;Flink&#x4E2D;&#x7684;RPC&#x5B9E;&#x73B0;</a><br>[4] <a href="http://chuquan.me/2023/01/15/actor/" target="_blank" rel="noopener">&#x6D45;&#x8C08;Actor&#x6A21;&#x578B;</a></p>
+</body></html>
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/Flink/">#Flink</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/flink-sql-overview.html">Flink SQL源码 - 整体架构及处理流程</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/flink-sql-minibatch.html">Flink SQL源码 - Mini-Batch原理与实现</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+<div class="sharebox">
+    
+<div class="sharethis-inline-share-buttons"></div>
+<script type='text/javascript' src='//platform-api.sharethis.com/js/sharethis.js#property=5e63913dd0c39800126ea9e7&amp;product=inline-share-buttons&amp;cms=sop' async='async'></script>
+
+</div>
+
+
+
+<div class="comments">
+    <p align="center">
+        本博客所有文章除特别声明外, 均采用<a href="https://creativecommons.org/licenses/by-nc-sa/3.0/cn/" target="_blank" rel="noopener">CC BY-NC-SA 3.0 CN</a>许可协议. 转载请注明出处!
+    </p>
+
+    <br><br>
+
+    <p align="center">
+        <img src="/images/WeChat.jpg" width="25%">
+    </p>
+    <p align="center">关注笔者微信公众号获得最新文章推送</p>
+</div>
+
+
+
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    
+<div id="valine-thread"></div>
+<script src="//code.bdstatic.com/npm/leancloud-storage@4.12.2/dist/av-min.js"></script>
+<script src='//cdn.jsdelivr.net/gh/AshinWang/SimpleValine@v0.1/SimpleValine.min.js'></script>
+<script>
+    new Valine({
+        el: '#valine-thread',
+        appId: 'v4Ich4NMxLXYhCkPcb1OmVPR-gzGzoHsz',
+        appKey: 'b5fiVY3XvcAwzJ06YR8rFCAj',
+        notify: true,
+        verify: false,
+        avatar: '',
+        placeholder: 'If you have any questions, please comment here!',
+        meta: ['nick', 'mail'],
+        visitor: true,
+        lang: 'en'
+    })
+</script>
+
+
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2018-2024 Liebing&nbsp;. 
+                <!-- <span id="busuanzi_container_site_uv"><span id="busuanzi_value_site_uv"></span> UV, </span>
+                <span id="busuanzi_container_site_pv"> <span id="busuanzi_value_site_pv"></span> PV</span> -->
+
+                View
+                <span id="busuanzi_value_site_pv" data-num="1000">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </span> times by
+                <span id="busuanzi_value_site_uv">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </span> visitors.
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="一行代码, 点滴生活!" href="">
+                    
+                    一行代码, 点滴生活!
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+    <script src="https://code.jquery.com/jquery-latest.js"></script>
+    <!-- 不蒜子计数初始值纠正 -->
+    <script >
+        $(document).ready(function() {
+            var int = setInterval(fixCount, 500);  // 50ms周期检测函数
+            var initPV = 3569;  // 初始化首次数据
+            var initUV = 1215;
+            function fixCount() {                   
+                if ($("#busuanzi_container_site_pv").css("display") != "none") {
+                    $("#busuanzi_value_site_pv").html(parseInt($("#busuanzi_value_site_pv").html()) + initPV); // 加上初始数据 
+                    clearInterval(int); // 停止检测
+                } 
+                if ($("#busuanzi_container_site_uv").css("display") != "none") {
+                    $("#busuanzi_value_site_uv").html(parseInt($("#busuanzi_value_site_uv").html()) + initUV); // 加上初始数据 
+                    clearInterval(int); // 停止检测
+                }  
+            }
+        });
+    </script>
+
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/" target="_blank" rel="noopener">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("en-AU");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+
+<script src="/js/script.js"></script>
+
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+    
+</body>
+</html>

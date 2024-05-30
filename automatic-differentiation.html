@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head>
+    <meta charset="utf-8">
+<title>Automatic Differentiation Based on Computation Graph - Liebing&#39;s Blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="baidu-site-verification" content="codeva-2Q9E1leVAG" />
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="">
+
+
+
+<meta name="keywords" content="code">
+
+
+
+    <meta name="description" content="Automatic differentiation (AD), also called algorithmic differentiation or simply &amp;#x201C;autodiff&amp;#x201D; is one of the basic algorithms hidden behind the deep learning framework such as tensorflow,">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Automatic Differentiation Based on Computation Graph">
+<meta property="og:url" content="http://yoursite.com/automatic-differentiation.html">
+<meta property="og:site_name" content="Liebing&#39;s Blog">
+<meta property="og:description" content="Automatic differentiation (AD), also called algorithmic differentiation or simply &amp;#x201C;autodiff&amp;#x201D; is one of the basic algorithms hidden behind the deep learning framework such as tensorflow,">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/automatic-differentiation/graph.png">
+<meta property="og:image" content="http://yoursite.com/automatic-differentiation/graph1.png">
+<meta property="article:published_time" content="2019-07-22T04:00:00.000Z">
+<meta property="article:modified_time" content="2024-05-29T12:13:46.525Z">
+<meta property="article:author" content="Liebing">
+<meta property="article:tag" content="AI System">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/automatic-differentiation/graph.png">
+
+
+
+
+
+<link rel="icon" href="/img/favicon.ico">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt="" height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/collections">合集</a>
+            
+            <a class="navbar-item "
+               href="/courses">课程</a>
+            
+            <a class="navbar-item "
+               href="/archive">归档</a>
+            
+            <a class="navbar-item "
+               href="/categories">分类</a>
+            
+            <a class="navbar-item "
+               href="/tags">标签</a>
+            
+            <a class="navbar-item "
+               href="/friends">友链</a>
+            
+            <a class="navbar-item "
+               href="/about">关于</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#Overview-of-AD">1&nbsp;&nbsp;<b>Overview of AD</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#AD-algorithm">2&nbsp;&nbsp;<b>AD algorithm</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Implementation">3&nbsp;&nbsp;<b>Implementation</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Logistic-Regression">4&nbsp;&nbsp;<b>Logistic Regression</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Conclusion">5&nbsp;&nbsp;<b>Conclusion</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Reference">6&nbsp;&nbsp;<b>Reference</b></a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/LB-Yu" target="_blank" rel="noopener">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="知" href="https://www.zhihu.com/people/liebingyu" target="_blank" rel="noopener">
+                
+                知
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Automatic Differentiation Based on Computation Graph
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2019-07-22T04:00:00.000Z" itemprop="datePublished">Jul 22 2019</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/Machine-Learning/">Machine Learning</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            21 minutes read (About 3154 words)
+        </span>
+        
+        
+        <span id="/automatic-differentiation.html" class="column is-narrow leancloud_visitors" data-flag-title="Automatic Differentiation Based on Computation Graph">
+            VISITED
+                <i class="leancloud-visitors-count">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </i>
+            TIMES
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <html><head></head><body><p><strong>Automatic differentiation</strong> (AD), also called algorithmic differentiation or simply &#x201C;autodiff&#x201D; is one of the basic algorithms hidden behind the <strong>deep learning framework</strong> such as tensorflow, pytorch, mxnet, etc. It&#x2019;s AD technique that allows us to focus on the design of the model structure without paying much attention to the gradient calculations during model training. However, this blog post will focus on the <strong>principle</strong> and <strong>implementation</strong> of AD. Finally, we will implement an AD framework based on <strong>computational graphs</strong> and use it for logistic regression. You could find all the code <a href="https://github.com/LB-Yu/distributed_system_courses/tree/master/cse559w/assignment1" target="_blank" rel="noopener">here</a>.</p>
+<a id="more"></a>
+
+<h1 id="Overview-of-AD"><a href="#Overview-of-AD" class="headerlink" title="Overview of AD"></a>Overview of AD</h1><p>Methods for the computation of derivatives in computer programs can be classified into four categories<sup><a href="https://arxiv.org/pdf/1502.05767.pdf" target="_blank" rel="noopener">[2]</a></sup>:</p>
+<ol>
+<li>Manually working out derivatives and coding them;</li>
+<li>Numerical differentiation using finite difference approximations;</li>
+<li>Symbolic differentiation using expression manipulation in computer algebra systems such as Mathematica, Maxima, and Maple;</li>
+<li>Automatic differentiation, also called algorithmic differentiation.</li>
+</ol>
+<p>Here, I will give a simple example to illustrate the difference between the first three methods of derivation. As for automatic differentiation, the details will be described in later sections. Suppose we need to calculate the gradient of $x=1$ for the function $ f(x)=x(1-2x)^2 $. The calculation process of different methods is as follows:</p>
+<ul>
+<li>Method 1&#xFF1A;<br>$$ f(x)=x-4x^2+4x^3 $$<br>$$ f&#x2019;(x)=1-8x+12x^2 $$<br>$$ f&#x2019;(1)=5 $$</li>
+<li>Method 2 ($ h $ can be any other minimum value):<br>$$ f&#x2019;(x) \approx \frac{f(x-h)+f(x+h)}{2h}=\frac{f(1-0.00001)+f(1+0.00001)}{2*0.00001}=5.000003999999669 $$</li>
+<li>Method 3:<br>$$ f&#x2019;(x)=(1-2x)^2 -4x(1-2x) $$<br>$$ f&#x2019;(1)=5 $$</li>
+</ul>
+<p>From this simple example we can see the shortcomings of the first three methods. Manual differentiation is time consuming and prone to error. Numerical differentiation is simple to implement but can be highly inaccurate and calculation consuming. Symbolic differentiation addresses the weaknesses of both the manual and numerical methods, but often results in complex and cryptic expressions plagued with the problem of &#x201C;expression swell&#x201D;.</p>
+<p>Although AD provide numerical values of derivatives and and it does so by using symbolic rules of differentiation, AD is either a type of numerical or symbolic differentiation. In order to implement the AD, we usually need to build a computation graph. Below is the computation graph of the example $ f(x_1, x_2)=log(x_1) + x_1x_2-sin(x_2) $.</p>
+<p align="center">
+    <img src="./automatic-differentiation/graph.png" , width="50%">
+</p>
+
+<p>Based on computation graph, there are two methods to implement AD: <strong>forward mode</strong> and <strong>reverse mode</strong>. AD in forward mode is the conceptually most simple type. For writing convenience, let $ \dot{v_i}=\frac{\partial v_i}{\partial x_1} $. So we can calculate the gradients in forward mode.</p>
+<table align="center">
+    <tbody><tr>
+        <th style="border:2px solid #000000">&#xA0;&#xA0;&#xA0;&#xA0;Forward Primal Trace&#xA0;&#xA0;&#xA0;</th>
+        <th style="border:2px solid #000000">&#xA0;&#xA0;&#xA0;&#xA0;Forward Derivative Trace&#xA0;&#xA0;&#xA0;&#xA0;</th>
+    </tr><tr>
+    </tr><tr>
+        <td style="border:2px solid #000000">$$ v_0=x_1=2 $$ $$ v_1=x_2=5 $$</td>
+        <td style="border:2px solid #000000">$$ \dot{v_0}=\dot{x_1}=1 $$ $$ \dot{v_1}=\dot{x_2}=0 $$ </td>
+    </tr><tr>
+    </tr><tr>
+        <td style="border:2px solid #000000">$$ v_2=log(v_0)=log2 $$ 
+            $$ v_3=v_0v_1=10 $$
+            $$ v_4=sin(v1)=sin5 $$
+            $$ v_5=v_2+v_3=0.693+10 $$
+            $$ v_6=-v_4=-sin5 $$
+            $$ v_7=v_5+v_6=10.693+0.959 $$
+        </td>
+        <td style="border:2px solid #000000">
+            $$ \dot{v_2}=\dot{v_0}/v_0=1/2 $$
+            $$ \dot{v_3}=\dot{v_0}v_1 + v_0\dot{v_1}=5 $$
+            $$ \dot{v_4}=cos(v_1)\dot{v_1}=0 $$
+            $$ \dot{v_5}=\dot{v_2} + \dot{v_3}=5.5 $$
+            $$ \dot{v_6}=-\dot{v_4}=0 $$
+            $$ \dot{v_7}=\dot{v_5} + \dot{v_6}=5.5 $$
+        </td>
+    </tr><tr>
+    </tr><tr>
+        <td style="border:2px solid #000000">$$ y=v_7=11.652 $$</td>
+        <td style="border:2px solid #000000">$$ \dot{y}=\dot{v_7}=5.5 $$</td>
+    </tr>
+</tbody></table>
+
+<p>Reverse mode is similar to forward mode, except that the gradient needs to be calculated backwards. Let $\bar{v_i}=\frac{\partial y}{\partial v_i}$. We can calculate the gradients in reverse mode.</p>
+<table align="center">
+    <tbody><tr>
+        <th style="border:2px solid #000000">&#xA0;&#xA0;&#xA0;&#xA0;Forward Primal Trace&#xA0;&#xA0;&#xA0;</th>
+        <th style="border:2px solid #000000">&#xA0;&#xA0;&#xA0;&#xA0;Reverse Derivative Trace&#xA0;&#xA0;&#xA0;&#xA0;</th>
+    </tr><tr>
+    </tr><tr>
+        <td style="border:2px solid #000000">$$ v_0=x_1=2 $$ $$ v_1=x_2=5 $$</td>
+        <td style="border:2px solid #000000">
+            $$ \bar{v_0}=\bar{v_0}^{(1)} + \bar{v_0}^{(2)}=5.5 $$
+            $$ \bar{v_0}^{(1)}=\bar{v_2}\frac{\partial v_2}{\partial v_0}=\frac{1}{2} $$ 
+            $$ \bar{v_0}^{(2)}=\bar{v_3}\frac{\partial v_3}{\partial v_=}=5 $$
+            $$ \bar{v_1}=\bar{v_4}\frac{\partial v_4}{\partial v_1}=-cos5 $$ 
+        </td>
+    </tr><tr>
+    </tr><tr>
+        <td style="border:2px solid #000000">$$ v_2=log(v_0)=log2 $$ 
+            $$ v_3=v_0v_1=10 $$
+            $$ v_4=sin(v1)=sin5 $$
+            $$ v_5=v_2+v_3=0.693+10 $$
+            $$ v_6=-v_4=-sin5 $$
+            $$ v_7=v_5+v_6=10.693+0.959 $$
+        </td>
+        <td style="border:2px solid #000000">
+            $$ \bar{v_2}=\bar{v_5}\frac{\partial v_5}{\partial v_2}=1 $$
+            $$ \bar{v_3}=\bar{v_5}\frac{\partial v_5}{\partial v_3}=1 $$
+            $$ \bar{v_4}=\bar{v_6}\frac{\partial v_6}{\partial v_4}=-1 $$
+            $$ \bar{v_5}=\bar{v_7}\frac{\partial v_7}{\partial v_5}=1 $$
+            $$ \bar{v_6}=\bar{v_7}\frac{\partial v_7}{\partial v_6}=1 $$
+            $$ \bar{v_7}=\frac{\partial v_7}{\partial v_7}=1 $$
+        </td>
+    </tr><tr>
+    </tr><tr>
+        <td style="border:2px solid #000000">$$ y=v_7=11.652 $$</td>
+        <td style="border:2px solid #000000">$$ \bar{y}=\bar{v_7}=1 $$</td>
+    </tr>
+</tbody></table>
+
+<p>The above two tables demonstrate AD based on forward mode and reverse mode, respectively. Only the gradient for $ x_1 $ is calculated in the tables, and the gradient calculation for $ x_2 $ is similar, I don&#x2019;t want to repeat it.</p>
+<h1 id="AD-algorithm"><a href="#AD-algorithm" class="headerlink" title="AD algorithm"></a>AD algorithm</h1><p>The idea of the reverse mode is closer to backpropagation and is easier to program. Therefore, in practice we usually use reverse mode to implemente AD. The pseudo-code of AD based on the reverse mode is as follows:<br></p><figure class="highlight python hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">gradient</span><span class="hljs-params">(output_node)</span>:</span></span><br><span class="line">    node_to_grad = {}</span><br><span class="line">    node_to_grad[output_node] = <span class="hljs-number">1</span></span><br><span class="line">    <span class="hljs-comment"># Get the reverse order topological arrangement of the nodes in computation graph</span></span><br><span class="line">    reverse_topo_order = reversed(find_topo_sort(output_node))</span><br><span class="line">    <span class="hljs-keyword">for</span> node <span class="hljs-keyword">in</span> reverse_topo_order:</span><br><span class="line">        grad &lt;-- sum partial adjoints <span class="hljs-keyword">from</span> output edges of node</span><br><span class="line">        <span class="hljs-comment"># calculate the gradient of the inputs</span></span><br><span class="line">        input_grads &lt;-- node.op.gradient(node, grad)</span><br><span class="line">        add input_grads to node_to_grad</span><br><span class="line">    <span class="hljs-keyword">return</span> node_to_grad</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>To better understand this algorithm, let&#x2019;s look at a concrete example (You can find the implementation of this example in the <code>test_exp</code> function of the <a href="https://github.com/LB-Yu/distributed_system_courses/blob/master/cse559w/assignment1/autodiff_test.py" target="_blank" rel="noopener">autodiff_test.py</a> file).</p>
+<p align="center">
+    <img src="./automatic-differentiation/graph1.png" width="50%">
+</p>
+
+<p>As shown in the computation graph above, the execution flow after calling function $ gradient(x_4) $ is as follows:</p>
+<ul>
+<li>Changes in <code>node_to_grad</code> during execution (assume $ x_1=2 $):<ol>
+<li>$ x_4: \bar{x_4}=1 $;</li>
+<li>$ x_3: \bar{x_3}=\bar{x_4}x_2=e^2 $;</li>
+<li>$ x_2: \bar{x_2}^{(1)}=\bar{x_4}x_3=e^2+1 $;</li>
+<li>$ x_2: \bar{x_2}^{(2)}=\bar{x_3}=e^2 $;</li>
+<li>$ x_1: \bar{x_1}=\bar{x_2}x_2=(\bar{x_2}^{(1)} + \bar{x_2}^{(2)})x_2=e^2(2e^2+1) $.</li>
+</ol>
+</li>
+</ul>
+<h1 id="Implementation"><a href="#Implementation" class="headerlink" title="Implementation"></a>Implementation</h1><p>In order to implement AD, we first need to build a computation graph which is composed of nodes. Each node has its inputs and operation (OP). The inputs records the node or constant that entered the current node, and there may be one or more. The OP records the type of operation of the current node on the input nodes, which may be addition, subtraction, multiplication, division, or any custom mathematical operation. Below is the Python code for node.<br></p><figure class="highlight python hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Node</span><span class="hljs-params">(object)</span>:</span></span><br><span class="line">    <span class="hljs-string">&quot;&quot;&quot;Node in a computation graph.&quot;&quot;&quot;</span></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self)</span>:</span></span><br><span class="line">        <span class="hljs-string">&quot;&quot;&quot;Constructor, new node is indirectly created by Op object __call__ method.&quot;&quot;&quot;</span></span><br><span class="line">        self.inputs = []</span><br><span class="line">        self.op = <span class="hljs-literal">None</span></span><br><span class="line">        self.const_attr = <span class="hljs-literal">None</span></span><br><span class="line">        self.name = <span class="hljs-string">&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__add__</span><span class="hljs-params">(self, other)</span>:</span></span><br><span class="line">        <span class="hljs-string">&quot;&quot;&quot;Adding two nodes return a new node.&quot;&quot;&quot;</span></span><br><span class="line">        <span class="hljs-keyword">if</span> isinstance(other, Node):</span><br><span class="line">            new_node = add_op(self, other)</span><br><span class="line">        <span class="hljs-keyword">else</span>:</span><br><span class="line">            <span class="hljs-comment"># Add by a constant stores the constant in the new node&apos;s const_attr field.</span></span><br><span class="line">            <span class="hljs-comment"># &apos;other&apos; argument is a constant</span></span><br><span class="line">            new_node = add_byconst_op(self, other)</span><br><span class="line">        <span class="hljs-keyword">return</span> new_node</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__sub__</span><span class="hljs-params">(self, other)</span>:</span></span><br><span class="line">        <span class="hljs-string">&quot;&quot;&quot;subtracting two nodes return a new node.&quot;&quot;&quot;</span></span><br><span class="line">        <span class="hljs-keyword">if</span> isinstance(other, Node):</span><br><span class="line">            new_node = add_op(self, <span class="hljs-number">-1</span> * other)</span><br><span class="line">        <span class="hljs-keyword">else</span>:</span><br><span class="line">            new_node = add_byconst_op(self, <span class="hljs-number">-1</span> * other)</span><br><span class="line">        <span class="hljs-keyword">return</span> new_node</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__rsub__</span><span class="hljs-params">(self, other)</span>:</span></span><br><span class="line">        <span class="hljs-string">&quot;&quot;&quot;allow left-hand-side subtract&quot;&quot;&quot;</span></span><br><span class="line">        <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span> * self.__sub__(other)</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__mul__</span><span class="hljs-params">(self, other)</span>:</span></span><br><span class="line">        <span class="hljs-string">&quot;&quot;&quot;Multiplying to nodes return a new node.&quot;&quot;&quot;</span></span><br><span class="line">        <span class="hljs-keyword">if</span> isinstance(other, Node):</span><br><span class="line">            new_node = mul_op(self, other)</span><br><span class="line">        <span class="hljs-keyword">else</span>:</span><br><span class="line">            new_node = mul_byconst_op(self, other)</span><br><span class="line">        <span class="hljs-keyword">return</span> new_node</span><br><span class="line"></span><br><span class="line">    <span class="hljs-comment"># Allow left-hand-side add and multiply.</span></span><br><span class="line">    __radd__ = __add__</span><br><span class="line">    __rmul__ = __mul__</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__str__</span><span class="hljs-params">(self)</span>:</span></span><br><span class="line">        <span class="hljs-string">&quot;&quot;&quot;Allow print to display node name.&quot;&quot;&quot;</span> </span><br><span class="line">        <span class="hljs-keyword">return</span> self.name</span><br><span class="line"></span><br><span class="line">    __repr__ = __str__</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>Each node has an OP that represents the mathematical operations that need to be performed. All OPs have a common base class. Its class definition is as follows:<br></p><figure class="highlight python hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Op</span><span class="hljs-params">(object)</span>:</span></span><br><span class="line">    <span class="hljs-string">&quot;&quot;&quot;Op represents operations performed on nodes.&quot;&quot;&quot;</span></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__call__</span><span class="hljs-params">(self)</span>:</span></span><br><span class="line">        <span class="hljs-string">&quot;&quot;&quot;Create a new node and associate the op object with the node.&quot;&quot;&quot;</span></span><br><span class="line">        new_node = Node()</span><br><span class="line">        new_node.op = self</span><br><span class="line">        <span class="hljs-keyword">return</span> new_node</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">compute</span><span class="hljs-params">(self, node, input_vals)</span>:</span></span><br><span class="line">        <span class="hljs-string">&quot;&quot;&quot;Given values of input nodes, compute the output value.&quot;&quot;&quot;</span></span><br><span class="line">        <span class="hljs-keyword">raise</span> NotImplementedError</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">gradient</span><span class="hljs-params">(self, node, output_grad)</span>:</span></span><br><span class="line">        <span class="hljs-string">&quot;&quot;&quot;Given value of output gradient, compute gradient contributions to each input node.&quot;&quot;&quot;</span></span><br><span class="line">        <span class="hljs-keyword">raise</span> NotImplementedError</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>In order to implement the corresponding mathematical operations on the node, it is only necessary to inherit the class <code>Op</code> and implement the function <code>compute</code> and <code>gradient</code>. In order to better explain the writing of OPs, I will write an example of the addition OP. The rest of the popular OPs will not be listed here, you can see the detailed code <a href="https://github.com/LB-Yu/distributed_system_courses/blob/master/cse559w/assignment1/autodiff.py" target="_blank" rel="noopener">here</a>. For the addition OP, there are two cases, one is to add two nodes, and the other is to add a node to a constant. Although there is only a slight difference between the two cases, we still need to treat them differently. Addition OP of two nodes is shown below:<br></p><figure class="highlight python hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AddOp</span><span class="hljs-params">(Op)</span>:</span></span><br><span class="line">    <span class="hljs-string">&quot;&quot;&quot;Op to element-wise add two nodes.&quot;&quot;&quot;</span></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__call__</span><span class="hljs-params">(self, node_A, node_B, name=None)</span>:</span></span><br><span class="line">        new_node = Op.__call__(self)</span><br><span class="line">        new_node.inputs = [node_A, node_B]</span><br><span class="line">        <span class="hljs-keyword">if</span> name <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:</span><br><span class="line">            new_node.name = name</span><br><span class="line">        <span class="hljs-keyword">else</span>:</span><br><span class="line">            new_node.name = <span class="hljs-string">&quot;(%s+%s)&quot;</span> % (node_A.name, node_B.name)</span><br><span class="line">        <span class="hljs-keyword">return</span> new_node</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">compute</span><span class="hljs-params">(self, node, input_vals)</span>:</span></span><br><span class="line">        <span class="hljs-string">&quot;&quot;&quot;Given values of two input nodes, return result of element-wise addition.&quot;&quot;&quot;</span></span><br><span class="line">        <span class="hljs-keyword">assert</span> len(input_vals) == <span class="hljs-number">2</span></span><br><span class="line">        <span class="hljs-keyword">return</span> input_vals[<span class="hljs-number">0</span>] + input_vals[<span class="hljs-number">1</span>]</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">gradient</span><span class="hljs-params">(self, node, output_grad)</span>:</span></span><br><span class="line">        <span class="hljs-string">&quot;&quot;&quot;Given gradient of add node, return gradient contributions to each input.&quot;&quot;&quot;</span></span><br><span class="line">        <span class="hljs-keyword">return</span> [output_grad, output_grad]</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>Addition OP of a node and a constent is shown below:<br></p><figure class="highlight python hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AddByConstOp</span><span class="hljs-params">(Op)</span>:</span></span><br><span class="line">    <span class="hljs-string">&quot;&quot;&quot;Op to element-wise add a nodes by a constant.&quot;&quot;&quot;</span></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__call__</span><span class="hljs-params">(self, node_A, const_val, name=None)</span>:</span></span><br><span class="line">        new_node = Op.__call__(self)</span><br><span class="line">        new_node.const_attr = const_val</span><br><span class="line">        new_node.inputs = [node_A]</span><br><span class="line">        <span class="hljs-keyword">if</span> name <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:</span><br><span class="line">            new_node.name = name</span><br><span class="line">        <span class="hljs-keyword">else</span>:</span><br><span class="line">            new_node.name = <span class="hljs-string">&quot;(%s+%s)&quot;</span> % (node_A.name, str(const_val))</span><br><span class="line">        <span class="hljs-keyword">return</span> new_node</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">compute</span><span class="hljs-params">(self, node, input_vals)</span>:</span></span><br><span class="line">        <span class="hljs-string">&quot;&quot;&quot;Given values of input node, return result of element-wise addition.&quot;&quot;&quot;</span></span><br><span class="line">        <span class="hljs-keyword">assert</span> len(input_vals) == <span class="hljs-number">1</span></span><br><span class="line">        <span class="hljs-keyword">return</span> input_vals[<span class="hljs-number">0</span>] + node.const_attr</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">gradient</span><span class="hljs-params">(self, node, output_grad)</span>:</span></span><br><span class="line">        <span class="hljs-string">&quot;&quot;&quot;Given gradient of add node, return gradient contribution to input.&quot;&quot;&quot;</span></span><br><span class="line">        <span class="hljs-keyword">return</span> [output_grad]</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>You can extend the OPs by mimicking the addition OP. In the next section, I will complete the OPs that logistic regression needs. And using the automatic differential logistic regression model for handwritten digit recognition.</p>
+<p>After building the computation graph, we need to calculate it. The calculation of the computation graph includes the forward propagation calculation and the backward propagation (gradient) calculation. The topological ordering of the computational graph is required for any calculation. Here we use a simple post-order DFS algorithm to get the topological order.<br></p><figure class="highlight python hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">find_topo_sort</span><span class="hljs-params">(node_list)</span>:</span></span><br><span class="line">    <span class="hljs-string">&quot;&quot;&quot;Given a list of nodes, return a topological sort list of nodes ending in them.</span></span><br><span class="line"><span class="hljs-string">    </span></span><br><span class="line"><span class="hljs-string">    A simple algorithm is to do a post-order DFS traversal on the given nodes, </span></span><br><span class="line"><span class="hljs-string">    going backwards based on input edges. Since a node is added to the ordering</span></span><br><span class="line"><span class="hljs-string">    after all its predecessors are traversed due to post-order DFS, we get a topological</span></span><br><span class="line"><span class="hljs-string">    sort.</span></span><br><span class="line"><span class="hljs-string"></span></span><br><span class="line"><span class="hljs-string">    &quot;&quot;&quot;</span></span><br><span class="line">    visited = set()</span><br><span class="line">    topo_order = []</span><br><span class="line">    <span class="hljs-keyword">for</span> node <span class="hljs-keyword">in</span> node_list:</span><br><span class="line">        topo_sort_dfs(node, visited, topo_order)</span><br><span class="line">    <span class="hljs-keyword">return</span> topo_order</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">topo_sort_dfs</span><span class="hljs-params">(node, visited, topo_order)</span>:</span></span><br><span class="line">    <span class="hljs-string">&quot;&quot;&quot;Post-order DFS&quot;&quot;&quot;</span></span><br><span class="line">    <span class="hljs-keyword">if</span> node <span class="hljs-keyword">in</span> visited:</span><br><span class="line">        <span class="hljs-keyword">return</span></span><br><span class="line">    visited.add(node)</span><br><span class="line">    <span class="hljs-keyword">for</span> n <span class="hljs-keyword">in</span> node.inputs:</span><br><span class="line">        topo_sort_dfs(n, visited, topo_order)</span><br><span class="line">    topo_order.append(node)</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>After the topological sorting of the computation graph is obtained, it can be calculated. The forward propagation calculation is wrapped in the class <code>Executor</code>, the code is as follows:<br></p><figure class="highlight python hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Executor</span>:</span></span><br><span class="line">    <span class="hljs-string">&quot;&quot;&quot;Executor computes values for a given subset of nodes in a computation graph.&quot;&quot;&quot;</span> </span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self, eval_node_list)</span>:</span></span><br><span class="line">        self.eval_node_list = eval_node_list</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">run</span><span class="hljs-params">(self, feed_dict)</span>:</span></span><br><span class="line">        <span class="hljs-string">&quot;&quot;&quot;Computes values of nodes in eval_node_list given computation graph.&quot;&quot;&quot;</span></span><br><span class="line">        node_to_val_map = dict(feed_dict)</span><br><span class="line">        <span class="hljs-comment"># Traverse graph in topological sort order and compute values for all nodes.</span></span><br><span class="line">        topo_order = find_topo_sort(self.eval_node_list)</span><br><span class="line"></span><br><span class="line">        <span class="hljs-comment"># calculated all the nodes in the computation graph.</span></span><br><span class="line">        <span class="hljs-keyword">for</span> node <span class="hljs-keyword">in</span> topo_order:</span><br><span class="line">            inputs = [node_to_val_map[i] <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> node.inputs]</span><br><span class="line">            <span class="hljs-keyword">if</span> inputs:</span><br><span class="line">                node_to_val_map[node] = node.op.compute(node, inputs)</span><br><span class="line"></span><br><span class="line">        <span class="hljs-comment"># Collect node values.</span></span><br><span class="line">        node_val_results = [node_to_val_map[node] <span class="hljs-keyword">for</span> node <span class="hljs-keyword">in</span> self.eval_node_list]</span><br><span class="line">        <span class="hljs-keyword">return</span> node_val_results</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>The specific algorithm for backpropagation has already been mentioned before. The corresponding Python code is as follows.<br></p><figure class="highlight python hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">gradients</span><span class="hljs-params">(output_node, node_list)</span>:</span></span><br><span class="line">    <span class="hljs-string">&quot;&quot;&quot;Take gradient of output node with respect to each node in node_list.&quot;&quot;&quot;</span></span><br><span class="line">    <span class="hljs-comment"># a map from node to a list of gradient contributions from each output node</span></span><br><span class="line">    node_to_output_grads_list = {}</span><br><span class="line">    <span class="hljs-comment"># Special note on initializing gradient of output_node as oneslike_op(output_node):</span></span><br><span class="line">    <span class="hljs-comment"># We are really taking a derivative of the scalar reduce_sum(output_node)</span></span><br><span class="line">    <span class="hljs-comment"># instead of the vector output_node. But this is the common case for loss function.</span></span><br><span class="line">    node_to_output_grads_list[output_node] = [oneslike_op(output_node)]</span><br><span class="line">    <span class="hljs-comment"># a map from node to the gradient of that node</span></span><br><span class="line">    node_to_output_grad = {}</span><br><span class="line">    <span class="hljs-comment"># Traverse graph in reverse topological order given the output_node that we are taking gradient wrt.</span></span><br><span class="line">    reverse_topo_order = reversed(find_topo_sort([output_node]))</span><br><span class="line"></span><br><span class="line">    <span class="hljs-keyword">for</span> node <span class="hljs-keyword">in</span> reverse_topo_order:</span><br><span class="line">        output_grad = sum_node_list(node_to_output_grads_list[node])</span><br><span class="line">        node_to_output_grad[node] = output_grad</span><br><span class="line">        input_grads_list = node.op.gradient(node, output_grad)</span><br><span class="line">        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(len(node.inputs)):</span><br><span class="line">            <span class="hljs-keyword">if</span> node.inputs[i] <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> node_to_output_grads_list:</span><br><span class="line">                node_to_output_grads_list[node.inputs[i]] = []</span><br><span class="line">            node_to_output_grads_list[node.inputs[i]].append(input_grads_list[i])</span><br><span class="line"></span><br><span class="line">    <span class="hljs-comment"># Collect results for gradients requested.</span></span><br><span class="line">    grad_node_list = [node_to_output_grad[node] <span class="hljs-keyword">for</span> node <span class="hljs-keyword">in</span> node_list]</span><br><span class="line">    <span class="hljs-keyword">return</span> grad_node_list</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>If you need the full code, go <a href="https://github.com/LB-Yu/distributed_system_courses/tree/master/cse559w/assignment1" target="_blank" rel="noopener">here</a>.</p>
+<h1 id="Logistic-Regression"><a href="#Logistic-Regression" class="headerlink" title="Logistic Regression"></a>Logistic Regression</h1><p>Based on the AD framework we have built, we only need to add some appropriate OPs to complete the LR model. If you don&#x2019;t know much about the principles of LR, please refer to my <a href="/2019/07/01/Logistic-Regression/index.html">blog post</a>. This blog will not describe the details of LR. In fact, in order to implement LR, we only need to add two OPs, <code>SigmoidOp</code> and <code>SigmoidCrossEntropyOp</code>, on the existing basis.<br></p><figure class="highlight python hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">sigmoid_fun</span><span class="hljs-params">(x)</span>:</span></span><br><span class="line">    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span> / (<span class="hljs-number">1</span> + np.exp(-x))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SigmoidOp</span><span class="hljs-params">(Op)</span>:</span></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__call__</span><span class="hljs-params">(self, node_A, name=None)</span>:</span></span><br><span class="line">        new_node = Op.__call__(self)</span><br><span class="line">        new_node.inputs = [node_A]</span><br><span class="line">        <span class="hljs-keyword">if</span> name <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:</span><br><span class="line">            new_node.name = name</span><br><span class="line">        <span class="hljs-keyword">else</span>:</span><br><span class="line">            new_node.name = <span class="hljs-string">&quot;SigmoidOp(%s)&quot;</span> % node_A.name</span><br><span class="line">        <span class="hljs-keyword">return</span> new_node</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">compute</span><span class="hljs-params">(self, node, input_vals)</span>:</span></span><br><span class="line">        <span class="hljs-keyword">assert</span> len(input_vals) == <span class="hljs-number">1</span></span><br><span class="line">        <span class="hljs-keyword">return</span> sigmoid_fun(input_vals[<span class="hljs-number">0</span>])</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">gradient</span><span class="hljs-params">(self, node, output_grad)</span>:</span></span><br><span class="line">        <span class="hljs-comment"># Do not directly use SigmoidOp, use SigmoidCrossEntropyOp instead.</span></span><br><span class="line">        <span class="hljs-keyword">raise</span> NotImplementedError</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SigmoidCrossEntropyOp</span><span class="hljs-params">(Op)</span>:</span></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__call__</span><span class="hljs-params">(self, node_A, node_B, name=None)</span>:</span></span><br><span class="line">        new_node = Op.__call__(self)</span><br><span class="line">        new_node.inputs = [node_A, node_B]</span><br><span class="line">        <span class="hljs-keyword">if</span> name <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:</span><br><span class="line">            new_node.name = name</span><br><span class="line">        <span class="hljs-keyword">else</span>:</span><br><span class="line">            new_node.name = <span class="hljs-string">&quot;SigmoidCrossEntropyOp(%s, %s)&quot;</span> % (node_A.name, node_B.name)</span><br><span class="line">        <span class="hljs-keyword">return</span> new_node</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">compute</span><span class="hljs-params">(self, node, input_vals)</span>:</span></span><br><span class="line">        <span class="hljs-keyword">assert</span> len(input_vals) == <span class="hljs-number">2</span></span><br><span class="line">        z = input_vals[<span class="hljs-number">0</span>]</span><br><span class="line">        y = input_vals[<span class="hljs-number">1</span>]</span><br><span class="line"></span><br><span class="line">        m, _ = z.shape</span><br><span class="line">        loss = np.sum(y * np.log(sigmoid_fun(z)) + (<span class="hljs-number">1</span> - y) * np.log(<span class="hljs-number">1</span> - sigmoid_fun(z))) / m</span><br><span class="line">        <span class="hljs-keyword">return</span> np.array(loss)</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">gradient</span><span class="hljs-params">(self, node, output_grad)</span>:</span></span><br><span class="line">        z = node.inputs[<span class="hljs-number">0</span>]</span><br><span class="line">        y = node.inputs[<span class="hljs-number">1</span>]</span><br><span class="line">        grad_A = (sigmoid_op(z) - y) * output_grad</span><br><span class="line">        grad_B = zeroslike_op(node.inputs[<span class="hljs-number">1</span>])</span><br><span class="line">        <span class="hljs-keyword">return</span> [grad_A, grad_B]</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>Then we can built an LR model to solve the handwritten digit recognition problem. Sine LR is an binary classification algrithm, we only select the number 0, 1 in mnist.<br></p><figure class="highlight python hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">mnist_lr</span><span class="hljs-params">(num_epochs=<span class="hljs-number">10</span>, print_loss_val_each_epoch=False)</span>:</span></span><br><span class="line">    print(<span class="hljs-string">&quot;Build logistic regression model...&quot;</span>)</span><br><span class="line"></span><br><span class="line">    W = ad.Variable(name=<span class="hljs-string">&quot;W&quot;</span>)</span><br><span class="line">    b = ad.Variable(name=<span class="hljs-string">&quot;b&quot;</span>)</span><br><span class="line">    X = ad.Variable(name=<span class="hljs-string">&quot;X&quot;</span>)</span><br><span class="line">    y = ad.Variable(name=<span class="hljs-string">&quot;y&quot;</span>)</span><br><span class="line"></span><br><span class="line">    z = ad.matmul_op(X, W) + b</span><br><span class="line">    y_hat = ad.sigmoid_op(z)</span><br><span class="line"></span><br><span class="line">    loss = ad.sigmoidcrossentropy_op(z, y)</span><br><span class="line"></span><br><span class="line">    grad_W, grad_b = ad.gradients(loss, [W, b])</span><br><span class="line">    executor = ad.Executor([loss, grad_W, grad_b, y_hat])</span><br><span class="line"></span><br><span class="line">    <span class="hljs-comment"># Read input data</span></span><br><span class="line">    train_X, train_Y, test_X, test_Y = load_mnist_for_lr()</span><br><span class="line">    print(<span class="hljs-string">&quot;train set num: %d&quot;</span> % train_X.shape[<span class="hljs-number">0</span>])</span><br><span class="line">    print(<span class="hljs-string">&quot;test set num: %d&quot;</span> % test_X.shape[<span class="hljs-number">0</span>])</span><br><span class="line"></span><br><span class="line">    <span class="hljs-comment"># Set up minibatch</span></span><br><span class="line">    batch_size = <span class="hljs-number">1000</span></span><br><span class="line">    n_train_batches = train_X.shape[<span class="hljs-number">0</span>] // batch_size</span><br><span class="line">    n_test_batches = test_X.shape[<span class="hljs-number">0</span>] // batch_size</span><br><span class="line"></span><br><span class="line">    print(<span class="hljs-string">&quot;Start training loop...&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="hljs-comment"># Initialize parameters</span></span><br><span class="line">    W_val = np.zeros((<span class="hljs-number">784</span>, <span class="hljs-number">10</span>))</span><br><span class="line">    b_val = np.zeros((<span class="hljs-number">10</span>))</span><br><span class="line">    X_val = np.empty(shape=(batch_size, <span class="hljs-number">784</span>), dtype=np.float32)</span><br><span class="line">    y_val = np.empty(shape=(batch_size, <span class="hljs-number">1</span>), dtype=np.float32)</span><br><span class="line">    test_X_val = np.empty(shape=(batch_size, <span class="hljs-number">784</span>), dtype=np.float32)</span><br><span class="line">    test_y_val = np.empty(shape=(batch_size, <span class="hljs-number">1</span>), dtype=np.float32)</span><br><span class="line"></span><br><span class="line">    lr = <span class="hljs-number">1e-3</span></span><br><span class="line">    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(num_epochs):</span><br><span class="line">        print(<span class="hljs-string">&quot;epoch %d&quot;</span> % i)</span><br><span class="line">        <span class="hljs-keyword">for</span> minibatch_index <span class="hljs-keyword">in</span> range(n_train_batches):</span><br><span class="line">            minibatch_start = minibatch_index * batch_size</span><br><span class="line">            minibatch_end = (minibatch_index + <span class="hljs-number">1</span>) * batch_size</span><br><span class="line">            X_val[:] = train_X[minibatch_start:minibatch_end]</span><br><span class="line">            y_val[:] = train_Y[minibatch_start:minibatch_end]</span><br><span class="line">            loss_val, grad_W_val, grad_b_val, _ = executor.run(</span><br><span class="line">                feed_dict={X: X_val, y: y_val, W: W_val, b: b_val})</span><br><span class="line">            <span class="hljs-comment"># SGD update</span></span><br><span class="line">            W_val = W_val - lr * grad_W_val</span><br><span class="line">            b_val = b_val - lr * grad_b_val</span><br><span class="line">        <span class="hljs-keyword">if</span> print_loss_val_each_epoch:</span><br><span class="line">                print(loss_val)</span><br><span class="line"></span><br><span class="line">    correct_predictions = []</span><br><span class="line">    <span class="hljs-keyword">for</span> minibatch_index <span class="hljs-keyword">in</span> range(n_test_batches):</span><br><span class="line">        minibatch_start = minibatch_index * batch_size</span><br><span class="line">        minibatch_end = (minibatch_index + <span class="hljs-number">1</span>) * batch_size</span><br><span class="line">        test_X_val[:] = test_X[minibatch_start:minibatch_end]</span><br><span class="line">        test_y_val[:] = test_Y[minibatch_start:minibatch_end]</span><br><span class="line">        _, _, _, test_y_predicted = executor.run(</span><br><span class="line">            feed_dict={</span><br><span class="line">                X: test_X_val,</span><br><span class="line">                y: test_y_val,</span><br><span class="line">                W: W_val,</span><br><span class="line">                b: b_val})</span><br><span class="line">        correct_prediction = (test_y_predicted &gt;= <span class="hljs-number">0.5</span>).astype(np.int) == test_y_val</span><br><span class="line">        correct_predictions.extend(correct_prediction)</span><br><span class="line">    accuracy = np.mean(correct_predictions)</span><br><span class="line">    print(<span class="hljs-string">&quot;test set accuracy=%f&quot;</span> % accuracy)</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>After 10 epochs, we get 100% accuracy on the test set.</p>
+<h1 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h1><p>In this blog post, we detail the principles of AD and give specific derivation cases. On the basis of understanding the mathematical principles of AD, we used <code>numpy</code> to construct a simple calculation graph and implemented some basic OPs. Finally, we constructed the LR model on the calculation graph and used it for handwritten digit recognition.</p>
+<p>So far, we have actually understood the basic principle behind the deep learning framework-AD based on computational graphs. However, we still have a long way to go before the real deep learning framework. Our numpy-based implementation is undoubtedly inefficient, and the real deep learning framework uses a variety of hardware acceleration.</p>
+<p>GPU acceleration is very common in deep learning frameworks. If you want to learn about GPU-based acceleration technology, you can refer to <a href="../../23/Tinyflow-A-Simple-Neural-Network-Framework">Tinyflow</a>.</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><p>[1] <a href="http://dlsys.cs.washington.edu/" target="_blank" rel="noopener">CSE 599W: System for ML</a><br>[2] <a href="https://arxiv.org/pdf/1502.05767.pdf" target="_blank" rel="noopener">Automatic Differentiation in Machine Learning: a Survey</a></p>
+</body></html>
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/AI-System/">#AI System</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/tinyflow.html">Tinyflow - A Simple Neural Network Framework</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/softmax-regression.html">Softmax Regression (SR)</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+<div class="sharebox">
+    
+<div class="sharethis-inline-share-buttons"></div>
+<script type='text/javascript' src='//platform-api.sharethis.com/js/sharethis.js#property=5e63913dd0c39800126ea9e7&amp;product=inline-share-buttons&amp;cms=sop' async='async'></script>
+
+</div>
+
+
+
+<div class="comments">
+    <p align="center">
+        本博客所有文章除特别声明外, 均采用<a href="https://creativecommons.org/licenses/by-nc-sa/3.0/cn/" target="_blank" rel="noopener">CC BY-NC-SA 3.0 CN</a>许可协议. 转载请注明出处!
+    </p>
+
+    <br><br>
+
+    <p align="center">
+        <img src="/images/WeChat.jpg" width="25%">
+    </p>
+    <p align="center">关注笔者微信公众号获得最新文章推送</p>
+</div>
+
+
+
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    
+<div id="valine-thread"></div>
+<script src="//code.bdstatic.com/npm/leancloud-storage@4.12.2/dist/av-min.js"></script>
+<script src='//cdn.jsdelivr.net/gh/AshinWang/SimpleValine@v0.1/SimpleValine.min.js'></script>
+<script>
+    new Valine({
+        el: '#valine-thread',
+        appId: 'v4Ich4NMxLXYhCkPcb1OmVPR-gzGzoHsz',
+        appKey: 'b5fiVY3XvcAwzJ06YR8rFCAj',
+        notify: true,
+        verify: false,
+        avatar: '',
+        placeholder: 'If you have any questions, please comment here!',
+        meta: ['nick', 'mail'],
+        visitor: true,
+        lang: 'en'
+    })
+</script>
+
+
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2018-2024 Liebing&nbsp;. 
+                <!-- <span id="busuanzi_container_site_uv"><span id="busuanzi_value_site_uv"></span> UV, </span>
+                <span id="busuanzi_container_site_pv"> <span id="busuanzi_value_site_pv"></span> PV</span> -->
+
+                View
+                <span id="busuanzi_value_site_pv" data-num="1000">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </span> times by
+                <span id="busuanzi_value_site_uv">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </span> visitors.
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="一行代码, 点滴生活!" href="">
+                    
+                    一行代码, 点滴生活!
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+    <script src="https://code.jquery.com/jquery-latest.js"></script>
+    <!-- 不蒜子计数初始值纠正 -->
+    <script >
+        $(document).ready(function() {
+            var int = setInterval(fixCount, 500);  // 50ms周期检测函数
+            var initPV = 3569;  // 初始化首次数据
+            var initUV = 1215;
+            function fixCount() {                   
+                if ($("#busuanzi_container_site_pv").css("display") != "none") {
+                    $("#busuanzi_value_site_pv").html(parseInt($("#busuanzi_value_site_pv").html()) + initPV); // 加上初始数据 
+                    clearInterval(int); // 停止检测
+                } 
+                if ($("#busuanzi_container_site_uv").css("display") != "none") {
+                    $("#busuanzi_value_site_uv").html(parseInt($("#busuanzi_value_site_uv").html()) + initUV); // 加上初始数据 
+                    clearInterval(int); // 停止检测
+                }  
+            }
+        });
+    </script>
+
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/" target="_blank" rel="noopener">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("en-AU");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+
+<script src="/js/script.js"></script>
+
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+    
+</body>
+</html>

@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head>
+    <meta charset="utf-8">
+<title>Apache Calcite关系代数 - Liebing&#39;s Blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="baidu-site-verification" content="codeva-2Q9E1leVAG" />
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="">
+
+
+
+<meta name="keywords" content="code">
+
+
+
+    <meta name="description" content="&amp;#x672C;&amp;#x6587;&amp;#x5DF2;&amp;#x6536;&amp;#x5F55;&amp;#x5728;&amp;#x5408;&amp;#x96C6;Apche Calcite&amp;#x539F;&amp;#x7406;&amp;#x4E0E;&amp;#x5B9E;&amp;#x8DF5;&amp;#x4E2D;.   &amp;#x672C;&amp;#x6587;&amp;#x662F;Apache Calcite&amp;#x539F;&amp;#x7406;&amp;#x4E0E;&amp;#x5B9E;&amp;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Apache Calcite关系代数">
+<meta property="og:url" content="http://yoursite.com/apache-calcite-relational-algebra.html">
+<meta property="og:site_name" content="Liebing&#39;s Blog">
+<meta property="og:description" content="&amp;#x672C;&amp;#x6587;&amp;#x5DF2;&amp;#x6536;&amp;#x5F55;&amp;#x5728;&amp;#x5408;&amp;#x96C6;Apche Calcite&amp;#x539F;&amp;#x7406;&amp;#x4E0E;&amp;#x5B9E;&amp;#x8DF5;&amp;#x4E2D;.   &amp;#x672C;&amp;#x6587;&amp;#x662F;Apache Calcite&amp;#x539F;&amp;#x7406;&amp;#x4E0E;&amp;#x5B9E;&amp;">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/apache-calcite-relational-algebra/sql_joins.png">
+<meta property="og:image" content="http://yoursite.com/apache-calcite-relational-algebra/sqlNode_2_relNode.png">
+<meta property="og:image" content="http://yoursite.com/apache-calcite-relational-algebra/relNode.png">
+<meta property="og:image" content="http://yoursite.com/apache-calcite-relational-algebra/singleRel.png">
+<meta property="og:image" content="http://yoursite.com/apache-calcite-relational-algebra/setOp.png">
+<meta property="og:image" content="http://yoursite.com/apache-calcite-relational-algebra/converter.png">
+<meta property="og:image" content="http://yoursite.com/apache-calcite-relational-algebra/rel_cat.png">
+<meta property="og:image" content="http://yoursite.com/apache-calcite-relational-algebra/relTrait.png">
+<meta property="og:image" content="http://yoursite.com/apache-calcite-relational-algebra/convention.png">
+<meta property="og:image" content="http://yoursite.com/apache-calcite-relational-algebra/relTraitDef.png">
+<meta property="og:image" content="http://yoursite.com/apache-calcite-relational-algebra/rexNode.png">
+<meta property="og:image" content="http://yoursite.com/apache-calcite-relational-algebra/SqlToRelConverter.png">
+<meta property="article:published_time" content="2023-04-04T01:00:00.000Z">
+<meta property="article:modified_time" content="2024-05-29T12:13:46.373Z">
+<meta property="article:author" content="Liebing">
+<meta property="article:tag" content="Apache Calcite">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/apache-calcite-relational-algebra/sql_joins.png">
+
+
+
+
+
+<link rel="icon" href="/img/favicon.ico">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt="" height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/collections">合集</a>
+            
+            <a class="navbar-item "
+               href="/courses">课程</a>
+            
+            <a class="navbar-item "
+               href="/archive">归档</a>
+            
+            <a class="navbar-item "
+               href="/categories">分类</a>
+            
+            <a class="navbar-item "
+               href="/tags">标签</a>
+            
+            <a class="navbar-item "
+               href="/friends">友链</a>
+            
+            <a class="navbar-item "
+               href="/about">关于</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#关系代数">1&nbsp;&nbsp;<b>关系代数</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#从SQL到关系代数">2&nbsp;&nbsp;<b>从SQL到关系代数</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Calcite关系算子实现">3&nbsp;&nbsp;<b>Calcite关系算子实现</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#RelNode">3.1&nbsp;&nbsp;RelNode</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#RelNode类型及继承关系">3.1.1&nbsp;&nbsp;RelNode类型及继承关系</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#RelNode内部实现">3.1.2&nbsp;&nbsp;RelNode内部实现</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#RelTrait">3.2&nbsp;&nbsp;RelTrait</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#RelTraitDef">3.2.1&nbsp;&nbsp;RelTraitDef</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#Calling-Convention">3.2.2&nbsp;&nbsp;Calling Convention</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#RexNode">3.3&nbsp;&nbsp;RexNode</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Calcite关系算子树构建">4&nbsp;&nbsp;<b>Calcite关系算子树构建</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#RelBuilder">4.1&nbsp;&nbsp;RelBuilder</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#SqlToRelConverter">4.2&nbsp;&nbsp;SqlToRelConverter</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#总结">5&nbsp;&nbsp;<b>总结</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#参考">6&nbsp;&nbsp;<b>参考</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#附录">7&nbsp;&nbsp;<b>附录</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#附录一-RelBuilder的创建">7.1&nbsp;&nbsp;附录一: RelBuilder的创建</a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/LB-Yu" target="_blank" rel="noopener">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="知" href="https://www.zhihu.com/people/liebingyu" target="_blank" rel="noopener">
+                
+                知
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Apache Calcite关系代数
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-04-04T01:00:00.000Z" itemprop="datePublished">Apr 4 2023</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/Database/">Database</a><span>></span><a class="article-category-link" href="/categories/Database/SQL-Engine/">SQL Engine</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            26 minutes read (About 3926 words)
+        </span>
+        
+        
+        <span id="/apache-calcite-relational-algebra.html" class="column is-narrow leancloud_visitors" data-flag-title="Apache Calcite关系代数">
+            VISITED
+                <i class="leancloud-visitors-count">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </i>
+            TIMES
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <html><head></head><body><blockquote class="colorquote info"><p>&#x672C;&#x6587;&#x5DF2;&#x6536;&#x5F55;&#x5728;&#x5408;&#x96C6;<a href="/collections/calcite/">Apche Calcite&#x539F;&#x7406;&#x4E0E;&#x5B9E;&#x8DF5;</a>&#x4E2D;.</p>
+</blockquote>
+
+<p>&#x672C;&#x6587;&#x662F;Apache Calcite&#x539F;&#x7406;&#x4E0E;&#x5B9E;&#x8DF5;&#x7CFB;&#x5217;&#x7684;&#x7B2C;&#x56DB;&#x7BC7;, &#x524D;&#x4E24;&#x7BC7;&#x6587;&#x7AE0;&#x4ECB;&#x7ECD;&#x4E86;SQL&#x8BED;&#x53E5;&#x7684;&#x89E3;&#x6790;&#x53CA;&#x9A8C;&#x8BC1;, &#x672C;&#x6587;&#x5F00;&#x59CB;&#x4ECB;&#x7ECD;&#x5173;&#x7CFB;&#x4EE3;&#x6570;&#x7684;&#x539F;&#x7406;&#x4E0E;&#x5B9E;&#x73B0;. &#x5173;&#x7CFB;&#x4EE3;&#x6570;&#x6700;&#x65E9;&#x7531;E. F. Codd&#x5728;1970&#x5E74;&#x7684;&#x8BBA;&#x6587;&#x201D;<a href="https://www.seas.upenn.edu/~zives/03f/cis550/codd.pdf" target="_blank" rel="noopener">A Relational Model of Data for Large Shared Data Banks</a>&#x201C;&#x4E2D;&#x63D0;&#x51FA;, &#x662F;&#x5173;&#x7CFB;&#x578B;&#x6570;&#x636E;&#x5E93;&#x67E5;&#x8BE2;&#x8BED;&#x8A00;&#x7684;&#x57FA;&#x7840;, &#x4E5F;&#x662F;&#x67E5;&#x8BE2;&#x4F18;&#x5316;&#x6280;&#x672F;&#x7684;&#x7406;&#x8BBA;&#x57FA;&#x7840;. &#x968F;&#x7740;&#x5173;&#x7CFB;&#x4EE3;&#x6570;&#x548C;&#x5173;&#x7CFB;&#x6A21;&#x578B;&#x7684;&#x4E0D;&#x65AD;&#x53D1;&#x5C55;&#x548C;&#x5B8C;&#x5584;, &#x76EE;&#x524D;&#x51E0;&#x4E4E;&#x6240;&#x6709;&#x5BF9;&#x5916;&#x652F;&#x6301;SQL&#x8BBF;&#x95EE;&#x7684;&#x7CFB;&#x7EDF;, &#x90FD;&#x4F1A;&#x5C06;SQL&#x8F6C;&#x5316;&#x4E3A;&#x7B49;&#x4EF7;&#x7684;&#x5173;&#x7CFB;&#x4EE3;&#x6570;&#x8868;&#x8FBE;, &#x5E76;&#x57FA;&#x4E8E;&#x6B64;&#x8FDB;&#x884C;&#x67E5;&#x8BE2;&#x4F18;&#x5316;. &#x5728;Calcite&#x5185;&#x90E8;, &#x540C;&#x6837;&#x4F1A;&#x5C06;SQL&#x67E5;&#x8BE2;&#x8F6C;&#x5316;&#x4E3A;&#x4E00;&#x9897;&#x7B49;&#x4EF7;&#x7684;&#x5173;&#x7CFB;&#x7B97;&#x5B50;&#x6811;, &#x5E76;&#x5728;&#x6B64;&#x57FA;&#x7840;&#x4E0A;&#x8FDB;&#x884C;&#x67E5;&#x8BE2;&#x4F18;&#x5316;. &#x672C;&#x6587;&#x9996;&#x5148;&#x4ECB;&#x7ECD;&#x901A;&#x7528;&#x7684;&#x5173;&#x7CFB;&#x4EE3;&#x6570;&#x7406;&#x8BBA;, &#x4E4B;&#x540E;&#x4ECB;&#x7ECD;&#x5176;&#x5728;Calciate&#x4E2D;&#x7684;&#x5B9E;&#x73B0;.<br><a name="YgEdH"></a></p>
+<a id="more"></a>
+
+<h1 id="&#x5173;&#x7CFB;&#x4EE3;&#x6570;"><a href="#&#x5173;&#x7CFB;&#x4EE3;&#x6570;" class="headerlink" title="&#x5173;&#x7CFB;&#x4EE3;&#x6570;"></a>&#x5173;&#x7CFB;&#x4EE3;&#x6570;</h1><p>Codd&#x63D0;&#x51FA;&#x7684;&#x5173;&#x7CFB;&#x4EE3;&#x6570;&#x7684;6&#x4E2A;&#x539F;&#x59CB;&#x8FD0;&#x7B97;&#x662F;<strong>&#x9009;&#x62E9;(Select), &#x6295;&#x5F71;(Project), &#x7B1B;&#x5361;&#x5C14;&#x79EF;(Cartesian-product), &#x5E76;&#x96C6;(Union), &#x5DEE;&#x96C6;(Difference), &#x548C;&#x91CD;&#x547D;&#x540D;(Rename)</strong>. &#x968F;&#x7740;&#x5173;&#x7CFB;&#x6A21;&#x578B;&#x7684;&#x4E0D;&#x65AD;&#x53D1;&#x5C55;, &#x66F4;&#x591A;&#x7684;&#x5173;&#x7CFB;&#x4EE3;&#x6570;&#x8FD0;&#x7B97;&#x88AB;&#x63D0;&#x51FA;, &#x76EE;&#x524D;&#x4E3B;&#x8981;&#x7684;&#x5173;&#x7CFB;&#x4EE3;&#x6570;&#x8FD0;&#x7B97;&#x5982;&#x4E0B;&#x8868;&#x6240;&#x793A;.</p>
+<table>
+<thead>
+<tr>
+<th><strong>&#x7C7B;&#x522B;</strong></th>
+<th><strong>&#x540D;&#x79F0;</strong></th>
+<th><strong>&#x7B26;&#x53F7;</strong></th>
+<th><strong>&#x793A;&#x4F8B;</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>&#x4E00;&#x5143;&#x8FD0;&#x7B97;</strong></td>
+<td>&#x9009;&#x62E9;(Select)</td>
+<td>$\sigma$</td>
+<td>&#x7B26;&#x53F7;: $\sigma_{condition}(R)$<br>SQL: <code>SELECT * FROM R WHERE condition</code></td>
+</tr>
+<tr>
+<td></td>
+<td>&#x6295;&#x5F71;(Project)</td>
+<td>$\Pi$</td>
+<td>&#x7B26;&#x53F7;: $\Pi_{x, y}(R)$ <br> SQL: <code>SELECT x, y FROM R</code></td>
+</tr>
+<tr>
+<td></td>
+<td>&#x8D4B;&#x503C;(Assignment)</td>
+<td>$\gets$</td>
+<td>&#x7B26;&#x53F7;: $$ t \gets \Pi_{x, y}(\sigma_{condition}(R)) $$ <br>SQL: <code>CREATE VIEW t AS SELECT x, y FROM R WHERE condition</code></td>
+</tr>
+<tr>
+<td></td>
+<td>&#x91CD;&#x547D;&#x540D;(Rename)</td>
+<td>$\rho$</td>
+<td>&#x7B26;&#x53F7;: $\rho_{S(x1, y1)}(R)$<br>SQL: <code>SELECT * FROM (SELECT x AS x1, y AS y1 FROM R) AS S</code></td>
+</tr>
+<tr>
+<td><strong>&#x4E8C;&#x5143;&#x8FD0;&#x7B97;</strong></td>
+<td>&#x5E76;(Union)</td>
+<td>$\cup$</td>
+<td>&#x7B26;&#x53F7;: $R \cup S$<br>SQL: <code>SELECT * FROM R UNION SELECT * FROM S</code></td>
+</tr>
+<tr>
+<td></td>
+<td>&#x4EA4;(Intersection)</td>
+<td>$\cap$</td>
+<td>&#x7B26;&#x53F7;: $R \cap S = R - (R-S)$<br>SQL: <code>SELECT * FROM R WHERE x NOT IN (SELECT x FROM R WHERE x NOT IN (SELECT x FROM S))</code></td>
+</tr>
+<tr>
+<td></td>
+<td>&#x5DEE;(Difference)</td>
+<td>$-$</td>
+<td>&#x7B26;&#x53F7;: $R - S$<br>SQL: <code>SELECT * FROM R WHERE x NOT IN (SELECT x FROM S)</code></td>
+</tr>
+<tr>
+<td></td>
+<td>&#x7B1B;&#x5361;&#x513F;&#x79EF;(Cartesian-product)</td>
+<td>$\times$</td>
+<td>&#x7B26;&#x53F7;: $R \times S$<br>SQL: <code>SELECT * FROM R, S</code></td>
+</tr>
+<tr>
+<td></td>
+<td>&#x9664;(Divide)</td>
+<td>$\div$</td>
+<td>&#x7B26;&#x53F7;: $R \div S$<br>SQL: <code>SELECT DISTINCT r1.x FROM R AS r1 WHERE NOT EXISTS (SELECT S.y FROM S WHERE NOT EXISTS (SELECT * FROM R AS r2 WHERE r2.x = r1.x AND r2.y = S.y))</code></td>
+</tr>
+<tr>
+<td></td>
+<td>&#x8FDE;&#x63A5;(Join)</td>
+<td>$\Join$</td>
+<td>&#x7B26;&#x53F7;: $R \Join_{condition} S$<br>SQL: <code>SELECT * FROM R JOIN S ON condition</code></td>
+</tr>
+</tbody></table>
+<p><strong>&#x6CE8;: &#x5176;&#x4E2D;$R$&#x548C;$S$&#x8868;&#x793A;&#x5173;&#x7CFB;, $x$, $y$&#x548C;$z$&#x8868;&#x793A;&#x5173;&#x7CFB;&#x4E2D;&#x7684;&#x5C5E;&#x6027;&#x6216;&#x5217;.</strong></p>
+<p>&#x4E0A;&#x8FF0;&#x8FD0;&#x7B97;&#x4E2D;, &#x5176;&#x4E2D;&#x4E00;&#x90E8;&#x5206;&#x4EC5;&#x5728;&#x4E00;&#x4E2A;&#x5173;&#x7CFB;&#x4E0A;&#x8FDB;&#x884C;&#x8FD0;&#x7B97;, &#x4E00;&#x822C;&#x79F0;&#x4E3A;&#x4E00;&#x5143;&#x8FD0;&#x7B97;. &#x53E6;&#x4E00;&#x90E8;&#x5206;&#x5728;&#x4E00;&#x5BF9;&#x5173;&#x7CFB;&#x4E0A;&#x8FDB;&#x884C;&#x8FD0;&#x7B97;, &#x79F0;&#x4E3A;&#x4E8C;&#x5143;&#x8FD0;&#x7B97;. &#x5176;&#x4E2D;&#x4E8C;&#x5143;&#x8FD0;&#x7B97;&#x4E2D;&#x5927;&#x591A;&#x6570;&#x90FD;&#x662F;&#x96C6;&#x5408;&#x8FD0;&#x7B97;(&#x5E76;, &#x4EA4;, &#x5DEE;, &#x7B1B;&#x5361;&#x5C14;&#x79EF;), &#x8FDE;&#x63A5;&#x662F;&#x4E00;&#x79CD;&#x6BD4;&#x8F83;&#x7279;&#x522B;&#x7684;&#x5173;&#x7CFB;&#x8FD0;&#x7B97;, &#x4E0A;&#x8868;&#x4E2D;&#x7684;&#x8FDE;&#x63A5;&#x66F4;&#x51C6;&#x786E;&#x5730;&#x6765;&#x8BF4;&#x662F;&#x81EA;&#x7136;&#x8FDE;&#x63A5;. &#x968F;&#x7740;&#x5173;&#x7CFB;&#x6A21;&#x578B;&#x7684;&#x5E7F;&#x6CDB;&#x4F7F;&#x7528;, &#x8D8A;&#x6765;&#x8D8A;&#x591A;&#x7684;&#x8FDE;&#x63A5;&#x8FD0;&#x7B97;&#x88AB;&#x63D0;&#x51FA;&#x548C;&#x5E94;&#x7528;.</p>
+<p>&#x4E0B;&#x56FE;(&#x56FE;&#x7247;&#x6765;&#x81EA;C.L. Moffatt&#x7684;<a href="https://www.codeproject.com/Articles/33052/Visual-Representation-of-SQL-Joins" target="_blank" rel="noopener">&#x535A;&#x6587;</a>)&#x901A;&#x8FC7;&#x53EF;&#x89C6;&#x5316;&#x7684;&#x65B9;&#x5F0F;&#x76F4;&#x89C2;&#x5730;&#x5C55;&#x793A;&#x4E86;&#x5404;&#x7C7B;&#x5E38;&#x89C1;&#x8FDE;&#x63A5;&#x7684;&#x542B;&#x4E49;&#x53CA;&#x5176;&#x5BF9;&#x5E94;&#x7684;SQL&#x8868;&#x793A;&#x65B9;&#x6CD5;.</p>
+<p align="center">
+    <img src="./apache-calcite-relational-algebra/sql_joins.png" width="80%">
+</p>
+
+<p>SQL&#x662F;&#x4E00;&#x79CD;&#x57FA;&#x4E8E;&#x5173;&#x7CFB;&#x4EE3;&#x6570;&#x7684;&#x6570;&#x636E;&#x5E93;&#x67E5;&#x8BE2;&#x8BED;&#x8A00;, &#x76EE;&#x524D;&#x5DF2;&#x7ECF;&#x6210;&#x4E3A;&#x4E86;&#x5173;&#x7CFB;&#x4EE3;&#x6570;&#x6A21;&#x578B;&#x7684;&#x6807;&#x51C6;&#x63A5;&#x53E3;, &#x5B83;&#x5B9E;&#x73B0;&#x4E86;&#x7EDD;&#x5927;&#x591A;&#x6570;&#x7684;&#x5173;&#x7CFB;&#x8FD0;&#x7B97;, &#x4F46;&#x4E0D;&#x662F;&#x5168;&#x90E8;. &#x6240;&#x6709;&#x7684;SQL&#x8BED;&#x53E5;&#x90FD;&#x53EF;&#x4EE5;&#x8F6C;&#x5316;&#x4E3A;&#x7B49;&#x4EF7;&#x7684;&#x5173;&#x7CFB;&#x4EE3;&#x6570;&#x8868;&#x793A;.</p>
+<h1 id="&#x4ECE;SQL&#x5230;&#x5173;&#x7CFB;&#x4EE3;&#x6570;"><a href="#&#x4ECE;SQL&#x5230;&#x5173;&#x7CFB;&#x4EE3;&#x6570;" class="headerlink" title="&#x4ECE;SQL&#x5230;&#x5173;&#x7CFB;&#x4EE3;&#x6570;"></a>&#x4ECE;SQL&#x5230;&#x5173;&#x7CFB;&#x4EE3;&#x6570;</h1><p>&#x7C7B;&#x4F3C;&#x4E8E;&#x7F16;&#x8BD1;&#x5668;&#x4F1A;&#x9996;&#x5148;&#x5C06;&#x9AD8;&#x7EA7;&#x8BED;&#x8A00;&#x8F6C;&#x5316;&#x4E3A;&#x4E2D;&#x95F4;&#x8868;&#x793A;(IR), &#x7136;&#x540E;&#x5BF9;IR&#x8FDB;&#x884C;&#x4F18;&#x5316;, &#x6700;&#x540E;&#x8F6C;&#x5316;&#x4E3A;&#x76EE;&#x6807;&#x673A;&#x5668;&#x8BED;&#x8A00;. Calcite&#x4F1A;&#x5148;&#x5C06;SQL&#x8BED;&#x53E5;&#x89E3;&#x6790;&#x4E3A;<code>SqlNode</code>&#x6811;(&#x5B9E;&#x9645;&#x4E0A;&#x662F;&#x4E00;&#x79CD;&#x62BD;&#x8C61;&#x8BED;&#x6CD5;&#x6811;(AST)), &#x4E4B;&#x540E;Calcite&#x4F1A;&#x5C06;<code>SqlNode</code>&#x6811;&#x8F6C;&#x5316;&#x4E3A;<code>RelNode</code>&#x6811;(&#x5373;Calcite&#x4E2D;&#x7684;IR)&#x5E76;&#x8FDB;&#x884C;&#x67E5;&#x8BE2;&#x4F18;&#x5316;.</p>
+<p>&#x4EE5;&#x4E0B;&#x662F;&#x4E00;&#x4E2A;&#x5C06;SQL&#x89E3;&#x6790;&#x4E3A;<code>SqlNode</code>&#x6811;, &#x518D;&#x8F6C;&#x5316;&#x4E3A;<code>RelNode</code>&#x6811;&#x7684;&#x6848;&#x4F8B;. &#x5173;&#x4E8E;Calcite&#x4E2D;SQL&#x89E3;&#x6790;&#x7684;&#x5185;&#x5BB9;&#x5DF2;&#x7ECF;&#x5728;&#x672C;&#x7CFB;&#x5217;&#x7684;<a href="/apache-calcite-sql-parser.html">&#x7B2C;&#x4E8C;&#x7BC7;</a>&#x6587;&#x7AE0;&#x4E2D;&#x4ECB;&#x7ECD;&#x4E86;, &#x672C;&#x6587;&#x63A5;&#x4E0B;&#x6765;&#x7684;&#x90E8;&#x5206;&#x5C06;&#x4F1A;&#x4ECB;&#x7ECD;&#x4ECE;<code>SqlNode</code>&#x5230;<code>RelNode</code>&#x7684;&#x8F6C;&#x6362;.</p>
+<p align="center">
+    <img src="./apache-calcite-relational-algebra/sqlNode_2_relNode.png" width="90%">
+</p>
+
+<p>&#x4E3A;&#x4E86;&#x65B9;&#x4FBF;&#x8868;&#x8FF0;, &#x672C;&#x6587;&#x63A5;&#x4E0B;&#x6765;&#x5C06;&#x67D0;&#x4E2A;&#x5173;&#x7CFB;&#x8FD0;&#x7B97;&#x7684;&#x5177;&#x4F53;&#x5B9E;&#x73B0;, &#x5373;&#x5177;&#x4F53;&#x7684;<code>RelNode</code>&#x5B9E;&#x73B0;&#x7C7B;, &#x79F0;&#x4E3A;&#x5173;&#x7CFB;&#x7B97;&#x5B50;&#x6216;&#x7B80;&#x79F0;&#x4E3A;&#x7B97;&#x5B50;.</p>
+<h1 id="Calcite&#x5173;&#x7CFB;&#x7B97;&#x5B50;&#x5B9E;&#x73B0;"><a href="#Calcite&#x5173;&#x7CFB;&#x7B97;&#x5B50;&#x5B9E;&#x73B0;" class="headerlink" title="Calcite&#x5173;&#x7CFB;&#x7B97;&#x5B50;&#x5B9E;&#x73B0;"></a>Calcite&#x5173;&#x7CFB;&#x7B97;&#x5B50;&#x5B9E;&#x73B0;</h1><p>Calcite&#x7684;&#x6838;&#x5FC3;&#x662F;&#x67E5;&#x8BE2;&#x4F18;&#x5316;, &#x5176;&#x80CC;&#x540E;&#x4E5F;&#x662F;&#x57FA;&#x4E8E;&#x5173;&#x7CFB;&#x4EE3;&#x6570;&#x5B9E;&#x73B0;&#x7684;. &#x63A5;&#x4E0B;&#x6765;&#x672C;&#x6587;&#x5C06;&#x8BE6;&#x7EC6;&#x4ECB;&#x7ECD;Calcite&#x4E2D;&#x5173;&#x7CFB;&#x7B97;&#x5B50;&#x7684;&#x5B9E;&#x73B0;. &#x5B9E;&#x73B0;&#x5173;&#x7CFB;&#x7B97;&#x5B50;&#x7684;&#x6700;&#x7EC8;&#x76EE;&#x7684;&#x662F;&#x8FDB;&#x884C;&#x7B49;&#x4EF7;&#x8F6C;&#x6362;&#x4ECE;&#x800C;&#x5B9E;&#x73B0;&#x67E5;&#x8BE2;&#x4F18;&#x5316;&#x548C;&#x6267;&#x884C;&#x8BA1;&#x5212;&#x751F;&#x6210;, &#x56E0;&#x6B64;&#x672C;&#x6587;&#x4F1A;&#x540C;&#x65F6;&#x4ECB;&#x7ECD;Calcite&#x5173;&#x7CFB;&#x7B97;&#x5B50;&#x4E2D;&#x4E0E;&#x67E5;&#x8BE2;&#x4F18;&#x5316;&#x548C;&#x6267;&#x884C;&#x8BA1;&#x5212;&#x76F8;&#x5173;&#x7684;&#x6982;&#x5FF5;.</p>
+<h2 id="RelNode"><a href="#RelNode" class="headerlink" title="RelNode"></a>RelNode</h2><h3 id="RelNode&#x7C7B;&#x578B;&#x53CA;&#x7EE7;&#x627F;&#x5173;&#x7CFB;"><a href="#RelNode&#x7C7B;&#x578B;&#x53CA;&#x7EE7;&#x627F;&#x5173;&#x7CFB;" class="headerlink" title="RelNode&#x7C7B;&#x578B;&#x53CA;&#x7EE7;&#x627F;&#x5173;&#x7CFB;"></a>RelNode&#x7C7B;&#x578B;&#x53CA;&#x7EE7;&#x627F;&#x5173;&#x7CFB;</h3><p><code>RelNode</code>&#x662F;Calcite&#x4E2D;&#x5173;&#x7CFB;&#x7B97;&#x5B50;&#x7684;&#x7236;&#x7C7B;&#x578B;, &#x4EE3;&#x8868;&#x4E86;&#x5BF9;&#x5173;&#x7CFB;&#x7684;&#x4E00;&#x79CD;&#x5904;&#x7406;&#x64CD;&#x4F5C;. &#x6240;&#x6709;&#x7684;&#x5173;&#x7CFB;&#x7B97;&#x5B50;&#x90FD;&#x662F;&#x5B83;&#x7684;&#x5B50;&#x7C7B;&#x578B;, &#x5B83;&#x7684;&#x51E0;&#x4E2A;&#x4E0A;&#x5C42;&#x5B50;&#x7C7B;&#x578B;&#x7684;&#x7EE7;&#x627F;&#x5173;&#x7CFB;&#x5982;&#x4E0B;&#x56FE;&#x6240;&#x793A;.</p>
+<p align="center">
+    <img src="./apache-calcite-relational-algebra/relNode.png" width="90%">
+</p>
+
+<blockquote>
+<p>&#x5B9E;&#x9645;&#x4E0A;&#x5173;&#x7CFB;&#x7B97;&#x5B50;&#x7684;&#x6700;&#x9876;&#x5C42;&#x7C7B;&#x578B;&#x662F;<code>RelOptNode</code>, &#x4E0D;&#x8FC7;&#x5728;Calcite&#x7684;&#x4EE3;&#x7801;&#x548C;&#x6587;&#x6863;&#x4E2D;&#x7ECF;&#x5E38;&#x51FA;&#x73B0;&#x7684;&#x662F;<code>RelNode</code>, &#x56E0;&#x6B64;&#x8FD9;&#x91CC;&#x6211;&#x4EEC;&#x4E5F;&#x7528;<code>RelNode</code>&#x8FDB;&#x884C;&#x8BB2;&#x8FF0;.</p>
+</blockquote>
+<p>&#x6211;&#x4EEC;&#x5E38;&#x89C1;&#x7684;&#x5173;&#x7CFB;&#x7B97;&#x5B50;&#x90FD;&#x662F;<code>AbstractRelNode</code>&#x7684;&#x5B50;&#x7C7B;&#x578B;, &#x5176;&#x4E2D;:</p>
+<ul>
+<li><code>SingleRel</code>&#x662F;&#x4E00;&#x5143;&#x7B97;&#x5B50;&#x7684;&#x7236;&#x7C7B;&#x578B;, &#x5176;&#x5B50;&#x7C7B;&#x578B;&#x5305;&#x542B;&#x5E38;&#x89C1;&#x7684;<code>Project</code>, <code>Filter</code>, <code>Aggregate</code>&#x7B49;.</li>
+</ul>
+<p align="center">
+    <img src="./apache-calcite-relational-algebra/singleRel.png" width="110%">
+</p>
+
+<ul>
+<li><code>BiRel</code>&#x662F;<code>Join</code>&#x7B97;&#x5B50;&#x7684;&#x7236;&#x7C7B;&#x578B;.</li>
+<li><code>SetOp</code>&#x662F;&#x96C6;&#x5408;&#x7B97;&#x5B50;&#x7684;&#x7236;&#x7C7B;&#x578B;, &#x5176;&#x5B50;&#x7C7B;&#x578B;&#x5305;&#x542B;<code>Union</code>, <code>Intersect</code>, <code>Minus</code>.</li>
+</ul>
+<p align="center">
+    <img src="./apache-calcite-relational-algebra/setOp.png" width="60%">
+</p>
+
+<p><code>AbstractRelNode</code>&#x5C5E;&#x4E8E;&#x903B;&#x8F91;&#x7B97;&#x5B50;, &#x4E0E;&#x7269;&#x7406;&#x6267;&#x884C;&#x65E0;&#x5173;. <code>EnumerableRel</code>&#x548C;<code>BindableRel</code>&#x662F;Calcite&#x4E2D;&#x7684;&#x7269;&#x7406;&#x7B97;&#x5B50;, &#x53EF;&#x4EE5;&#x8F6C;&#x5316;&#x4E3A;&#x6267;&#x884C;&#x8BA1;&#x5212;, &#x4ECE;&#x5E95;&#x5C42;&#x6570;&#x636E;&#x6E90;&#x4E2D;&#x83B7;&#x53D6;&#x6570;&#x636E;. &#x5177;&#x4F53;&#x6765;&#x8BF4;<code>EnumerableRel</code>&#x662F;&#x901A;&#x8FC7;&#x4EE3;&#x7801;&#x751F;&#x6210;&#x7684;&#x65B9;&#x5F0F;&#x6765;&#x751F;&#x6210;&#x6267;&#x884C;&#x8BA1;&#x5212;&#x7684;, &#x800C;<code>BindableRel</code>&#x662F;&#x901A;&#x8FC7;&#x89E3;&#x91CA;&#x6267;&#x884C;&#x7684;. &#x5173;&#x4E8E;Calcite&#x7684;&#x6267;&#x884C;&#x8BA1;&#x5212;&#x4F1A;&#x5728;&#x540E;&#x7EED;&#x7684;&#x6587;&#x7AE0;&#x4E2D;&#x8BE6;&#x7EC6;&#x4ECB;&#x7ECD;.</p>
+<p><code>Converter</code>&#x867D;&#x7136;&#x4E5F;&#x662F;<code>RelNode</code>&#x7684;&#x5B50;&#x7C7B;&#x578B;, &#x4F46;&#x5B83;&#x5B9E;&#x9645;&#x4E0A;&#x4E0D;&#x4EE3;&#x8868;&#x4E00;&#x79CD;&#x5173;&#x7CFB;&#x8FD0;&#x7B97;, &#x800C;&#x662F;&#x4E0D;&#x540C;<code>RelNode</code>&#x4E4B;&#x95F4;&#x7684;&#x8F6C;&#x6362;&#x5668;. &#x901A;&#x5E38;&#x6765;&#x8BF4;&#x662F;&#x5C06;&#x903B;&#x8F91;&#x7B97;&#x5B50;&#x8F6C;&#x6362;&#x4E3A;&#x7269;&#x7406;&#x7B97;&#x5B50;&#x6216;&#x6267;&#x884C;&#x8BA1;&#x5212;, &#x5728;&#x540E;&#x7EED;&#x5173;&#x4E8E;&#x6267;&#x884C;&#x8BA1;&#x5212;&#x7684;&#x6587;&#x7AE0;&#x4E2D;&#x4F1A;&#x8FDB;&#x4E00;&#x6B65;&#x4ECB;&#x7ECD;<code>Conveter</code>.</p>
+<p align="center">
+    <img src="./apache-calcite-relational-algebra/converter.png" width="110%">
+</p>
+
+<p><code>RelNode</code>&#x7684;&#x5B50;&#x7C7B;&#x578B;&#x5F88;&#x591A;, &#x4E3A;&#x4E86;&#x65B9;&#x4FBF;&#x8868;&#x8FF0;&#x548C;&#x7406;&#x89E3;, &#x672C;&#x6587;&#x5C06;&#x5176;&#x5728;&#x6A2A;&#x5411;&#x548C;&#x7EB5;&#x5411;&#x4E24;&#x4E2A;&#x7EF4;&#x5EA6;&#x8FDB;&#x884C;&#x5206;&#x7C7B;. &#x6A2A;&#x5411;&#x4E0A;&#x5B58;&#x5728;&#x5404;&#x79CD;&#x4E0D;&#x540C;&#x79CD;&#x7C7B;&#x7684;&#x5173;&#x7CFB;&#x7B97;&#x5B50;, &#x4F8B;&#x5982;<code>Project</code>, <code>Filter</code>&#x7B49;; &#x7EB5;&#x5411;&#x4E0A;&#x5B58;&#x5728;&#x4E0D;&#x540C;&#x5C5E;&#x6027;&#x7684;&#x5173;&#x7CFB;&#x7B97;&#x5B50;, &#x4F8B;&#x5982;<code>Project</code>&#x65E2;&#x6709;<code>LogicalProject</code>&#x4E5F;&#x6709;<code>EnumerableProject</code>. &#x7531;&#x4E8E;Calcite&#x652F;&#x6301;&#x591A;&#x79CD;&#x6570;&#x636E;&#x6E90;, &#x5BF9;&#x4E8E;&#x6BCF;&#x79CD;&#x6570;&#x636E;&#x6E90;&#x90FD;&#x4F1A;&#x6709;&#x591A;&#x4E2A;&#x76F8;&#x540C;&#x5C5E;&#x6027;&#x4E0D;&#x540C;&#x79CD;&#x7C7B;&#x7684;&#x5173;&#x7CFB;&#x7B97;&#x5B50;.</p>
+<p align="center">
+    <img src="./apache-calcite-relational-algebra/rel_cat.png" width="70%">
+</p>
+
+<h3 id="RelNode&#x5185;&#x90E8;&#x5B9E;&#x73B0;"><a href="#RelNode&#x5185;&#x90E8;&#x5B9E;&#x73B0;" class="headerlink" title="RelNode&#x5185;&#x90E8;&#x5B9E;&#x73B0;"></a>RelNode&#x5185;&#x90E8;&#x5B9E;&#x73B0;</h3><p>&#x4ECB;&#x7ECD;&#x5B8C;<code>RelNode</code>&#x7684;&#x79CD;&#x7C7B;, &#x6211;&#x4EEC;&#x518D;&#x6765;&#x770B;&#x4E0B;<code>RelNode</code>&#x7684;&#x5177;&#x4F53;&#x5B9E;&#x73B0;. &#x4EE5;&#x4E0B;&#x662F;<code>RelNode</code>&#x4E2D;&#x51E0;&#x4E2A;&#x6BD4;&#x8F83;&#x91CD;&#x8981;&#x7684;&#x65B9;&#x6CD5;, &#x672C;&#x6587;&#x91CD;&#x70B9;&#x8981;&#x4ECB;&#x7ECD;&#x7684;&#x662F;&#x4E0E;&#x7269;&#x7406;&#x5C5E;&#x6027;&#x6709;&#x5173;&#x7684;&#x4E24;&#x4E2A;&#x65B9;&#x6CD5;, &#x5173;&#x4E8E;&#x67E5;&#x8BE2;&#x4F18;&#x5316;&#x76F8;&#x5173;&#x7684;&#x65B9;&#x6CD5;&#x4F1A;&#x5728;&#x540E;&#x7EED;&#x5173;&#x4E8E;&#x67E5;&#x8BE2;&#x4F18;&#x5316;&#x5668;&#x7684;&#x6587;&#x7AE0;&#x4E2D;&#x4ECB;&#x7ECD;.</p>
+<ul>
+<li><code>getTraitSet()</code>&#x7528;&#x4E8E;&#x83B7;&#x53D6;&#x5F53;&#x524D;&#x7B97;&#x5B50;&#x7684;&#x6240;&#x6709;&#x7269;&#x7406;&#x5C5E;&#x6027;&#x96C6;&#x5408;, &#x53EF;&#x4EE5;&#x770B;&#x5230;&#x5728;<code>AbstractRelNode</code>&#x4E2D;&#x5305;&#x542B;&#x4E00;&#x4E2A;<code>RelTraitSet</code>&#x7C7B;&#x578B;&#x7684;&#x5C5E;&#x6027;, &#x5B83;&#x5B9E;&#x73B0;&#x4E86;<code>AbstractList&lt;RelTrait&gt;</code>&#x7528;&#x4E8E;&#x4FDD;&#x7559;&#x6240;&#x6709;&#x7269;&#x7406;&#x5C5E;&#x6027;;</li>
+<li><code>getConvention()</code>&#x7528;&#x4E8E;&#x83B7;&#x53D6;&#x5F53;&#x524D;&#x7B97;&#x5B50;&#x7684;Calling Convertion(&#x4E0B;&#x6587;&#x5C06;&#x8BE6;&#x7EC6;&#x4ECB;&#x7ECD;).</li>
+</ul>
+<p></p><figure class="highlight java hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">RelNode</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">RelOptNode</span>, <span class="hljs-title">Cloneable</span> </span>{</span><br><span class="line">    <span class="hljs-comment">// &#x83B7;&#x53D6;&#x5F53;&#x524D;&#x7B97;&#x5B50;&#x7684;Calling Convertion, Calling Convertion&#x7684;&#x6982;&#x5FF5;&#x5728;&#x4E0B;&#x6587;&#x4ECB;&#x7ECD;</span></span><br><span class="line">    <span class="hljs-function">Convention <span class="hljs-title">getConvention</span><span class="hljs-params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="hljs-comment">// &#x83B7;&#x53D6;&#x5F53;&#x524D;&#x7B97;&#x5B50;&#x7684;&#x7269;&#x7406;&#x5C5E;&#x6027;</span></span><br><span class="line">    <span class="hljs-function">RelTraitSet <span class="hljs-title">getTraitSet</span><span class="hljs-params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="hljs-comment">// &#x83B7;&#x53D6;RelOptTable&#x5982;&#x679C;&#x5F53;&#x524D;&#x8282;&#x70B9;&#x662F;TableScan&#x8282;&#x70B9;, &#x5426;&#x5219;&#x8FD4;&#x56DE;null</span></span><br><span class="line">    <span class="hljs-function">RelOptTable <span class="hljs-title">getTable</span><span class="hljs-params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="hljs-comment">// &#x83B7;&#x53D6;&#x5F53;&#x524D;&#x8282;&#x70B9;&#x7684;&#x5B50;&#x8282;&#x70B9;</span></span><br><span class="line">    <span class="hljs-function">RelNode <span class="hljs-title">getInput</span><span class="hljs-params">(<span class="hljs-keyword">int</span> i)</span></span>;</span><br><span class="line">    <span class="hljs-function">List&lt;RelNode&gt; <span class="hljs-title">getInputs</span><span class="hljs-params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="hljs-comment">// &#x5411;RelOptPlanner&#x6CE8;&#x518C;&#x5F53;&#x524D;&#x8282;&#x70B9;&#x53CA;&#x5176;&#x5B50;&#x8282;&#x70B9;</span></span><br><span class="line">    <span class="hljs-function">RelNode <span class="hljs-title">onRegister</span><span class="hljs-params">(RelOptPlanner planner)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="hljs-comment">// &#x5411;RelOptPlanner&#x6CE8;&#x518C;&#x4E13;&#x6709;&#x4F18;&#x5316;&#x89C4;&#x5219;</span></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">register</span><span class="hljs-params">(RelOptPlanner planner)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="hljs-comment">// &#x4EE3;&#x4EF7;&#x76F8;&#x5173;&#x65B9;&#x6CD5;</span></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">double</span> <span class="hljs-title">estimateRowCount</span><span class="hljs-params">(RelMetadataQuery mq)</span></span>;</span><br><span class="line">    <span class="hljs-function">RelOptCost <span class="hljs-title">computeSelfCost</span><span class="hljs-params">(RelOptPlanner planner, RelMetadataQuery mq)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="hljs-comment">// &#x904D;&#x5386;&#x76F8;&#x5173;&#x65B9;&#x6CD5;</span></span><br><span class="line">    <span class="hljs-function">RelNode <span class="hljs-title">accept</span><span class="hljs-params">(RelShuttle shuttle)</span></span>;</span><br><span class="line">    <span class="hljs-function">RelNode <span class="hljs-title">accept</span><span class="hljs-params">(RexShuttle shuttle)</span></span>;</span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">childrenAccept</span><span class="hljs-params">(RelVisitor visitor)</span></span>;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AbstractRelNode</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">RelNode</span> </span>{</span><br><span class="line">    <span class="hljs-keyword">protected</span> RelTraitSet traitSet;</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> Convention <span class="hljs-title">getConvention</span><span class="hljs-params">()</span> </span>{</span><br><span class="line">        <span class="hljs-keyword">return</span> traitSet.getTrait(ConventionTraitDef.INSTANCE);</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">public</span> RelTraitSet <span class="hljs-title">getTraitSet</span><span class="hljs-params">()</span> </span>{</span><br><span class="line">        <span class="hljs-keyword">return</span> traitSet;</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><p></p>
+<h2 id="RelTrait"><a href="#RelTrait" class="headerlink" title="RelTrait"></a>RelTrait</h2><p><code>RelTrait</code>&#x7528;&#x4E8E;&#x63CF;&#x8FF0;<code>RelNode</code>&#x7684;&#x7269;&#x7406;&#x5C5E;&#x6027;, &#x5B83;&#x5BF9;&#x4E8E;&#x67E5;&#x8BE2;&#x4F18;&#x5316;&#x4EE5;&#x53CA;&#x5173;&#x7CFB;&#x7B97;&#x5B50;&#x5728;&#x903B;&#x8F91;&#x548C;&#x7269;&#x7406;&#x5C42;&#x9762;&#x7684;&#x8F6C;&#x5316;&#x90FD;&#x6709;&#x91CD;&#x8981;&#x5F71;&#x54CD;. &#x4E3E;&#x4F8B;&#x6765;&#x8BF4;, <code>RelTrait</code>&#x53EF;&#x4EE5;&#x7528;&#x6765;&#x63CF;&#x8FF0;<code>RelNode</code>&#x7684;&#x6392;&#x5E8F;&#x5C5E;&#x6027;, &#x5728;&#x67E5;&#x8BE2;&#x4F18;&#x5316;&#x65F6;&#x5982;&#x679C;<code>Sort</code>&#x7B97;&#x5B50;&#x7684;&#x8F93;&#x5165;&#x5DF2;&#x7ECF;&#x6709;&#x5E8F;, &#x800C;&#x4E14;&#x6392;&#x5E8F;&#x7684;&#x76EE;&#x6807;&#x5217;&#x4E00;&#x81F4;, &#x90A3;&#x4E48;&#x53EF;&#x4EE5;&#x76F4;&#x63A5;&#x7701;&#x7565;<code>Sort</code>&#x7B97;&#x5B50;&#x4EE5;&#x5B9E;&#x73B0;&#x4F18;&#x5316;; &#x53E6;&#x5916;, <code>RelTrait</code>&#x8FD8;&#x53EF;&#x4EE5;&#x7528;&#x6765;&#x63CF;&#x8FF0;<code>RelNode</code>&#x7684;&#x7269;&#x7406;&#x6570;&#x636E;&#x6E90;, &#x8FD9;&#x6837;&#x5C31;&#x53EF;&#x5C06;&#x903B;&#x8F91;&#x7B97;&#x5B50;&#x8F6C;&#x6362;&#x4E3A;&#x6307;&#x5B9A;&#x7684;&#x7269;&#x7406;&#x7B97;&#x5B50;.</p>
+<p align="center">
+    <img src="./apache-calcite-relational-algebra/relTrait.png" width="70%">
+</p>
+
+<p><code>RelTrait</code>&#x7684;&#x7EE7;&#x627F;&#x5173;&#x7CFB;&#x5982;&#x4E0A;&#x56FE;&#x6240;&#x793A;, &#x5B83;&#x7684;3&#x4E2A;&#x5B50;&#x7C7B;&#x578B;&#x7684;&#x4E3B;&#x8981;&#x542B;&#x4E49;&#x5982;&#x4E0B;:</p>
+<ul>
+<li><code>RelCollation</code>&#x7528;&#x4E8E;&#x63CF;&#x8FF0;&#x7B97;&#x5B50;&#x8F93;&#x51FA;&#x7684;&#x6392;&#x5E8F;&#x5C5E;&#x6027;.</li>
+<li><code>RelDistribution</code>&#x7528;&#x4E8E;&#x63CF;&#x8FF0;&#x7B97;&#x5B50;&#x8F93;&#x51FA;&#x7684;&#x5206;&#x5E03;&#x5C5E;&#x6027;, &#x5982;<code>HASH_DISTRIBUTED</code>, <code>RANDOM_DISTRIBUTED</code>&#x7B49;.</li>
+<li><code>Convention</code>&#x7528;&#x4E8E;&#x63CF;&#x8FF0;&#x7B97;&#x5B50;&#x7684;&#x5E95;&#x5C42;&#x6570;&#x636E;&#x5904;&#x7406;&#x5F15;&#x64CE;. &#x5F15;&#x5165;<code>Convention</code>&#x53EF;&#x4EE5;&#x8BA9;Calcite&#x4E0E;&#x5E95;&#x5C42;&#x7684;&#x6267;&#x884C;&#x5F15;&#x64CE;&#x89E3;&#x8026;, &#x5982;&#x679C;&#x8981;&#x9002;&#x914D;&#x65B0;&#x7684;&#x6267;&#x884C;&#x5F15;&#x64CE;, &#x53EA;&#x9700;&#x8981;&#x6269;&#x5C55;&#x4E00;&#x4E2A;<code>Convention</code>&#x5B9E;&#x73B0;&#x5373;&#x53EF;, &#x5982;Flink&#x4E2D;&#x5C31;&#x6709;&#x6269;&#x5C55;&#x7684;<a href="https://github.com/apache/flink/blob/master/flink-table/flink-table-planner/src/main/scala/org/apache/flink/table/planner/plan/nodes/FlinkConventions.scala" target="_blank" rel="noopener">FlinkConvention</a>. Calcite&#x4E2D;&#x5DF2;&#x7ECF;&#x5B9E;&#x73B0;&#x7684;<code>Convention</code>&#x5982;&#x4E0B;&#x56FE;&#x6240;&#x793A;, &#x4ECE;&#x540D;&#x79F0;&#x4E2D;&#x5C31;&#x53EF;&#x4EE5;&#x770B;&#x51FA;&#x662F;&#x7528;&#x4E8E;&#x8F6C;&#x6362;&#x5230;&#x4EC0;&#x4E48;&#x6267;&#x884C;&#x5F15;&#x64CE;.</li>
+</ul>
+<p align="center">
+    <img src="./apache-calcite-relational-algebra/convention.png" width="90%">
+</p>
+
+<h3 id="RelTraitDef"><a href="#RelTraitDef" class="headerlink" title="RelTraitDef"></a>RelTraitDef</h3><p><code>RelTraitDef</code>&#x4EE3;&#x8868;&#x4E00;&#x4E2A;<code>RelTrait</code>&#x79CD;&#x7C7B;, <strong>&#x8FD9;&#x91CC;&#x9700;&#x8981;&#x6CE8;&#x610F;&#x7684;&#x662F;&#x201D;&#x79CD;&#x7C7B;&#x201D;&#x662F;&#x6307;<code>RelDistribution</code>, <code>RelCollation</code>&#x548C;<code>Convention</code>&#x8FD9;&#x4E09;&#x7C7B;, &#x800C;&#x4E0D;&#x662F;&#x6307;&#x5177;&#x4F53;&#x7684;&#x5B9E;&#x73B0;&#x7C7B;. &#x4E5F;&#x5C31;&#x662F;&#x8BF4;<code>JdbcConvention</code>, <code>EnumerableConvention</code>&#x4EE5;&#x53CA;&#x5176;&#x4ED6;<code>Convention</code>&#x5B9E;&#x73B0;&#x7C7B;&#x7684;&#x6240;&#x5BF9;&#x5E94;&#x7684;&#x90FD;&#x662F;<code>ConventionTraitDef</code>, &#x5728;&#x5B9E;&#x73B0;&#x4E0A;&#x5B83;&#x4EEC;&#x7684;<code>getTraitDef()</code>&#x65B9;&#x6CD5;&#x90FD;&#x8FD4;&#x56DE;&#x7684;&#x662F;<code>ConventionTraitDef.INSTANCE</code></strong>. <code>RelTraitDef</code>&#x7684;&#x5B9E;&#x73B0;&#x7C7B;&#x5982;&#x4E0B;&#x56FE;&#x6240;&#x793A;.</p>
+<p align="center">
+    <img src="./apache-calcite-relational-algebra/relTraitDef.png" width="70%">
+</p>
+
+<h3 id="Calling-Convention"><a href="#Calling-Convention" class="headerlink" title="Calling Convention"></a>Calling Convention</h3><p>&#x5728;<code>RelNode</code>&#x76F8;&#x5173;&#x7684;&#x4EE3;&#x7801;&#x6CE8;&#x91CA;&#x4E2D;&#x7ECF;&#x5E38;&#x4F1A;&#x770B;&#x5230;Calling Convention&#x8FD9;&#x4E2A;&#x8BCD;, &#x4ECE;&#x5B57;&#x9762;&#x4E0A;&#x7406;&#x89E3;&#x5B83;&#x8868;&#x793A;&#x7684;&#x662F;<code>RelNode</code>&#x8BE5;&#x5982;&#x4F55;&#x88AB;&#x8C03;&#x7528;. &#x8FD9;&#x4E2A;&#x201D;&#x8C03;&#x7528;&#x201D;&#x5B9E;&#x9645;&#x4E0A;&#x5E94;&#x8BE5;&#x7406;&#x89E3;&#x4E3A;&#x201D;&#x8F6C;&#x6362;&#x201D;, &#x4E00;&#x822C;&#x60C5;&#x51B5;&#x4E0B;&#x662F;&#x6307;&#x4ECE;&#x903B;&#x8F91;&#x7B97;&#x5B50;&#x5230;&#x7269;&#x7406;&#x7B97;&#x5B50;&#x7684;&#x8F6C;&#x6362;, &#x5982;&#x4ECE;<code>LogicalTableScan</code>&#x5230;<code>EnumerableTableScan</code>&#x7684;&#x8F6C;&#x6362;.</p>
+<p>&#x4ECE;&#x4E0A;&#x6587;&#x7684;&#x4ECB;&#x7ECD;&#x4E2D;&#x4E5F;&#x53EF;&#x4EE5;&#x77E5;&#x9053;, &#x6BCF;&#x4E2A;<code>RelNode</code>&#x90FD;&#x4F1A;&#x6709;&#x4E00;&#x4E2A;<code>RelTraitSet</code>&#x7C7B;&#x578B;&#x7684;&#x53D8;&#x91CF;&#x6765;&#x63CF;&#x8FF0;&#x5176;&#x5F53;&#x524D;&#x7684;&#x7269;&#x7406;&#x5C5E;&#x6027;, &#x5176;&#x4E2D;&#x5305;&#x542B;<code>Convention</code>. &#x5BF9;&#x4E8E;&#x903B;&#x8F91;&#x7B97;&#x5B50;, &#x5176;<code>Convention</code>&#x4E00;&#x822C;&#x662F;&#x9ED8;&#x8BA4;&#x5B9E;&#x73B0;, &#x5373;<code>Convention.Impl</code>, &#x800C;&#x7269;&#x7406;&#x7B97;&#x5B50;&#x5219;&#x6709;&#x5176;&#x5BF9;&#x5E94;&#x7684;<code>Convention</code>&#x5C5E;&#x6027;, &#x5982;<code>EnumerableRel</code>&#x5305;&#x542B;<code>EnumerableConvention</code>.</p>
+<p>&#x5728;Calcite&#x4E2D;&#x5F15;&#x5165;Calling Convention&#x662F;&#x4E3A;&#x4E86;&#x65B9;&#x4FBF;&#x5BF9;&#x63A5;&#x591A;&#x79CD;&#x4E0D;&#x540C;&#x7684;&#x7269;&#x7406;&#x6570;&#x636E;&#x6E90;, &#x4E0D;&#x540C;&#x5C5E;&#x6027;&#x95F4;&#x7684;&#x7B97;&#x5B50;&#x8F6C;&#x6362;&#x7531;<code>ConverterRule</code>&#x5B9E;&#x73B0;, &#x4F8B;&#x5982;&#x4ECE;<code>LogicalTableScan</code>&#x5230;<code>EnumerableTableScan</code>&#x7684;&#x8F6C;&#x6362;&#x7531;<code>EnumerableTableScanRule</code>&#x5B9E;&#x73B0;, &#x5B83;&#x662F;<code>ConverterRule</code>&#x7684;&#x4E00;&#x4E2A;&#x5B9E;&#x73B0;, &#x9876;&#x5C42;&#x7236;&#x7C7B;&#x578B;&#x662F;<code>RelOptRule</code>, &#x5728;&#x540E;&#x9762;&#x5173;&#x4E8E;&#x67E5;&#x8BE2;&#x4F18;&#x5316;&#x5668;&#x7684;&#x6587;&#x7AE0;&#x4E2D;&#x4F1A;&#x6709;&#x5173;&#x4E8E;<code>RelOptRule</code>&#x7684;&#x8BE6;&#x7EC6;&#x4ECB;&#x7ECD;.</p>
+<h2 id="RexNode"><a href="#RexNode" class="headerlink" title="RexNode"></a>RexNode</h2><p><code>RexNode</code>&#x8868;&#x793A;&#x4E00;&#x4E2A;&#x884C;&#x8868;&#x8FBE;&#x5F0F;. &#x5982;&#x679C;&#x8BF4;<code>RelNode</code>&#x8868;&#x793A;&#x7684;&#x662F;&#x5982;&#x4F55;&#x5BF9;&#x4E00;&#x4E2A;&#x5173;&#x7CFB;&#x6216;&#x8868;&#x8FDB;&#x884C;&#x64CD;&#x4F5C;, &#x90A3;&#x4E48;<code>RexNode</code>&#x8868;&#x793A;&#x7684;&#x662F;&#x5982;&#x4F55;&#x5BF9;&#x8868;&#x4E2D;&#x7684;&#x4E00;&#x884C;&#x8FDB;&#x884C;&#x64CD;&#x4F5C;. &#x5176;&#x5B9E;&#x73B0;&#x5173;&#x7CFB;&#x5982;&#x4E0B;.</p>
+<p align="center">
+    <img src="./apache-calcite-relational-algebra/rexNode.png" width="110%">
+</p>
+
+<p>&#x5176;&#x4E2D;:</p>
+<ul>
+<li><code>RexVariable</code>&#x4EE3;&#x8868;&#x53D8;&#x91CF;, &#x4E00;&#x822C;&#x662F;&#x4E00;&#x4E2A;&#x5B57;&#x6BB5;. &#x5B83;&#x7684;&#x5B50;&#x7C7B;&#x578B;&#x4E2D;:<ul>
+<li><code>RexDynamicParam</code>&#x4EE3;&#x8868;SQL&#x8BED;&#x53E5;&#x4E2D;&#x7684;&#x52A8;&#x6001;&#x53C2;&#x6570;, &#x5982;<code>SELECT name FROM users where id = ?</code>&#x4E2D;&#x7684;<code>?</code>;</li>
+<li><code>RexLocalRef</code>&#x4EE3;&#x8868;&#x672C;&#x5730;&#x53D8;&#x91CF;, &#x4E00;&#x822C;&#x7528;&#x4E8E;&#x5728;&#x4E00;&#x4E2A;&#x8282;&#x70B9;&#x5185;&#x90E8;&#x76F8;&#x540C;&#x5B57;&#x6BB5;&#x76F8;&#x4E92;&#x4E4B;&#x95F4;&#x7684;&#x5F15;&#x7528;;</li>
+<li><code>RexInputRef</code>&#x4EE3;&#x8868;&#x5B57;&#x6BB5;&#x5F15;&#x7528;, &#x7528;&#x4E8E;&#x4E0A;&#x5C42;&#x8282;&#x70B9;&#x5BF9;&#x4E0B;&#x5C42;&#x8282;&#x70B9;&#x5B57;&#x6BB5;&#x7684;&#x5F15;&#x7528;;</li>
+<li><code>RexCorrelVariable</code>&#x4EE3;&#x8868;&#x4E00;&#x4E2A;&#x5B57;&#x6BB5;, &#x7528;&#x5728;Nested Loop Join&#x4E2D;, &#x8868;&#x793A;&#x5C5E;&#x4E8E;&#x5916;&#x8868;&#x7684;&#x5173;&#x8054;&#x5B57;&#x6BB5;. &#x6BD4;&#x5982;<code>SELECT u.name, o.price FROM user AS u JOIN order AS o on u.id = o.user_id</code>&#x4E2D;&#x5982;&#x679C;&#x91C7;&#x7528;Nested Loop Join&#x5B9E;&#x73B0;, &#x5E76;&#x4E14;<code>user</code>&#x4E3A;&#x5916;&#x8868;, &#x90A3;&#x4E48;&#x7528;<code>RexCorrelVariable</code>&#x6765;&#x8868;&#x793A;<code>u.id</code>.</li>
+</ul>
+</li>
+<li><code>RexLiteral</code>&#x4EE3;&#x8868;&#x5E38;&#x91CF;.</li>
+<li><code>RexCall</code>&#x4EE3;&#x8868;&#x8868;&#x8FBE;&#x5F0F;, SQL&#x8BED;&#x53E5;&#x4E2D;&#x7684;&#x6240;&#x6709;&#x8FD0;&#x7B97;&#x90FD;&#x662F;&#x4E00;&#x4E2A;&#x8868;&#x8FBE;&#x5F0F;, &#x5982;<code>id = 1</code>, <code>id = 1 and name = &apos;Jack&apos;</code>.</li>
+<li><code>RexRangeRef</code>&#x4EE3;&#x8868;&#x591A;&#x4E2A;&#x5217;&#x7684;&#x96C6;&#x5408;.</li>
+<li><code>RexFieldAccess</code>&#x4EE3;&#x8868;&#x5B57;&#x6BB5;&#x5F15;&#x7528;.</li>
+</ul>
+<h1 id="Calcite&#x5173;&#x7CFB;&#x7B97;&#x5B50;&#x6811;&#x6784;&#x5EFA;"><a href="#Calcite&#x5173;&#x7CFB;&#x7B97;&#x5B50;&#x6811;&#x6784;&#x5EFA;" class="headerlink" title="Calcite&#x5173;&#x7CFB;&#x7B97;&#x5B50;&#x6811;&#x6784;&#x5EFA;"></a>Calcite&#x5173;&#x7CFB;&#x7B97;&#x5B50;&#x6811;&#x6784;&#x5EFA;</h1><p>Calcite&#x63D0;&#x4F9B;&#x4E86;<code>SqlToRelConverter</code>&#x6765;&#x5B9E;&#x73B0;&#x4ECE;<code>SqlNode</code>&#x5230;<code>RelNode</code>&#x7684;&#x8F6C;&#x6362;, &#x5B9E;&#x9645;&#x4E0A;<code>SqlToRelConverter</code>&#x7684;&#x5B9E;&#x73B0;&#x4F9D;&#x8D56;&#x4E8E;<code>RelBuilder</code>, &#x672C;&#x8282;&#x9996;&#x5148;&#x4ECB;&#x7ECD;&#x5982;&#x4F55;&#x57FA;&#x4E8E;<code>RelBuilder</code>&#x6784;&#x5EFA;&#x5173;&#x7CFB;&#x7B97;&#x5B50;, &#x4E4B;&#x540E;&#x5206;&#x6790;<code>SqlToRelConverter</code>&#x7684;&#x5B9E;&#x73B0;&#x539F;&#x7406;.</p>
+<h2 id="RelBuilder"><a href="#RelBuilder" class="headerlink" title="RelBuilder"></a>RelBuilder</h2><p><code>RelBuilder</code>&#x662F;Calcite&#x4E2D;&#x7684;&#x5173;&#x7CFB;&#x7B97;&#x5B50;&#x751F;&#x6210;&#x5668;, &#x5B83;&#x63D0;&#x4F9B;&#x7684;&#x65B9;&#x6CD5;&#x53EF;&#x7528;&#x4E8E;&#x5FEB;&#x901F;&#x751F;&#x6210;&#x7EDD;&#x5927;&#x591A;&#x6570;&#x5173;&#x7CFB;&#x7B97;&#x5B50;. &#x4ECE;&#x6574;&#x4F53;&#x4E0A;&#x6765;&#x770B;, <code>RelBuilder</code>&#x6240;&#x63D0;&#x4F9B;&#x7684;&#x65B9;&#x6CD5;&#x53EF;&#x5206;&#x4E3A;&#x4EE5;&#x4E0B;&#x51E0;&#x7C7B;:</p>
+<ul>
+<li>&#x4E00;&#x7C7B;&#x662F;&#x751F;&#x6210;<code>RelNode</code>&#x7684;<a href="https://calcite.apache.org/docs/algebra.html#relational-operators" target="_blank" rel="noopener">&#x65B9;&#x6CD5;</a>, &#x5982;<code>scan()</code>, <code>filter()</code>, <code>project()</code>&#x7B49;.</li>
+<li>&#x4E00;&#x7C7B;&#x662F;&#x751F;&#x6210;<code>RexNode</code>&#x7684;<a href="https://calcite.apache.org/docs/algebra.html#scalar-expression-methods" target="_blank" rel="noopener">&#x65B9;&#x6CD5;</a>, &#x5982;<code>field()</code>, <code>and()</code>, <code>equals()</code>&#x7B49;.</li>
+<li>&#x8FD8;&#x6709;&#x5176;&#x4ED6;&#x4E00;&#x4E9B;&#x8F85;&#x52A9;&#x65B9;&#x6CD5;, &#x5982;&#x751F;&#x6210;<code>GROUP BY</code>&#x5B57;&#x6BB5;&#x7684;<code>groupKey()</code><a href="https://calcite.apache.org/docs/algebra.html#group-key-methods" target="_blank" rel="noopener">&#x65B9;&#x6CD5;</a>, </li>
+</ul>
+<p>Calcite&#x6E90;&#x4EE3;&#x7801;&#x4E2D;&#x7684;<a href="https://github.com/apache/calcite/blob/main/core/src/test/java/org/apache/calcite/examples/RelBuilderExample.java" target="_blank" rel="noopener">RelBuilderExample</a>&#x5305;&#x542B;&#x4E86;<code>RelBuilder</code>&#x7684;&#x8BE6;&#x7EC6;&#x793A;&#x4F8B;, &#x672C;&#x6587;&#x4E0D;&#x518D;&#x8D58;&#x8FF0;.</p>
+<h2 id="SqlToRelConverter"><a href="#SqlToRelConverter" class="headerlink" title="SqlToRelConverter"></a>SqlToRelConverter</h2><p><code>SqlToRelConverter</code>&#x7528;&#x4E8E;&#x5C06;<code>SqlValidator</code>&#x9A8C;&#x8BC1;&#x4E4B;&#x540E;&#x7684;<code>SqlNode</code>&#x6811;&#x8F6C;&#x5316;&#x4E3A;<code>RelNode</code>&#x6811;, &#x5176;&#x4E3B;&#x8981;&#x601D;&#x60F3;&#x662F;&#x901A;&#x8FC7;&#x904D;&#x5386;<code>SqlNode</code>&#x6811;&#x5C06;&#x5176;&#x7ED3;&#x70B9;&#x9010;&#x4E2A;&#x8F6C;&#x6362;&#x4E3A;<code>RelNode</code>. &#x4F46;&#x662F;&#x7531;&#x4E8E;<code>SqlNode</code>&#x79CD;&#x7C7B;&#x4F17;&#x591A;, &#x5176;&#x5B9E;&#x73B0;&#x6BD4;&#x8F83;&#x7E41;&#x6742;, &#x672C;&#x6587;&#x4EE5;&#x4E00;&#x6761;&#x7B80;&#x5355;&#x7684;SQL&#x8BED;&#x53E5;&#x4E3A;&#x4F8B;, &#x6765;&#x68B3;&#x7406;&#x4ECE;<code>SqlNode</code>&#x5230;<code>RelNode</code>&#x7684;&#x6574;&#x4E2A;&#x8F6C;&#x6362;&#x6D41;&#x7A0B;.</p>
+<p>&#x6211;&#x4EEC;&#x4EE5;<code>SELECT * FROM users;</code>&#x4E3A;&#x4F8B;, &#x8FD9;&#x6761;SQL&#x8BED;&#x53E5;&#x7684;&#x5173;&#x7CFB;&#x4EE3;&#x6570;&#x8868;&#x793A;&#x5F88;&#x5BB9;&#x6613;&#x901A;&#x8FC7;&#x8089;&#x773C;&#x770B;&#x51FA;, &#x5728;Calcite&#x4E2D;&#x7684;&#x8868;&#x793A;&#x5982;&#x4E0B;.<br></p><figure class="highlight plain hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">LogicalProject(id=[$0], name=[$1], age=[$2])</span><br><span class="line">  LogicalTableScan(table=[[s, users]])</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>&#x4E0A;&#x8FF0;SQL&#x8BED;&#x53E5;&#x7684;&#x8F6C;&#x6362;&#x8FC7;&#x7A0B;&#x5982;&#x4E0B;&#x56FE;&#x6240;&#x793A;:</p>
+<ul>
+<li><code>convertQuery</code>&#x662F;<code>SqlToRelConverter</code>&#x7684;&#x5165;&#x53E3;, &#x5B83;&#x7684;&#x8F93;&#x5165;&#x662F;SQL&#x8BED;&#x53E5;&#x5BF9;&#x5E94;&#x7684;<code>SqlNode</code>&#x8868;&#x793A;;</li>
+<li><code>convertQueryRecursive</code>&#x4F1A;&#x6839;&#x636E;<code>SqlNode</code>&#x7684;<code>SqlKind</code>&#x6765;&#x8C03;&#x7528;&#x5BF9;&#x5E94;&#x7684;&#x65B9;&#x6CD5;&#x8FDB;&#x884C;&#x8F6C;&#x6362;, &#x5982;<code>SELECT</code>&#x7C7B;&#x578B;&#x8C03;&#x7528;<code>convertSelect</code>, <code>INSERT</code>&#x7C7B;&#x578B;&#x8C03;&#x7528;<code>convertInsert</code>&#x7B49;. &#x5F88;&#x660E;&#x663E;&#x4E0A;&#x8FF0;&#x793A;&#x4F8B;SQL&#x8BED;&#x53E5;&#x662F;<code>SELECT</code>&#x7C7B;&#x578B;, &#x56E0;&#x6B64;&#x4F1A;&#x8C03;&#x7528;<code>convertSelect</code>;</li>
+<li><code>convertSelect</code>&#x505A;&#x5B8C;&#x7B80;&#x5355;&#x7684;&#x51C6;&#x5907;&#x5DE5;&#x4F5C;&#x540E;&#x4F1A;&#x76F4;&#x63A5;&#x8C03;&#x7528;<code>convertSelectImpl</code>, &#x5B83;&#x4F1A;&#x5BF9;SQL&#x8BED;&#x53E5;&#x7684;&#x5404;&#x4E2A;&#x90E8;&#x5206;&#x5206;&#x522B;&#x8FDB;&#x884C;&#x8F6C;&#x6362;, &#x5982;&#x5BF9;<code>SELECT</code>&#x5B57;&#x6BB5;&#x8C03;&#x7528;<code>convertSelectList</code>, &#x5BF9;<code>FROM</code>&#x5B50;&#x53E5;&#x8C03;&#x7528;<code>convertFrom</code>, &#x5BF9;<code>WHERE</code>&#x5B50;&#x53E5;&#x8C03;&#x7528;<code>convertWhere</code>, &#x5BF9;<code>GROUP BY</code>&#x5B50;&#x53E5;&#x8C03;&#x7528;<code>convertAgg</code>, &#x5BF9;<code>ORDER BY</code>&#x5B50;&#x53E5;&#x8C03;&#x7528;<code>convertOrder</code>. &#x5728;&#x672C;&#x4F8B;&#x4E2D;&#x4F1A;&#x9996;&#x5148;&#x8C03;&#x7528;<code>convertFrom</code>&#x8F6C;&#x6362;<code>FROM</code>&#x5B50;&#x53E5;, &#x7136;&#x540E;&#x8C03;&#x7528;<code>convertSelectList</code>&#x8F6C;&#x6362;<code>SELECT</code>&#x5B57;&#x6BB5;;</li>
+<li><code>convertFrom</code>&#x4F1A;&#x8C03;&#x7528;<code>conevrtIdentifier</code>&#x5C06;<code>FROM users</code>&#x8F6C;&#x6362;&#x4E3A;<code>LogicalTableScan</code>;</li>
+<li><code>convertSelectList</code>&#x4F1A;&#x5C06;<code>*</code>&#x5C55;&#x5F00;&#x4E3A;&#x5177;&#x4F53;&#x7684;&#x5B57;&#x6BB5;&#x540D;, &#x6700;&#x540E;&#x8C03;&#x7528;<code>RelBuilder.projectNamed</code>&#x751F;&#x6210;<code>LogicalProject</code>.</li>
+</ul>
+<p align="center">
+    <img src="./apache-calcite-relational-algebra/SqlToRelConverter.png" width="70%">
+</p>
+
+<h1 id="&#x603B;&#x7ED3;"><a href="#&#x603B;&#x7ED3;" class="headerlink" title="&#x603B;&#x7ED3;"></a>&#x603B;&#x7ED3;</h1><p>&#x5173;&#x7CFB;&#x4EE3;&#x6570;&#x662F;&#x67E5;&#x8BE2;&#x4F18;&#x5316;&#x7684;&#x57FA;&#x7840;, &#x672C;&#x6587;&#x4ECB;&#x7ECD;&#x4E86;Calcite&#x4E2D;&#x5173;&#x7CFB;&#x4EE3;&#x6570;&#x7684;&#x5B9E;&#x73B0;. &#x53EF;&#x4EE5;&#x770B;&#x5230;, Calcite&#x4E2D;&#x5173;&#x7CFB;&#x7B97;&#x5B50;&#x7684;&#x79CD;&#x7C7B;&#x591A;&#x6837;, &#x91CD;&#x70B9;&#x662F;&#x8981;&#x628A;&#x63E1;&#x5404;&#x4E2A;&#x7B97;&#x5B50;&#x7684;&#x62BD;&#x8C61;&#x5C42;&#x6B21;, &#x4E00;&#x822C;&#x6765;&#x8BF4;&#x5728;&#x6269;&#x5C55;Calcite&#x9002;&#x914D;&#x81EA;&#x5B9A;&#x4E49;&#x6570;&#x636E;&#x6E90;&#x65F6;, &#x53EA;&#x9700;&#x5B9E;&#x73B0;&#x5BF9;&#x5E94;&#x7684;&#x7269;&#x7406;&#x7B97;&#x5B50;&#x5373;&#x53EF;. Calcite&#x63D0;&#x4F9B;&#x4E86;<code>SqlToRelConverter</code>&#x6765;&#x5B9E;&#x73B0;&#x4ECE;<code>SqlNode</code>&#x5230;<code>RelNode</code>&#x7684;&#x8F6C;&#x6362;, &#x8FD9;&#x4E00;&#x6B65;&#x5F97;&#x5230;&#x7684;<code>RelNode</code>&#x90FD;&#x662F;&#x903B;&#x8F91;&#x7B97;&#x5B50;, &#x4ECE;&#x903B;&#x8F91;&#x7B97;&#x5B50;&#x5230;&#x7269;&#x7406;&#x7B97;&#x5B50;&#x7684;&#x8F6C;&#x6362;&#x5C06;&#x5728;<code>RelOptPlanner</code>&#x4E2D;&#x5B9E;&#x73B0;.</p>
+<h1 id="&#x53C2;&#x8003;"><a href="#&#x53C2;&#x8003;" class="headerlink" title="&#x53C2;&#x8003;"></a>&#x53C2;&#x8003;</h1><p>[1] <a href="https://calcite.apache.org/docs/algebra.html" target="_blank" rel="noopener">Apache Calcite Docs - Algebra</a><br>[2] <a href="https://www.querifylabs.com/blog/relational-operators-in-apache-calcite" target="_blank" rel="noopener">Relational Operators in Apache Calcite</a><br>[3] <a href="https://www.codeproject.com/Articles/33052/Visual-Representation-of-SQL-Joins" target="_blank" rel="noopener">Visual Representation of SQL Joins</a></p>
+<h1 id="&#x9644;&#x5F55;"><a href="#&#x9644;&#x5F55;" class="headerlink" title="&#x9644;&#x5F55;"></a>&#x9644;&#x5F55;</h1><h2 id="&#x9644;&#x5F55;&#x4E00;-RelBuilder&#x7684;&#x521B;&#x5EFA;"><a href="#&#x9644;&#x5F55;&#x4E00;-RelBuilder&#x7684;&#x521B;&#x5EFA;" class="headerlink" title="&#x9644;&#x5F55;&#x4E00;: RelBuilder&#x7684;&#x521B;&#x5EFA;"></a>&#x9644;&#x5F55;&#x4E00;: RelBuilder&#x7684;&#x521B;&#x5EFA;</h2><p>&#x5728;<a href="https://github.com/apache/calcite/blob/main/core/src/test/java/org/apache/calcite/examples/RelBuilderExample.java" target="_blank" rel="noopener">RelBuilderExample</a>&#x4E2D;, <code>RelBuilder</code>&#x662F;&#x901A;&#x8FC7;<code>Frameworks</code>&#x521B;&#x5EFA;&#x7684;, &#x53BB;&#x9664;&#x4F9D;&#x8D56;&#x4E4B;&#x540E;&#x7684;&#x4EE3;&#x7801;&#x5982;&#x4E0B;. <code>Frameworks</code>&#x4F1A;&#x81EA;&#x52A8;&#x521B;&#x5EFA;<code>RelBuilder</code>&#x6240;&#x9700;&#x7684;&#x53C2;&#x6570;.</p>
+<p></p><figure class="highlight java hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">SchemaPlus rootSchema = Frameworks.createRootSchema(<span class="hljs-keyword">true</span>);</span><br><span class="line">Schema hrSchema = <span class="hljs-keyword">new</span> HrClusteredSchema();</span><br><span class="line">rootSchema.add(<span class="hljs-string">&quot;hr&quot;</span>, hrSchema);</span><br><span class="line"></span><br><span class="line">FrameworkConfig config = Frameworks.newConfigBuilder()</span><br><span class="line">    .parserConfig(SqlParser.Config.DEFAULT)</span><br><span class="line">    .defaultSchema(rootSchema.getSubSchema(<span class="hljs-string">&quot;hr&quot;</span>))</span><br><span class="line">    .build();</span><br><span class="line">RelBuilder builder = RelBuilder.create(config);</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>&#x4E3A;&#x4E86;&#x66F4;&#x597D;&#x5730;&#x7406;&#x89E3;<code>RelBuilder</code>&#x7684;&#x521B;&#x5EFA;&#x8FC7;&#x7A0B;, &#x7B14;&#x8005;&#x5C06;<code>Frameworks</code>&#x7684;&#x521B;&#x5EFA;&#x8FC7;&#x7A0B;&#x62C6;&#x89E3;&#x51FA;&#x6765;&#x4E86;, &#x4EE5;&#x4E0B;&#x4EE3;&#x7801;&#x540C;&#x6837;&#x53EF;&#x4EE5;&#x521B;&#x5EFA;<code>RelBuilder</code>. &#x4ECE;&#x4E2D;&#x53EF;&#x4EE5;&#x770B;&#x51FA;, <code>RelBuilder</code>&#x7684;&#x521B;&#x5EFA;&#x9700;&#x8981;&#x4E24;&#x4E2A;&#x53C2;&#x6570;:</p>
+<ul>
+<li><code>RelOptCluster</code>&#x4E3B;&#x8981;&#x7528;&#x4E8E;&#x83B7;&#x53D6;<code>RexBuilder</code>&#x548C;<code>RelDataTypeFactory</code>, &#x8FD9;&#x91CC;&#x7B14;&#x8005;&#x8BA4;&#x4E3A;&#x4EE3;&#x7801;&#x62BD;&#x8C61;&#x5F97;&#x5E76;&#x4E0D;&#x4F18;&#x96C5;, &#x5B9E;&#x9645;&#x4E0A;&#x5728;&#x6784;&#x5EFA;<code>RelNode</code>&#x7684;&#x65F6;&#x5019;&#x4E0D;&#x9700;&#x8981;&#x7528;&#x5230;<code>RelOptPlanner</code>.</li>
+<li><code>CatalogReader</code>&#x4E3B;&#x8981;&#x7528;&#x4E8E;&#x5728;&#x521B;&#x5EFA;<code>TableScan</code>&#x65F6;&#x83B7;&#x53D6;&#x5177;&#x4F53;&#x7684;&#x8868;&#x7ED3;&#x6784;&#x4FE1;&#x606F;.</li>
+</ul>
+<p></p><figure class="highlight java hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">CalciteSchema rootSchema = CalciteSchema.createRootSchema(<span class="hljs-keyword">false</span>, <span class="hljs-keyword">false</span>);</span><br><span class="line">Schema hrSchema = <span class="hljs-keyword">new</span> HrClusteredSchema();</span><br><span class="line">rootSchema.add(<span class="hljs-string">&quot;hr&quot;</span>, hrSchema);</span><br><span class="line"></span><br><span class="line">RelBuilderFactory relBuilderFactory = RelFactories.LOGICAL_BUILDER;</span><br><span class="line">RelDataTypeFactory relDataTypeFactory = <span class="hljs-keyword">new</span> JavaTypeFactoryImpl();</span><br><span class="line"></span><br><span class="line">VolcanoPlanner planner = <span class="hljs-keyword">new</span> VolcanoPlanner();</span><br><span class="line">RelOptCluster cluster = RelOptCluster.create(planner, <span class="hljs-keyword">new</span> RexBuilder(relDataTypeFactory));</span><br><span class="line">Prepare.CatalogReader catalogReader = <span class="hljs-keyword">new</span> CalciteCatalogReader(</span><br><span class="line">    rootSchema.getSubSchema(<span class="hljs-string">&quot;hr&quot;</span>, <span class="hljs-keyword">false</span>),</span><br><span class="line">    Collections.singletonList(rootSchema.getName()),</span><br><span class="line">    relDataTypeFactory,</span><br><span class="line">    CalciteConnectionConfig.DEFAULT);</span><br><span class="line"></span><br><span class="line">RelBuilder relBuilder = relBuilderFactory.create(cluster, catalogReader);</span><br></pre></td></tr></tbody></table></figure><p></p>
+</body></html>
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/Apache-Calcite/">#Apache Calcite</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/flink-code-kafka-source.html">Flink源码 - 从Kafka Connector看Source接口重构</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/flink-table-datastream-convert.html">Flink最佳实践 - Table与DataStream互相转换</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+<div class="sharebox">
+    
+<div class="sharethis-inline-share-buttons"></div>
+<script type='text/javascript' src='//platform-api.sharethis.com/js/sharethis.js#property=5e63913dd0c39800126ea9e7&amp;product=inline-share-buttons&amp;cms=sop' async='async'></script>
+
+</div>
+
+
+
+<div class="comments">
+    <p align="center">
+        本博客所有文章除特别声明外, 均采用<a href="https://creativecommons.org/licenses/by-nc-sa/3.0/cn/" target="_blank" rel="noopener">CC BY-NC-SA 3.0 CN</a>许可协议. 转载请注明出处!
+    </p>
+
+    <br><br>
+
+    <p align="center">
+        <img src="/images/WeChat.jpg" width="25%">
+    </p>
+    <p align="center">关注笔者微信公众号获得最新文章推送</p>
+</div>
+
+
+
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    
+<div id="valine-thread"></div>
+<script src="//code.bdstatic.com/npm/leancloud-storage@4.12.2/dist/av-min.js"></script>
+<script src='//cdn.jsdelivr.net/gh/AshinWang/SimpleValine@v0.1/SimpleValine.min.js'></script>
+<script>
+    new Valine({
+        el: '#valine-thread',
+        appId: 'v4Ich4NMxLXYhCkPcb1OmVPR-gzGzoHsz',
+        appKey: 'b5fiVY3XvcAwzJ06YR8rFCAj',
+        notify: true,
+        verify: false,
+        avatar: '',
+        placeholder: 'If you have any questions, please comment here!',
+        meta: ['nick', 'mail'],
+        visitor: true,
+        lang: 'en'
+    })
+</script>
+
+
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2018-2024 Liebing&nbsp;. 
+                <!-- <span id="busuanzi_container_site_uv"><span id="busuanzi_value_site_uv"></span> UV, </span>
+                <span id="busuanzi_container_site_pv"> <span id="busuanzi_value_site_pv"></span> PV</span> -->
+
+                View
+                <span id="busuanzi_value_site_pv" data-num="1000">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </span> times by
+                <span id="busuanzi_value_site_uv">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </span> visitors.
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="一行代码, 点滴生活!" href="">
+                    
+                    一行代码, 点滴生活!
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+    <script src="https://code.jquery.com/jquery-latest.js"></script>
+    <!-- 不蒜子计数初始值纠正 -->
+    <script >
+        $(document).ready(function() {
+            var int = setInterval(fixCount, 500);  // 50ms周期检测函数
+            var initPV = 3569;  // 初始化首次数据
+            var initUV = 1215;
+            function fixCount() {                   
+                if ($("#busuanzi_container_site_pv").css("display") != "none") {
+                    $("#busuanzi_value_site_pv").html(parseInt($("#busuanzi_value_site_pv").html()) + initPV); // 加上初始数据 
+                    clearInterval(int); // 停止检测
+                } 
+                if ($("#busuanzi_container_site_uv").css("display") != "none") {
+                    $("#busuanzi_value_site_uv").html(parseInt($("#busuanzi_value_site_uv").html()) + initUV); // 加上初始数据 
+                    clearInterval(int); // 停止检测
+                }  
+            }
+        });
+    </script>
+
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/" target="_blank" rel="noopener">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("en-AU");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+
+<script src="/js/script.js"></script>
+
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+    
+</body>
+</html>

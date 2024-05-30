@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head>
+    <meta charset="utf-8">
+<title>HBase最佳实践 - Bulk Loading原理与Spark实现 - Liebing&#39;s Blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="baidu-site-verification" content="codeva-2Q9E1leVAG" />
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="">
+
+
+
+<meta name="keywords" content="code">
+
+
+
+    <meta name="description" content="Apache HBase&amp;#x80FD;&amp;#x591F;&amp;#x5728;&amp;#x5927;&amp;#x6570;&amp;#x636E;&amp;#x96C6;&amp;#x4E0A;&amp;#x4E3A;&amp;#x6211;&amp;#x4EEC;&amp;#x63D0;&amp;#x4F9B;&amp;#x968F;&amp;#x673A;, &amp;#x5B9E;&amp;#x65F6;&amp;#x7684;&amp;#x8BFB;&amp;#x5199;&amp;#x8BBF;&amp;#x95EE;. &amp;#x7136;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HBase最佳实践 - Bulk Loading原理与Spark实现">
+<meta property="og:url" content="http://yoursite.com/hbase-bulk-loading.html">
+<meta property="og:site_name" content="Liebing&#39;s Blog">
+<meta property="og:description" content="Apache HBase&amp;#x80FD;&amp;#x591F;&amp;#x5728;&amp;#x5927;&amp;#x6570;&amp;#x636E;&amp;#x96C6;&amp;#x4E0A;&amp;#x4E3A;&amp;#x6211;&amp;#x4EEC;&amp;#x63D0;&amp;#x4F9B;&amp;#x968F;&amp;#x673A;, &amp;#x5B9E;&amp;#x65F6;&amp;#x7684;&amp;#x8BFB;&amp;#x5199;&amp;#x8BBF;&amp;#x95EE;. &amp;#x7136;">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/hbase-bulk-loading/bulkload.png">
+<meta property="article:published_time" content="2020-03-12T14:33:21.000Z">
+<meta property="article:modified_time" content="2024-05-29T12:13:46.494Z">
+<meta property="article:author" content="Liebing">
+<meta property="article:tag" content="HBase">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/hbase-bulk-loading/bulkload.png">
+
+
+
+
+
+<link rel="icon" href="/img/favicon.ico">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt="" height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/collections">合集</a>
+            
+            <a class="navbar-item "
+               href="/courses">课程</a>
+            
+            <a class="navbar-item "
+               href="/archive">归档</a>
+            
+            <a class="navbar-item "
+               href="/categories">分类</a>
+            
+            <a class="navbar-item "
+               href="/tags">标签</a>
+            
+            <a class="navbar-item "
+               href="/friends">友链</a>
+            
+            <a class="navbar-item "
+               href="/about">关于</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#Bulk-Loading原理">1&nbsp;&nbsp;<b>Bulk Loading原理</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#使用Spark实现Bulk-Loading">2&nbsp;&nbsp;<b>使用Spark实现Bulk Loading</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#HBase-1-x中的Bulk-Loading">2.1&nbsp;&nbsp;HBase 1.x中的Bulk Loading</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#HBase-2-x中的Bulk-Loding">2.2&nbsp;&nbsp;HBase 2.x中的Bulk Loding</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#参-考">3&nbsp;&nbsp;<b>参  考</b></a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/LB-Yu" target="_blank" rel="noopener">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="知" href="https://www.zhihu.com/people/liebingyu" target="_blank" rel="noopener">
+                
+                知
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            HBase最佳实践 - Bulk Loading原理与Spark实现
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2020-03-12T14:33:21.000Z" itemprop="datePublished">Mar 12 2020</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/Database/">Database</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            13 minutes read (About 1910 words)
+        </span>
+        
+        
+        <span id="/hbase-bulk-loading.html" class="column is-narrow leancloud_visitors" data-flag-title="HBase最佳实践 - Bulk Loading原理与Spark实现">
+            VISITED
+                <i class="leancloud-visitors-count">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </i>
+            TIMES
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <html><head></head><body><p><a href="https://hbase.apache.org/" target="_blank" rel="noopener">Apache HBase</a>&#x80FD;&#x591F;&#x5728;&#x5927;&#x6570;&#x636E;&#x96C6;&#x4E0A;&#x4E3A;&#x6211;&#x4EEC;&#x63D0;&#x4F9B;&#x968F;&#x673A;, &#x5B9E;&#x65F6;&#x7684;&#x8BFB;&#x5199;&#x8BBF;&#x95EE;. &#x7136;&#x800C;, &#x5728;&#x5B9E;&#x9645;&#x4E1A;&#x52A1;&#x4E2D;, &#x6211;&#x4EEC;&#x7684;&#x539F;&#x59CB;&#x5E94;&#x7528;&#x5E76;&#x975E;&#x57FA;&#x4E8E;HBase&#x6784;&#x5EFA;. &#x8FD9;&#x65F6;&#x5019;, &#x5982;&#x4F55;&#x5C06;&#x5927;&#x91CF;&#x7684;&#x6570;&#x636E;(&#x8FD9;&#x4E9B;&#x6570;&#x636E;&#x7684;&#x5B58;&#x50A8;&#x91CF;&#x53EF;&#x80FD;&#x662F;TB&#x751A;&#x81F3;PB&#x7EA7;&#x522B;&#x7684;)&#x5BFC;&#x5165;&#x5230;HBase&#x4E2D;&#x6210;&#x4E86;&#x6211;&#x4EEC;&#x9996;&#x5148;&#x9700;&#x8981;&#x89E3;&#x51B3;&#x7684;&#x95EE;&#x9898;. &#x6700;&#x57FA;&#x672C;&#x7684;, &#x6211;&#x4EEC;&#x53EF;&#x80FD;&#x4F1A;&#x60F3;&#x5230;&#x4F7F;&#x7528;Client APIs&#x6216;&#x5229;&#x7528;<a href="https://hbase.apache.org/book.html#_hbase_as_a_mapreduce_job_data_source_and_data_sink" target="_blank" rel="noopener">MapReduce Job</a>&#x901A;&#x8FC7;<code>TableOutputFormat</code>&#x5199;&#x5165;. &#x7136;&#x800C;, &#x8FD9;&#x4E24;&#x79CD;&#x65B9;&#x5F0F;&#x90FD;&#x4E0D;&#x662F;&#x6700;&#x9AD8;&#x6548;&#x7684;, &#x5728;&#x5411;HBase&#x4E2D;&#x5BFC;&#x5165;&#x5927;&#x89C4;&#x6A21;&#x6570;&#x636E;&#x96C6;&#x65F6;, &#x9996;&#x5148;&#x5E94;&#x8BE5;&#x8003;&#x8651;&#x7684;&#x662F;HBase&#x63D0;&#x4F9B;&#x7684;<a href="https://hbase.apache.org/book.html#arch.bulk.load" target="_blank" rel="noopener">Bulk Loading</a>&#x65B9;&#x6CD5;. </p>
+<a id="more"></a>
+
+<p>&#x4F46;&#x662F;, &#x5728;&#x5229;&#x7528;Bulk Loading&#x5411;HBase&#x4E2D;&#x5BFC;&#x5165;&#x6570;&#x636E;&#x65F6;, &#x5E38;&#x5E38;&#x4F1A;&#x9047;&#x5230;&#x5F88;&#x591A;&#x56F0;&#x96BE;. &#x4E00;&#x65B9;&#x9762;&#x662F;&#x7531;&#x4E8E;HBase&#x7684;&#x5B98;&#x65B9;&#x6307;&#x5357;&#x4EC5;&#x7ED9;&#x51FA;&#x4E86;&#x4E00;&#x4E9B;&#x5173;&#x4E8E;Bulk Loading&#x7684;&#x539F;&#x7406;&#x8BF4;&#x660E;, &#x5E76;&#x6CA1;&#x6709;&#x7ED9;&#x51FA;&#x4EE3;&#x7801;&#x793A;&#x4F8B;; &#x53E6;&#x4E00;&#x65B9;&#x9762;Bulk Loading&#x6D89;&#x53CA;&#x5230;&#x4E00;&#x4E9B;&#x5E95;&#x5C42;&#x7684;&#x539F;&#x7406;(&#x6BD4;&#x5982;&#x6570;&#x636E;&#x7684;&#x6392;&#x5E8F;&#x662F;&#x5982;&#x4F55;&#x8FDB;&#x884C;&#x7684;, &#x6570;&#x636E;&#x662F;&#x5982;&#x4F55;&#x5206;&#x533A;&#x7684;), &#x5982;&#x679C;&#x4E0D;&#x4E86;&#x89E3;&#x8FD9;&#x4E9B;&#x539F;&#x7406;&#x5C31;&#x96BE;&#x4EE5;&#x5199;&#x51FA;&#x9AD8;&#x6548;&#x7684;Bulk Loading&#x7A0B;&#x5E8F;. &#x6B64;&#x5916;, &#x901A;&#x8FC7;MapReduce&#x5BF9;&#x6570;&#x636E;&#x8FDB;&#x884C;&#x9884;&#x5904;&#x7406;&#x5E76;&#x4F7F;&#x7528;<code>HFileOutputFormat2.configureIncrementalLoad</code>&#x5BF9;&#x6570;&#x636E;&#x8FDB;&#x884C;&#x5168;&#x5C40;&#x6392;&#x5E8F;&#x7684;&#x65B9;&#x6CD5;&#x5E76;&#x4E0D;&#x80FD;&#x6700;&#x5927;&#x9650;&#x5EA6;&#x7684;&#x5229;&#x7528;&#x96C6;&#x7FA4;&#x7684;&#x8BA1;&#x7B97;&#x80FD;&#x529B;, &#x65E0;&#x8BBA;&#x5982;&#x4F55;&#x76EE;&#x524D;&#x5DF2;&#x7ECF;&#x5F88;&#x5C11;&#x6709;&#x4EBA;&#x8FD8;&#x5728;&#x7F16;&#x5199;MapReduce&#x7A0B;&#x5E8F;, &#x53D6;&#x800C;&#x4EE3;&#x4E4B;&#x7684;&#x662F;Spark. &#x4E3A;&#x6B64;, HBase&#x5B98;&#x65B9;&#x63A8;&#x51FA;&#x4E86;<a href="https://github.com/apache/hbase-connectors" target="_blank" rel="noopener">Apache HBase Connectors</a>&#x652F;&#x6301;Spark&#x4E0E;HBase&#x7684;&#x8FDE;&#x63A5;, &#x63D0;&#x4F9B;&#x4E86;&#x57FA;&#x4E8E;Spark&#x7684;bulk put/get/delete/load&#x7B49;&#x64CD;&#x4F5C;, &#x4F46;&#x662F;HBase Connectors&#x4EC5;&#x652F;&#x6301;2.2.x&#x7248;&#x672C;&#x7684;HBase.</p>
+<p>&#x672C;&#x6587;&#x9996;&#x5148;&#x8BB2;&#x8FF0;HBase Bulk Loading&#x7684;&#x539F;&#x7406;&#x4EE5;&#x53CA;&#x4E3A;&#x751A;&#x4E48;&#x9700;&#x8981;&#x4F7F;&#x7528;Bulk Loading, &#x6700;&#x540E;&#x8BB2;&#x8FF0;&#x5982;&#x4F55;&#x57FA;&#x4E8E;Spark&#x5728;1.4.x&#x7CFB;&#x5217;&#x7248;&#x672C;&#x4E0A;&#x5229;&#x7528;Spark&#x800C;&#x975E;<code>HFileOutputFormat2.configureIncrementalLoad</code>&#x8FDB;&#x884C;&#x66F4;&#x52A0;&#x9AD8;&#x6548;&#x7684;Bulk Loading, &#x540C;&#x65F6;&#x4E5F;&#x7ED9;&#x51FA;&#x4E86;&#x5728;2.2.x&#x7CFB;&#x5217;&#x7248;&#x672C;&#x4E0A;&#x4F7F;&#x7528;HBase Connectors&#x8FDB;&#x884C;Bulk Loading&#x7684;&#x793A;&#x4F8B;.</p>
+<h2 id="Bulk-Loading&#x539F;&#x7406;"><a href="#Bulk-Loading&#x539F;&#x7406;" class="headerlink" title="Bulk Loading&#x539F;&#x7406;"></a>Bulk Loading&#x539F;&#x7406;</h2><p>&#x7B80;&#x5355;&#x6765;&#x8BF4;, Bulk Loading&#x5373;&#x901A;&#x8FC7;MapReduce&#x6216;Spark&#x7B49;&#x5206;&#x5E03;&#x5F0F;&#x8BA1;&#x7B97;&#x6846;&#x67B6;&#x5BF9;&#x5927;&#x89C4;&#x6A21;&#x6570;&#x636E;&#x96C6;&#x8FDB;&#x884C;&#x9884;&#x5904;&#x7406;&#x548C;&#x6392;&#x5E8F;, &#x8F93;&#x51FA;&#x4E3A;HBase&#x7684;&#x5E95;&#x5C42;&#x5B58;&#x50A8;&#x6587;&#x4EF6;HFile, &#x6700;&#x7EC8;&#x901A;&#x8FC7;HBase&#x63D0;&#x4F9B;&#x7684;<code>LoadIncrementalHFiles.completebulkload</code>&#x5DE5;&#x5177;&#x5C06;&#x8F93;&#x51FA;&#x7684;HFile&#x79FB;&#x52A8;&#x5230;RegionServer&#x5BF9;&#x5E94;Region&#x7684;&#x5B58;&#x50A8;&#x6587;&#x4EF6;&#x5939;&#x4E2D;, &#x4ECE;&#x800C;&#x5B8C;&#x6210;&#x6570;&#x636E;&#x5BFC;&#x5165;. &#x4E8B;&#x5B9E;&#x4E0A;, Bulk Loading&#x7684;&#x8FC7;&#x7A0B;&#x4E0E;ETL&#x7C7B;&#x4F3C;, &#x4E3B;&#x8981;&#x5305;&#x542B;&#x4EE5;&#x4E0B;&#x51E0;&#x4E2A;&#x6B65;&#x9AA4;:</p>
+<p><strong>1. Extract: &#x4ECE;&#x6570;&#x636E;&#x6E90;&#x4E2D;&#x5BFC;&#x51FA;&#x6570;&#x636E;, &#x4E00;&#x822C;&#x4E3A;&#x6587;&#x672C;&#x6587;&#x4EF6;&#x6216;&#x5176;&#x4ED6;&#x6570;&#x636E;&#x5E93;&#x7684;dump&#x6587;&#x4EF6;.</strong> &#x5982;&#x4F55;&#x4ECE;&#x6570;&#x636E;&#x6E90;&#x4E2D;&#x5BFC;&#x51FA;&#x6570;&#x636E;&#x5E76;&#x4E0D;&#x5728;&#x672C;&#x6587;&#x7684;&#x8BA8;&#x8BBA;&#x8303;&#x56F4;&#x4E4B;&#x5185;, &#x4E00;&#x822C;&#x6765;&#x8BF4;&#x73B0;&#x6709;&#x7684;&#x6570;&#x636E;&#x5E93;&#x90FD;&#x652F;&#x6301;&#x5404;&#x79CD;&#x7C7B;&#x578B;&#x7684;&#x5BFC;&#x51FA;, &#x4E5F;&#x53EF;&#x4EE5;&#x5F88;&#x65B9;&#x4FBF;&#x5730;&#x901A;&#x8FC7;MapReduce&#x6216;Spark&#x63D0;&#x4F9B;&#x7684;&#x63A5;&#x53E3;&#x8FDB;&#x884C;&#x8BFB;&#x53D6;. &#x5728;&#x8FDB;&#x884C;&#x4E0B;&#x4E00;&#x6B65;&#x4E4B;&#x524D;, &#x9700;&#x8981;&#x63D0;&#x524D;&#x5C06;&#x6570;&#x636E;&#x6E90;&#x6587;&#x4EF6;&#x4E0A;&#x4F20;&#x5230;HDFS&#x4E2D;.</p>
+<p><strong>2. Transform: &#x5C06;&#x539F;&#x59CB;&#x6570;&#x636E;&#x5904;&#x7406;&#x6392;&#x5E8F;&#x5E76;&#x91CD;&#x5199;&#x4E3A;HFile.</strong> &#x672C;&#x6587;&#x5229;&#x7528;Spark&#x8FDB;&#x884C;&#x8FD9;&#x4E00;&#x6B65;&#x64CD;&#x4F5C;, &#x5177;&#x4F53;&#x6D41;&#x7A0B;&#x5982;&#x4E0B;(HBase Connectors&#x4E2D;&#x7684;&#x5B9E;&#x73B0;&#x7C7B;&#x4F3C;):</p>
+<ul>
+<li>&#x8BFB;&#x53D6;&#x5E76;&#x89E3;&#x6790;&#x539F;&#x59CB;&#x6587;&#x4EF6;, &#x901A;&#x5E38;&#x9700;&#x8981;&#x8BFB;&#x8005;&#x81EA;&#x884C;&#x7F16;&#x5199;&#x89E3;&#x6790;&#x51FD;&#x6570;, &#x4ECE;&#x539F;&#x59CB;&#x6587;&#x4EF6;&#x751F;&#x6210;RDD;</li>
+<li>&#x901A;&#x8FC7;Spark&#x7684;<code>repartitionAndSortWithinPartitions</code>&#x51FD;&#x6570;&#x5BF9;RDD&#x8FDB;&#x884C;&#x91CD;&#x5206;&#x533A;&#x548C;&#x6392;&#x5E8F;, &#x7B14;&#x8005;&#x63D0;&#x4F9B;&#x4E86;&#x7C7B;<code>BulkLoadPartitioner</code>&#x7528;&#x4E8E;&#x91CD;&#x5206;&#x533A;, &#x7C7B;<code>KeyFamilyRow</code>&#x7528;&#x4E8E;&#x6839;&#x636E;row key, column family, column qualifier&#x5BF9;&#x8BB0;&#x5F55;&#x8FDB;&#x884C;&#x5168;&#x5C40;&#x6392;&#x5E8F;;</li>
+<li>&#x5C06;RDD&#x901A;&#x8FC7;Spark&#x7684;<code>saveAsNewHadoopFile</code>&#x5199;&#x4E3A;HFile&#x6587;&#x4EF6;;</li>
+</ul>
+<blockquote class="colorquote info"><p>&#x8FD9;&#x4E00;&#x6B65;&#x4E2D;&#x6709;&#x51E0;&#x4E2A;&#x7EC6;&#x8282;&#x503C;&#x7684;&#x8BF4;&#x660E;. &#x9996;&#x5148;, <code>BulkLoadPartitioner</code>&#x8FDB;&#x884C;&#x91CD;&#x5206;&#x533A;&#x7684;&#x5206;&#x533A;&#x6570;&#x91CF;&#x7B49;&#x4E8E;HBase table&#x4E2D;&#x5B58;&#x5728;&#x7684;Region&#x6570;&#x91CF;(&#x4EC5;&#x9488;&#x5BF9;&#x672A;&#x8FDB;&#x884C;&#x9884;&#x5206;&#x533A;&#x7684;table, &#x5BF9;&#x4E8E;&#x9884;&#x5206;&#x533A;&#x7684;table&#x5219;&#x5206;&#x533A;&#x6570;&#x7B49;&#x4E8E;table&#x7684;&#x9884;&#x5206;&#x533A;&#x6570;), &#x4E5F;&#x5C31;&#x662F;&#x8BF4;, &#x5BF9;&#x4E8E;&#x4E00;&#x4E2A;&#x672A;&#x8FDB;&#x884C;&#x9884;&#x5206;&#x533A;&#x7684;&#x7A7A;table, &#x5728;&#x5229;&#x7528;Spark&#x8FDB;&#x884C;repartition&#x540E;&#x53EA;&#x4F1A;&#x6709;&#x4E00;&#x4E2A;&#x5206;&#x533A;, &#x8FD9;&#x53EF;&#x80FD;&#x4F1A;&#x5F71;&#x54CD;&#x751F;&#x6210;HFile&#x7684;&#x6548;&#x7387;. &#x7136;&#x800C;&#x8BFB;&#x8005;&#x5E94;&#x5F53;&#x614E;&#x91CD;&#x6539;&#x53D8;RDD&#x5206;&#x533A;&#x7684;&#x6570;&#x91CF;, &#x867D;&#x7136;&#x8FD9;&#x53EF;&#x80FD;&#x63D0;&#x5347;&#x751F;&#x6210;HFile&#x7684;&#x6548;&#x7387;, &#x4F46;&#x662F;&#x8FD9;&#x53EF;&#x80FD;&#x5BFC;&#x81F4;&#x65E0;&#x6CD5;&#x786E;&#x5B9A;&#x751F;&#x6210;&#x7684;HFile&#x5E94;&#x5F53;&#x52A0;&#x8F7D;&#x5230;&#x54EA;&#x4E2A;RegionServer&#x4E2D;. &#x5176;&#x6B21;, &#x672C;&#x6587;&#x7684;&#x65B9;&#x6CD5;&#x5229;&#x7528;saveAsNewHadoopFile&#x5C06;RDD&#x8F93;&#x51FA;&#x4E3A;HFile, HBase Connectors&#x4E2D;&#x91C7;&#x7528;&#x4E86;&#x81EA;&#x5B9A;&#x4E49;&#x7684;&#x65B9;&#x6CD5;, &#x5177;&#x4F53;&#x53EF;&#x53C2;&#x89C1;<a href="https://github.com/apache/hbase-connectors/blob/master/spark/hbase-spark/src/main/scala/org/apache/hadoop/hbase/spark/HBaseContext.scala" target="_blank" rel="noopener">HBaseContext.scala</a>&#x4E2D;&#x7684;<code>bulkLoad</code>&#x51FD;&#x6570;.</p>
+</blockquote>
+
+<p><strong>3. Load: &#x5C06;&#x751F;&#x6210;&#x7684;HFile&#x5BFC;&#x5165;RegionServer&#x76F8;&#x5E94;&#x7684;&#x76EE;&#x5F55;&#x4E2D;.</strong> &#x8C03;&#x7528;<code>LoadIncrementalHFiles.completebulkload</code>&#x5C06;HFile&#x5BFC;&#x5165;RegionServer&#x4E2D;, &#x5E76;&#x4F7F;&#x6570;&#x636E;&#x5BF9;&#x5BA2;&#x6237;&#x7AEF;&#x53EF;&#x89C1;. &#x5728;&#x8C03;&#x7528;<code>completebulkload</code>&#x524D;&#x5982;&#x679C;&#x6709;&#x65B0;&#x6570;&#x636E;&#x63D2;&#x5165;, &#x6216;&#x8005;Region split&#x53D1;&#x751F;, &#x5219;<code>completebulkload</code>&#x4F1A;&#x6839;&#x636E;&#x5F53;&#x524D;table&#x7684;Region&#x8D77;&#x6B62;row key&#x8303;&#x56F4;, &#x91CD;&#x65B0;&#x5BF9;HFile&#x8FDB;&#x884C;&#x5206;&#x5272;. &#x8FD9;&#x5E76;&#x4E0D;&#x662F;&#x9AD8;&#x6548;&#x7684;, &#x56E0;&#x6B64;&#x5E94;&#x5F53;&#x907F;&#x514D;&#x76EE;&#x6807;table&#x5728;&#x751F;&#x6210;HFile&#x7684;&#x8FC7;&#x7A0B;&#x4E2D;&#x6709;&#x8F83;&#x5927;&#x53D8;&#x52A8;. &#x6B64;&#x5916;, <code>completebulkload</code>&#x5E76;&#x4E0D;&#x662F;&#x7EBF;&#x7A0B;&#x5B89;&#x5168;&#x7684;, <strong>&#x5207;&#x52FF;&#x5BF9;&#x540C;&#x4E00;&#x4E2A;&#x8868;&#x540C;&#x65F6;&#x8C03;&#x7528;&#x6B64;&#x51FD;&#x6570;</strong>.</p>
+<p>Bulk Loading&#x7684;&#x8FC7;&#x7A0B;&#x5982;&#x4E0B;&#x56FE;&#x6240;&#x793A;. &#x6570;&#x636E;&#x4ECE;&#x6E90;&#x5BFC;&#x5165;HDFS&#x4E2D;, &#x901A;&#x8FC7;Spark&#x5B9A;&#x4E49;&#x7684;DAG&#x64CD;&#x4F5C;&#x8FDB;&#x884C;&#x5904;&#x7406;&#x751F;&#x6210;HFile. &#x6700;&#x540E;&#x5C06;HFile&#x79FB;&#x52A8;&#x5230;&#x5BF9;&#x5E94;&#x7684;RegionServer.</p>
+<p align="center">
+    <img src="./hbase-bulk-loading/bulkload.png" width="90%">
+</p>
+
+<h2 id="&#x4F7F;&#x7528;Spark&#x5B9E;&#x73B0;Bulk-Loading"><a href="#&#x4F7F;&#x7528;Spark&#x5B9E;&#x73B0;Bulk-Loading" class="headerlink" title="&#x4F7F;&#x7528;Spark&#x5B9E;&#x73B0;Bulk Loading"></a>&#x4F7F;&#x7528;Spark&#x5B9E;&#x73B0;Bulk Loading</h2><p>&#x5728;HBase 2.2.x&#x7248;&#x672C;&#x4E2D;HBase&#x5B98;&#x65B9;&#x63A8;&#x51FA;&#x4E86;HBase Connectors, &#x63D0;&#x4F9B;&#x4E86;Spark, Kafka&#x4E0E;HBase&#x7684;&#x5404;&#x79CD;&#x4EA4;&#x4E92;&#x64CD;&#x4F5C;. &#x5176;&#x4E2D;&#x5305;&#x62EC;&#x5229;&#x7528;Spark&#x8FDB;&#x884C;Bulk Loading. &#x7136;&#x800C;, HBase Connectors&#x5E76;&#x4E0D;&#x517C;&#x5BB9;HBase 1.4.x&#x7CFB;&#x5217;, &#x4E3A;&#x6B64;&#x672C;&#x6587;&#x63D0;&#x4F9B;&#x4E86;&#x4E00;&#x4E2A;&#x5229;&#x7528;Spark&#x5728;1.4.x&#x7248;&#x672C;&#x4E0A;&#x8FDB;&#x884C;Bulk Loading&#x7684;&#x4F8B;&#x5B50;, &#x6839;&#x636E;&#x8BE5;&#x4F8B;&#x8BFB;&#x8005;&#x53EA;&#x9700;&#x5229;&#x7528;Spark&#x91CD;&#x5199;&#x6E90;&#x6587;&#x4EF6;&#x5904;&#x7406;&#x64CD;&#x4F5C;&#x5373;&#x53EF;.</p>
+<h3 id="HBase-1-x&#x4E2D;&#x7684;Bulk-Loading"><a href="#HBase-1-x&#x4E2D;&#x7684;Bulk-Loading" class="headerlink" title="HBase 1.x&#x4E2D;&#x7684;Bulk Loading"></a>HBase 1.x&#x4E2D;&#x7684;Bulk Loading</h3><p>&#x5728;HBase 1.4.x&#x4E2D;&#x5229;&#x7528;Spark&#x8FDB;&#x884C;Bulk Loading&#x9700;&#x8981;&#x81EA;&#x5B9A;&#x4E49;&#x5206;&#x533A;&#x53CA;&#x6392;&#x5E8F;&#x903B;&#x8F91;, &#x4F5C;&#x8005;&#x63D0;&#x4F9B;&#x4E86;&#x901A;&#x7528;&#x7684;&#x5B9E;&#x73B0;. &#x5206;&#x533A;&#x5B9E;&#x73B0;&#x89C1;<a href="https://github.com/LB-Yu/data_systems_learning/blob/master/hbase-learning/hbase1/src/main/scala/org/apache/hbase/bulkload/BulkLoadPartitioner.scala" target="_blank" rel="noopener">BulkLoadPartitioner</a>, &#x6392;&#x5E8F;&#x5B9E;&#x73B0;&#x89C1;<a href="https://github.com/LB-Yu/data_systems_learning/blob/master/hbase-learning/hbase1/src/main/scala/org/apache/hbase/bulkload/KeyFamilyQualifier.scala" target="_blank" rel="noopener">KeyFamilyQualifier</a>. &#x5728;&#x6B64;&#x57FA;&#x7840;&#x4E0A;, &#x4FBF;&#x53EF;&#x6839;&#x636E;Spark&#x73B0;&#x6709;&#x7684;API&#x51FD;&#x6570;&#x5B9E;&#x73B0;Bulk Loading. &#x4EE5;&#x4E0B;&#x662F;&#x4E00;&#x4E2A;&#x7B80;&#x5355;&#x4F8B;&#x5B50;&#x7684;&#x90E8;&#x5206;&#x4EE3;&#x7801;, &#x5B8C;&#x6574;&#x4EE3;&#x7801;&#x53EF;&#x53C2;&#x89C1;<a href="https://github.com/LB-Yu/data_systems_learning/blob/master/hbase-learning/hbase1/src/main/scala/org/apache/hbase/learning/HBaseSparkBulkLoad.scala" target="_blank" rel="noopener">HBaseSparkBulkLoad</a>.</p>
+<p></p><figure class="highlight scala hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-comment">// get table info</span></span><br><span class="line"><span class="hljs-keyword">val</span> hConf = <span class="hljs-type">HBaseConfiguration</span>.create()</span><br><span class="line"><span class="hljs-keyword">val</span> connection = <span class="hljs-type">ConnectionFactory</span>.createConnection(hConf)</span><br><span class="line"><span class="hljs-keyword">val</span> table = connection.getTable(<span class="hljs-type">TableName</span>.valueOf(tableName))</span><br><span class="line"><span class="hljs-keyword">val</span> regionLocator = connection.getRegionLocator(<span class="hljs-type">TableName</span>.valueOf(tableName))</span><br><span class="line"><span class="hljs-keyword">val</span> sConf = <span class="hljs-keyword">new</span> <span class="hljs-type">SparkConf</span>().setAppName(<span class="hljs-string">&quot;bulkload&quot;</span>).setMaster(<span class="hljs-string">&quot;local&quot;</span>)</span><br><span class="line">sConf.set(<span class="hljs-string">&quot;spark.serializer&quot;</span>, <span class="hljs-string">&quot;org.apache.spark.serializer.KryoSerializer&quot;</span>)</span><br><span class="line"><span class="hljs-keyword">val</span> sc = <span class="hljs-keyword">new</span> <span class="hljs-type">SparkContext</span>(sConf)</span><br><span class="line"><span class="hljs-comment">// simple data to bulk load to hbase</span></span><br><span class="line"><span class="hljs-keyword">val</span> rdd = sc.parallelize(<span class="hljs-type">Array</span>(</span><br><span class="line">    (<span class="hljs-type">Bytes</span>.toBytes(<span class="hljs-string">&quot;4&quot;</span>),</span><br><span class="line">     <span class="hljs-type">Array</span>((<span class="hljs-type">Bytes</span>.toBytes(columnFamily), <span class="hljs-type">Bytes</span>.toBytes(<span class="hljs-string">&quot;4&quot;</span>), <span class="hljs-type">Bytes</span>.toBytes(<span class="hljs-string">&quot;1&quot;</span>)))),</span><br><span class="line">    (<span class="hljs-type">Bytes</span>.toBytes(<span class="hljs-string">&quot;1&quot;</span>),</span><br><span class="line">     <span class="hljs-type">Array</span>((<span class="hljs-type">Bytes</span>.toBytes(columnFamily), <span class="hljs-type">Bytes</span>.toBytes(<span class="hljs-string">&quot;2&quot;</span>), <span class="hljs-type">Bytes</span>.toBytes(<span class="hljs-string">&quot;2&quot;</span>))))</span><br><span class="line">    )).repartition(<span class="hljs-number">2</span>) <span class="hljs-comment">// random partition to simulate a real scene</span></span><br><span class="line"><span class="hljs-comment">// parse the source data and repartition and sort by row key, family, qualify</span></span><br><span class="line"><span class="hljs-keyword">val</span> sortedRdd = rdd.map(line =&gt; {</span><br><span class="line">    <span class="hljs-keyword">val</span> keyFamilyQualifier = <span class="hljs-keyword">new</span> <span class="hljs-type">KeyFamilyQualifier</span>(line._1, line._2(<span class="hljs-number">0</span>)._1, line._2(<span class="hljs-number">0</span>)._2)</span><br><span class="line">    <span class="hljs-keyword">val</span> value = line._2(<span class="hljs-number">0</span>)._3</span><br><span class="line">    (keyFamilyQualifier, value)</span><br><span class="line">    }).repartitionAndSortWithinPartitions(<span class="hljs-keyword">new</span> <span class="hljs-type">BulkLoadPartitioner</span>(regionLocator.getStartKeys))</span><br><span class="line"><span class="hljs-comment">// reformat the data so that we can save as HFileOutputFormat2</span></span><br><span class="line"><span class="hljs-keyword">val</span> hfileRdd = sortedRdd.map(line =&gt; {</span><br><span class="line">    <span class="hljs-keyword">val</span> rowKey = <span class="hljs-keyword">new</span> <span class="hljs-type">ImmutableBytesWritable</span>(line._1.getRowKey)</span><br><span class="line">    <span class="hljs-keyword">val</span> keyValue = <span class="hljs-keyword">new</span> hbase.<span class="hljs-type">KeyValue</span>(line._1.getRowKey, line._1.getFamily, line._1.getQualifier, line._2)</span><br><span class="line">    (rowKey, keyValue)</span><br><span class="line">    })</span><br><span class="line"><span class="hljs-comment">// save the rdd as hfile</span></span><br><span class="line">hfileRdd.saveAsNewAPIHadoopFile(</span><br><span class="line">    stagingFolder,</span><br><span class="line">    classOf[<span class="hljs-type">ImmutableBytesWritable</span>],</span><br><span class="line">    classOf[<span class="hljs-type">KeyValue</span>],</span><br><span class="line">    classOf[<span class="hljs-type">HFileOutputFormat2</span>], hConf)</span><br><span class="line"><span class="hljs-comment">// load the hfile from hdfs</span></span><br><span class="line"><span class="hljs-keyword">val</span> loader = <span class="hljs-keyword">new</span> <span class="hljs-type">LoadIncrementalHFiles</span>(hConf)</span><br><span class="line">loader.doBulkLoad(<span class="hljs-keyword">new</span> <span class="hljs-type">Path</span>(stagingFolder), connection.getAdmin, table, regionLocator)</span><br></pre></td></tr></tbody></table></figure><p></p>
+<h3 id="HBase-2-x&#x4E2D;&#x7684;Bulk-Loding"><a href="#HBase-2-x&#x4E2D;&#x7684;Bulk-Loding" class="headerlink" title="HBase 2.x&#x4E2D;&#x7684;Bulk Loding"></a>HBase 2.x&#x4E2D;&#x7684;Bulk Loding</h3><p>&#x5728;HBase 2.2.x&#x4E2D;&#x53EF;&#x5229;&#x7528;HBase Connectors&#x63D0;&#x4F9B;&#x7684;API&#x66F4;&#x52A0;&#x65B9;&#x4FBF;&#x5730;&#x5B9E;&#x73B0;Bulk Loading. &#x4EE5;&#x4E0B;&#x662F;&#x4E00;&#x4E2A;&#x7B80;&#x5355;&#x7684;&#x6848;&#x4F8B;, &#x5B8C;&#x6574;&#x7684;&#x5B9E;&#x73B0;&#x53EF;&#x53C2;&#x8003;<a href="https://github.com/apache/hbase-connectors/blob/master/spark/hbase-spark/src/main/java/org/apache/hadoop/hbase/spark/example/hbasecontext/JavaHBaseBulkLoadExample.java" target="_blank" rel="noopener">JavaHBaseBulkLoadExample</a>.</p>
+<p></p><figure class="highlight java hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">SparkConf sparkConf = <span class="hljs-keyword">new</span> SparkConf().setAppName(<span class="hljs-string">&quot;JavaHBaseBulkLoadExample &quot;</span> + tableName);</span><br><span class="line">JavaSparkContext jsc = <span class="hljs-keyword">new</span> JavaSparkContext(sparkConf);</span><br><span class="line">List&lt;String&gt; list= <span class="hljs-keyword">new</span> ArrayList&lt;String&gt;();</span><br><span class="line">list.add(<span class="hljs-string">&quot;1,&quot;</span> + columnFamily1 + <span class="hljs-string">&quot;,b,1&quot;</span>);    <span class="hljs-comment">// row1</span></span><br><span class="line">list.add(<span class="hljs-string">&quot;2,&quot;</span> + columnFamily2 + <span class="hljs-string">&quot;,a,3&quot;</span>);    <span class="hljs-comment">// row2</span></span><br><span class="line">list.add(<span class="hljs-string">&quot;2,&quot;</span> + columnFamily2 + <span class="hljs-string">&quot;,b,3&quot;</span>);</span><br><span class="line">JavaRDD&lt;String&gt; rdd = jsc.parallelize(list);</span><br><span class="line">Configuration conf = HBaseConfiguration.create();</span><br><span class="line">JavaHBaseContext hbaseContext = <span class="hljs-keyword">new</span> JavaHBaseContext(jsc, conf);</span><br><span class="line">hbaseContext.bulkLoad(rdd, TableName.valueOf(tableName),<span class="hljs-keyword">new</span> BulkLoadFunction(), args[<span class="hljs-number">0</span>],</span><br><span class="line">    <span class="hljs-keyword">new</span> HashMap&lt;<span class="hljs-keyword">byte</span>[], FamilyHFileWriteOptions&gt;(), <span class="hljs-keyword">false</span>, HConstants.DEFAULT_MAX_FILE_SIZE);</span><br></pre></td></tr></tbody></table></figure><p></p>
+<h2 id="&#x53C2;-&#x8003;"><a href="#&#x53C2;-&#x8003;" class="headerlink" title="&#x53C2;  &#x8003;"></a>&#x53C2;  &#x8003;</h2><p>[1] Apach HBase &#x2122; Reference Guide <a href="https://hbase.apache.org/book.html#arch.bulk.load" target="_blank" rel="noopener">72</a> <a href="https://hbase.apache.org/book.html#_bulk_load" target="_blank" rel="noopener">110</a><br>[2] <a href="https://blog.cloudera.com/how-to-use-hbase-bulk-loading-and-why/" target="_blank" rel="noopener">How-to: Use HBase Bulk Loading, and Why</a></p>
+</body></html>
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/HBase/">#HBase</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/jvm-runtime-data-area.html">深入探索Java虚拟机运行时数据区域</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/hbase-filter.html">HBase最佳实践 - HBase过滤器源码剖析及自定义过滤器</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+<div class="sharebox">
+    
+<div class="sharethis-inline-share-buttons"></div>
+<script type='text/javascript' src='//platform-api.sharethis.com/js/sharethis.js#property=5e63913dd0c39800126ea9e7&amp;product=inline-share-buttons&amp;cms=sop' async='async'></script>
+
+</div>
+
+
+
+<div class="comments">
+    <p align="center">
+        本博客所有文章除特别声明外, 均采用<a href="https://creativecommons.org/licenses/by-nc-sa/3.0/cn/" target="_blank" rel="noopener">CC BY-NC-SA 3.0 CN</a>许可协议. 转载请注明出处!
+    </p>
+
+    <br><br>
+
+    <p align="center">
+        <img src="/images/WeChat.jpg" width="25%">
+    </p>
+    <p align="center">关注笔者微信公众号获得最新文章推送</p>
+</div>
+
+
+
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    
+<div id="valine-thread"></div>
+<script src="//code.bdstatic.com/npm/leancloud-storage@4.12.2/dist/av-min.js"></script>
+<script src='//cdn.jsdelivr.net/gh/AshinWang/SimpleValine@v0.1/SimpleValine.min.js'></script>
+<script>
+    new Valine({
+        el: '#valine-thread',
+        appId: 'v4Ich4NMxLXYhCkPcb1OmVPR-gzGzoHsz',
+        appKey: 'b5fiVY3XvcAwzJ06YR8rFCAj',
+        notify: true,
+        verify: false,
+        avatar: '',
+        placeholder: 'If you have any questions, please comment here!',
+        meta: ['nick', 'mail'],
+        visitor: true,
+        lang: 'en'
+    })
+</script>
+
+
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2018-2024 Liebing&nbsp;. 
+                <!-- <span id="busuanzi_container_site_uv"><span id="busuanzi_value_site_uv"></span> UV, </span>
+                <span id="busuanzi_container_site_pv"> <span id="busuanzi_value_site_pv"></span> PV</span> -->
+
+                View
+                <span id="busuanzi_value_site_pv" data-num="1000">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </span> times by
+                <span id="busuanzi_value_site_uv">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </span> visitors.
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="一行代码, 点滴生活!" href="">
+                    
+                    一行代码, 点滴生活!
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+    <script src="https://code.jquery.com/jquery-latest.js"></script>
+    <!-- 不蒜子计数初始值纠正 -->
+    <script >
+        $(document).ready(function() {
+            var int = setInterval(fixCount, 500);  // 50ms周期检测函数
+            var initPV = 3569;  // 初始化首次数据
+            var initUV = 1215;
+            function fixCount() {                   
+                if ($("#busuanzi_container_site_pv").css("display") != "none") {
+                    $("#busuanzi_value_site_pv").html(parseInt($("#busuanzi_value_site_pv").html()) + initPV); // 加上初始数据 
+                    clearInterval(int); // 停止检测
+                } 
+                if ($("#busuanzi_container_site_uv").css("display") != "none") {
+                    $("#busuanzi_value_site_uv").html(parseInt($("#busuanzi_value_site_uv").html()) + initUV); // 加上初始数据 
+                    clearInterval(int); // 停止检测
+                }  
+            }
+        });
+    </script>
+
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/" target="_blank" rel="noopener">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("en-AU");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+
+<script src="/js/script.js"></script>
+
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+    
+</body>
+</html>

@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head>
+    <meta charset="utf-8">
+<title>Flink SQL源码 - 整体架构及处理流程 - Liebing&#39;s Blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="baidu-site-verification" content="codeva-2Q9E1leVAG" />
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="">
+
+
+
+<meta name="keywords" content="code">
+
+
+
+    <meta name="description" content="&amp;#x672C;&amp;#x6587;&amp;#x5DF2;&amp;#x6536;&amp;#x5F55;&amp;#x5728;&amp;#x5408;&amp;#x96C6;Apche Flink&amp;#x539F;&amp;#x7406;&amp;#x4E0E;&amp;#x5B9E;&amp;#x8DF5;&amp;#x4E2D;.   Flink SQL&amp;#x4F5C;&amp;#x4E3A;Stream SQL&amp;#x7684;&amp;#x4E8B;&amp;#x5B9E;&amp;#x6807;&amp;#x51C">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flink SQL源码 - 整体架构及处理流程">
+<meta property="og:url" content="http://yoursite.com/flink-sql-overview.html">
+<meta property="og:site_name" content="Liebing&#39;s Blog">
+<meta property="og:description" content="&amp;#x672C;&amp;#x6587;&amp;#x5DF2;&amp;#x6536;&amp;#x5F55;&amp;#x5728;&amp;#x5408;&amp;#x96C6;Apche Flink&amp;#x539F;&amp;#x7406;&amp;#x4E0E;&amp;#x5B9E;&amp;#x8DF5;&amp;#x4E2D;.   Flink SQL&amp;#x4F5C;&amp;#x4E3A;Stream SQL&amp;#x7684;&amp;#x4E8B;&amp;#x5B9E;&amp;#x6807;&amp;#x51C">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/flink-sql-overview/flink_sql_arch.png">
+<meta property="article:published_time" content="2024-05-16T13:00:00.000Z">
+<meta property="article:modified_time" content="2024-05-29T12:13:46.432Z">
+<meta property="article:author" content="Liebing">
+<meta property="article:tag" content="Flink">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/flink-sql-overview/flink_sql_arch.png">
+
+
+
+
+
+<link rel="icon" href="/img/favicon.ico">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt="" height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/collections">合集</a>
+            
+            <a class="navbar-item "
+               href="/courses">课程</a>
+            
+            <a class="navbar-item "
+               href="/archive">归档</a>
+            
+            <a class="navbar-item "
+               href="/categories">分类</a>
+            
+            <a class="navbar-item "
+               href="/tags">标签</a>
+            
+            <a class="navbar-item "
+               href="/friends">友链</a>
+            
+            <a class="navbar-item "
+               href="/about">关于</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#Table-API-amp-SQL入口">1&nbsp;&nbsp;<b>Table API &amp;amp; SQL入口</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#整体执行流程">2&nbsp;&nbsp;<b>整体执行流程</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#源码模块">3&nbsp;&nbsp;<b>源码模块</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#总结">4&nbsp;&nbsp;<b>总结</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#参考">5&nbsp;&nbsp;<b>参考</b></a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/LB-Yu" target="_blank" rel="noopener">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="知" href="https://www.zhihu.com/people/liebingyu" target="_blank" rel="noopener">
+                
+                知
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Flink SQL源码 - 整体架构及处理流程
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2024-05-16T13:00:00.000Z" itemprop="datePublished">May 16 2024</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/Distributed-System/">Distributed System</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            10 minutes read (About 1533 words)
+        </span>
+        
+        
+        <span id="/flink-sql-overview.html" class="column is-narrow leancloud_visitors" data-flag-title="Flink SQL源码 - 整体架构及处理流程">
+            VISITED
+                <i class="leancloud-visitors-count">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </i>
+            TIMES
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <html><head></head><body><blockquote class="colorquote info"><p>&#x672C;&#x6587;&#x5DF2;&#x6536;&#x5F55;&#x5728;&#x5408;&#x96C6;<a href="/collections/flink/">Apche Flink&#x539F;&#x7406;&#x4E0E;&#x5B9E;&#x8DF5;</a>&#x4E2D;.</p>
+</blockquote>
+
+<p>Flink SQL&#x4F5C;&#x4E3A;Stream SQL&#x7684;&#x4E8B;&#x5B9E;&#x6807;&#x51C6;, &#x5DF2;&#x7ECF;&#x5F97;&#x5230;&#x4E86;&#x5E7F;&#x6CDB;&#x7684;&#x5E94;&#x7528;. &#x7136;&#x800C;&#x4E0D;&#x540C;&#x4E8E;Hive, Spark&#x7B49;&#x79BB;&#x7EBF;&#x5F15;&#x64CE;&#x6216;&#x6570;&#x636E;&#x5E93;&#x7684;SQL, &#x6D41;&#x5F0F;&#x7CFB;&#x7EDF;&#x4E2D;&#x7684;SQL&#x6709;&#x66F4;&#x591A;&#x7684;&#x9690;&#x85CF;&#x7279;&#x6027;&#x548C;&#x590D;&#x6742;&#x5EA6;, &#x7406;&#x89E3;&#x5176;&#x5185;&#x90E8;&#x5B9E;&#x73B0;&#x662F;&#x66F4;&#x597D;&#x4F7F;&#x7528;Flink SQL&#x7684;&#x57FA;&#x7840;. &#x4E3A;&#x6B64;, &#x7B14;&#x8005;&#x8BA1;&#x5212;&#x901A;&#x8FC7;&#x4E00;&#x7CFB;&#x5217;&#x6587;&#x7AE0;&#x5BF9;Flink SQL&#x7684;&#x6267;&#x884C;&#x6846;&#x67B6;&#x8FDB;&#x884C;&#x62BD;&#x8327;&#x5265;&#x4E1D;, &#x8BE6;&#x7EC6;&#x4ECB;&#x7ECD;&#x5176;&#x5185;&#x90E8;&#x5B9E;&#x73B0;. &#x672C;&#x6587;&#x662F;&#x8BE5;&#x7CFB;&#x5217;&#x7684;&#x7B2C;&#x4E00;&#x7BC7;, &#x5C06;&#x4ECE;&#x6574;&#x4F53;&#x4E0A;&#x4ECB;&#x7ECD;Flink SQL&#x7684;&#x6267;&#x884C;&#x6D41;&#x7A0B;. &#x540E;&#x7EED;&#x6587;&#x7AE0;&#x4F1A;&#x8FDB;&#x4E00;&#x6B65;&#x4ECB;&#x7ECD;&#x5404;&#x4E2A;&#x6A21;&#x5757;&#x7684;&#x5177;&#x4F53;&#x5B9E;&#x73B0;.</p>
+<a id="more"></a>
+
+<h1 id="Table-API-amp-SQL&#x5165;&#x53E3;"><a href="#Table-API-amp-SQL&#x5165;&#x53E3;" class="headerlink" title="Table API &amp; SQL&#x5165;&#x53E3;"></a>Table API &amp; SQL&#x5165;&#x53E3;</h1><p>&#x5728;&#x4EE3;&#x7801;&#x5C42;&#x9762;, <code>TableEnvironment</code>&#x662F;&#x4F7F;&#x7528;Table API&#x548C;SQL&#x7684;&#x7EDF;&#x4E00;&#x5165;&#x53E3;, &#x5176;&#x4ED6;Flink SQL&#x7684;&#x5E73;&#x53F0;&#x5316;&#x80FD;&#x529B;, &#x5982;SQL Gateway&#x7B49;&#x90FD;&#x662F;&#x57FA;&#x4E8E;&#x6B64;&#x6784;&#x5EFA;&#x7684;, &#x5176;&#x4F7F;&#x7528;&#x65B9;&#x5F0F;&#x5982;&#x4E0B;.<br></p><figure class="highlight java hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">TableEnvironment tableEnv = TableEnvironment.create(<span class="hljs-comment">/*&#x2026;*/</span>);</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// &#x901A;&#x8FC7;Table API&#x521B;&#x5EFA;&#x8868;</span></span><br><span class="line">tableEnv.createTemporaryTable(</span><br><span class="line">    <span class="hljs-string">&quot;SourceTable&quot;</span>, </span><br><span class="line">    TableDescriptor</span><br><span class="line">        .forConnector(<span class="hljs-string">&quot;datagen&quot;</span>)</span><br><span class="line">        .schema(</span><br><span class="line">            Schema.newBuilder()</span><br><span class="line">                .column(<span class="hljs-string">&quot;f0&quot;</span>, DataTypes.STRING())</span><br><span class="line">                .build())</span><br><span class="line">        .option(DataGenConnectorOptions.ROWS_PER_SECOND, <span class="hljs-number">100L</span>)</span><br><span class="line">        .build());</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// &#x901A;&#x8FC7;SQL DDL&#x521B;&#x5EFA;&#x8868;</span></span><br><span class="line">tableEnv.executeSql(<span class="hljs-string">&quot;CREATE TEMPORARY TABLE SinkTable WITH (&apos;connector&apos; = &apos;blackhole&apos;) LIKE SourceTable (EXCLUDING OPTIONS) &quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// &#x901A;&#x8FC7;Table API&#x6267;&#x884C;Flink&#x4F5C;&#x4E1A;</span></span><br><span class="line">Table table1 = tableEnv.from(<span class="hljs-string">&quot;SourceTable&quot;</span>);</span><br><span class="line">TableResult tableResult1 = table1.insertInto(<span class="hljs-string">&quot;SinkTable&quot;</span>).execute();</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// &#x901A;&#x8FC7;SQL DQL&#x521B;&#x5EFA;Table</span></span><br><span class="line">Table table2 = tableEnv.sqlQuery(<span class="hljs-string">&quot;SELECT * FROM SourceTable&quot;</span>);</span><br><span class="line"><span class="hljs-comment">// &#x901A;&#x8FC7;SQL DML&#x6267;&#x884C;Flink&#x4F5C;&#x4E1A;</span></span><br><span class="line">TableResult tableResult2 = tableEnv.executeSql(<span class="hljs-string">&quot;INSERT INTO SinkTable SELECT * FROM SourceTable&quot;</span>);</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>&#x7531;&#x4E8E;Table API&#x7684;&#x4F7F;&#x7528;&#x573A;&#x666F;&#x8F83;&#x5C11;, &#x5728;&#x5B9E;&#x73B0;&#x4E0A;&#x8DDF;SQL&#x4E5F;&#x6709;&#x5F88;&#x5927;&#x76F8;&#x4F3C;&#x6027;, &#x56E0;&#x6B64;&#x672C;&#x6587;&#x53CA;&#x540E;&#x7EED;&#x6587;&#x7AE0;&#x4F1A;&#x5C06;&#x91CD;&#x70B9;&#x653E;&#x5728;SQL&#x7684;&#x5B9E;&#x73B0;&#x4E0A;. &#x6B64;&#x5916;, DDL&#x8BED;&#x53E5;&#x7684;&#x6267;&#x884C;&#x6BD4;&#x8F83;&#x7B80;&#x5355;, &#x65E0;&#x975E;&#x662F;&#x5143;&#x6570;&#x636E;&#x7684;&#x64CD;&#x4F5C;, &#x91CD;&#x8981;&#x7684;&#x662F;DQL&#x53CA;DML&#x8BED;&#x53E5;&#x7684;&#x6267;&#x884C;, &#x672C;&#x6587;&#x6240;&#x4ECB;&#x7ECD;&#x7684;&#x6267;&#x884C;&#x6D41;&#x7A0B;&#x4E5F;&#x662F;&#x6307;&#x6B64;&#x7C7B;SQL&#x8BED;&#x53E5;&#x7684;&#x6267;&#x884C;.</p>
+<h1 id="&#x6574;&#x4F53;&#x6267;&#x884C;&#x6D41;&#x7A0B;"><a href="#&#x6574;&#x4F53;&#x6267;&#x884C;&#x6D41;&#x7A0B;" class="headerlink" title="&#x6574;&#x4F53;&#x6267;&#x884C;&#x6D41;&#x7A0B;"></a>&#x6574;&#x4F53;&#x6267;&#x884C;&#x6D41;&#x7A0B;</h1><blockquote>
+<p>Flink SQL&#x7684;&#x89E3;&#x6790;&#x53CA;&#x5173;&#x7CFB;&#x4EE3;&#x6570;&#x7684;&#x4F18;&#x5316;&#x90FD;&#x662F;&#x901A;&#x8FC7;&#x6269;&#x5C55;Apache Calcite&#x5B9E;&#x73B0;&#x7684;, &#x5173;&#x4E8E;Calcite&#x7684;&#x539F;&#x7406;&#x89E3;&#x6790;&#x5728;&#x7B14;&#x8005;&#x4E4B;&#x524D;&#x7684;&#x7CFB;&#x5217;&#x6587;&#x7AE0;<a href="/collections/calcite/">Apache Calcite&#x539F;&#x7406;&#x4E0E;&#x5B9E;&#x8DF5;</a>&#x4E2D;&#x5DF2;&#x7ECF;&#x8BE6;&#x7EC6;&#x4ECB;&#x7ECD;&#x8FC7;, &#x8FD9;&#x91CC;&#x5C06;&#x4E0D;&#x518D;&#x4ECB;&#x7ECD;&#x8FC7;&#x591A;&#x7684;&#x7EC6;&#x8282;.</p>
+</blockquote>
+<p align="center">
+    <img src="./flink-sql-overview/flink_sql_arch.png" width="100%">
+</p>
+
+<p>Flink SQL&#x7684;&#x6574;&#x4F53;&#x6267;&#x884C;&#x6D41;&#x7A0B;&#x5982;&#x4E0A;&#x56FE;&#x6240;&#x793A;(&#x5176;&#x4E2D;&#x9EC4;&#x8272;&#x6846;&#x4E2D;&#x662F;Calcite&#x4E2D;&#x7684;&#x6838;&#x5FC3;&#x6A21;&#x5757;, &#x5305;&#x542B;Flink&#x7684;&#x6269;&#x5C55;), &#x4ECE;&#x7AEF;&#x5230;&#x7AEF;&#x7684;&#x89C6;&#x89D2;&#x6765;&#x770B;, Flink SQL&#x6A21;&#x5757;&#x7684;&#x4EFB;&#x52A1;&#x5C31;&#x662F;&#x5C06;&#x8F93;&#x5165;&#x7684;SQL&#x6587;&#x672C;&#x7FFB;&#x8BD1;&#x4E3A;Flink&#x7684;<code>Transformation</code>&#x7ED3;&#x6784;, &#x4E4B;&#x540E;&#x7684;&#x63D0;&#x4EA4;&#x548C;&#x6267;&#x884C;&#x6D41;&#x7A0B;&#x5C31;&#x8DDF;DataStream&#x4F5C;&#x4E1A;&#x4E00;&#x6837;&#x4E86;. &#x4ECE;SQL&#x5230;<code>Transformation</code>&#x7684;&#x7FFB;&#x8BD1;&#x8FC7;&#x7A0B;&#x90FD;&#x662F;&#x5728;&#x672C;&#x5730;JVM&#x4E2D;&#x6267;&#x884C;&#x7684;, &#x8FD9;&#x4E5F;&#x7ED9;&#x6211;&#x4EEC;&#x8C03;&#x8BD5;Flink SQL&#x7684;&#x6267;&#x884C;&#x8FC7;&#x7A0B;&#x5E26;&#x6765;&#x4E86;&#x4FBF;&#x5229;.</p>
+<p><code>Operation</code>&#x662F;Flink&#x5F15;&#x5165;&#x7684;&#x4E00;&#x79CD;&#x4E2D;&#x95F4;&#x7ED3;&#x6784;, &#x662F;Table API&#x548C;SQL&#x7684;&#x7EDF;&#x4E00;&#x4E2D;&#x95F4;&#x8868;&#x8FBE;. &#x4EE5;<code>Operation</code>&#x7ED3;&#x6784;&#x4F5C;&#x4E3A;&#x5206;&#x754C;, Flink SQL&#x7684;&#x6267;&#x884C;&#x8FC7;&#x7A0B;&#x53EF;&#x5206;&#x4E3A;&#x4E24;&#x4E2A;&#x5927;&#x7684;&#x9636;&#x6BB5;, &#x5373;&#x4ECE;SQL&#x6587;&#x672C;&#x5230;<code>Operation</code>&#x7684;&#x8F6C;&#x6362;&#x4EE5;&#x53CA;&#x4ECE;<code>Operation</code>&#x5230;<code>Transformation</code>&#x7684;&#x8F6C;&#x6362;.</p>
+<p>&#x4ECE;SQL&#x6587;&#x672C;&#x5230;<code>Operation</code>&#x7684;&#x8F6C;&#x6362;&#x53C8;&#x53EF;&#x5206;&#x4E3A;&#x4EE5;&#x4E0B;&#x51E0;&#x4E2A;&#x5177;&#x4F53;&#x6B65;&#x9AA4;:</p>
+<ul>
+<li>SQL&#x89E3;&#x6790;: &#x5C06;SQL&#x6587;&#x672C;&#x89E3;&#x6790;&#x4E3A;Calcite&#x7684;<code>SqlNode</code>&#x7ED3;&#x6784;, Flink&#x5728;SQL&#x8BED;&#x6CD5;&#x4E0A;&#x57FA;&#x4E8E;Calcite&#x8FDB;&#x884C;&#x4E86;&#x4E00;&#x5B9A;&#x6269;&#x5C55;;</li>
+<li>SQL&#x9A8C;&#x8BC1;: &#x5C06;&#x89E3;&#x6790;&#x5F97;&#x5230;&#x7684;<code>SqlNode</code>&#x914D;&#x5408;&#x5143;&#x6570;&#x636E;&#x8FDB;&#x884C;&#x8BED;&#x4E49;&#x9A8C;&#x8BC1;, &#x8F93;&#x51FA;&#x7ED3;&#x6784;&#x4ECD;&#x4E3A;<code>SqlNode</code>&#x7ED3;&#x6784;;</li>
+<li>&#x5173;&#x7CFB;&#x4EE3;&#x6570;&#x8F6C;&#x6362;: &#x5C06;&#x9A8C;&#x8BC1;&#x540E;&#x7684;<code>SqlNode</code>&#x7ED3;&#x6784;&#x8F6C;&#x6362;&#x4E3A;<code>RelNode</code>&#x7ED3;&#x6784;, &#x5373;&#x5173;&#x7CFB;&#x4EE3;&#x6570;;</li>
+<li><code>Operation</code>&#x8F6C;&#x6362;: &#x5C06;<code>RelNode</code>&#x7ED3;&#x6784;&#x5C01;&#x88C5;&#x4E3A;<code>Operation</code>, &#x5177;&#x4F53;&#x5C31;&#x662F;&#x5C01;&#x88C5;&#x4E3A;<code>PlannerQueryOperation</code>.</li>
+</ul>
+<p>&#x4ECE;<code>Operation</code>&#x5230;<code>Transform</code>&#x7684;&#x8F6C;&#x6362;&#x53C8;&#x53EF;&#x5206;&#x4E3A;&#x4EE5;&#x4E0B;&#x51E0;&#x4E2A;&#x6B65;&#x9AA4;:</p>
+<ul>
+<li>&#x5173;&#x7CFB;&#x4EE3;&#x6570;&#x4F18;&#x5316;: &#x4E3B;&#x8981;&#x662F;&#x5229;&#x7528;Calcite&#x7684;HepPlanner&#x548C;VolcanoPlanner&#x8FDB;&#x884C;&#x5173;&#x7CFB;&#x4EE3;&#x6570;&#x4F18;&#x5316;, Flink&#x5728;Calcite&#x7684;&#x57FA;&#x7840;&#x4E0A;&#x6269;&#x5C55;&#x4E86;&#x4E00;&#x7CFB;&#x5217;&#x4F18;&#x5316;&#x89C4;&#x5219;&#x548C;&#x5173;&#x7CFB;&#x8282;&#x70B9;;</li>
+<li><code>ExecNodeGraph</code>&#x751F;&#x6210;: &#x5C06;&#x4F18;&#x5316;&#x540E;&#x7684;&#x5173;&#x7CFB;&#x4EE3;&#x6570;&#x7FFB;&#x8BD1;&#x6210;Flink&#x5B9A;&#x4E49;&#x7684;<code>ExecNodeGraph</code>&#x7ED3;&#x6784;;</li>
+<li><code>Transformation</code>&#x751F;&#x6210;: &#x5C06;<code>ExecNodeGraph</code>&#x8FDB;&#x4E00;&#x6B65;&#x7FFB;&#x8BD1;&#x4E3A;<code>Transformation</code>&#x7ED3;&#x6784;, &#x8FD9;&#x4E00;&#x6B65;&#x4F1A;&#x5229;&#x7528;Codegen&#x6280;&#x672F;&#x52A8;&#x6001;&#x751F;&#x6210;&#x4E00;&#x4E9B;&#x7B97;&#x5B50;&#x7684;Java&#x4EE3;&#x7801;.</li>
+</ul>
+<h1 id="&#x6E90;&#x7801;&#x6A21;&#x5757;"><a href="#&#x6E90;&#x7801;&#x6A21;&#x5757;" class="headerlink" title="&#x6E90;&#x7801;&#x6A21;&#x5757;"></a>&#x6E90;&#x7801;&#x6A21;&#x5757;</h1><p>Flink Table API &amp; SQL&#x76F8;&#x5173;&#x7684;&#x5B9E;&#x73B0;&#x90FD;&#x5728;<code>flink-table</code>&#x6A21;&#x5757;&#x4E0B;&#x9762;, &#x5176;&#x5404;&#x4E2A;&#x5B50;&#x6A21;&#x5757;&#x7684;&#x6838;&#x5FC3;&#x529F;&#x80FD;&#x5982;&#x4E0B;.<br></p><figure class="highlight plain hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">flink-table                          # Table API &amp; SQL&#x5B9E;&#x73B0;&#x7236;&#x6A21;&#x5757;</span><br><span class="line">&#x251C;&#x2500;&#x2500; flink-sql-client                   # SQL Client&#x5B9E;&#x73B0;</span><br><span class="line">&#x251C;&#x2500;&#x2500; flink-sql-gateway                  # SQL Gateway&#x5B9E;&#x73B0;</span><br><span class="line">&#x251C;&#x2500;&#x2500; flink-sql-gateway-api              # SQL Gateway API&#x63A5;&#x53E3;, &#x7528;&#x4E8E;&#x5176;&#x4ED6;&#x7CFB;&#x7EDF;&#x8C03;&#x7528;SQL Gateway&#x670D;&#x52A1;</span><br><span class="line">&#x251C;&#x2500;&#x2500; flink-sql-jdbc-driver              # Flink SQL JDBC&#x63A5;&#x53E3;&#x5B9E;&#x73B0;</span><br><span class="line">&#x251C;&#x2500;&#x2500; flink-sql-jdbc-driver-bundle       # &#x6253;&#x5305;&#x6A21;&#x5757;, &#x7528;&#x4E8E;&#x6253;&#x5305;jdbc-driver&#x53CA;&#x76F8;&#x5173;&#x4F9D;&#x8D56;</span><br><span class="line">&#x251C;&#x2500;&#x2500; flink-sql-parser                   # SQL&#x89E3;&#x6790;&#x5B9E;&#x73B0;, &#x5728;Calcite&#x4E4B;&#x4E0A;&#x8FDB;&#x884C;&#x4E86;&#x6269;&#x5C55;</span><br><span class="line">&#x251C;&#x2500;&#x2500; flink-table-api-bridge-base        # api-java-bridge&#x548C;api-scala-bridge&#x4E2D;&#x5171;&#x540C;&#x4F9D;&#x8D56;&#x7684;&#x63A5;&#x53E3;</span><br><span class="line">&#x251C;&#x2500;&#x2500; flink-table-api-java               # &#x5305;&#x542B;&#x7F16;&#x5199;Table/SQL&#x7A0B;&#x5E8F;&#x7684;Java API&#x63A5;&#x53E3;</span><br><span class="line">&#x251C;&#x2500;&#x2500; flink-table-api-java-bridge        # &#x5305;&#x542B;Table/SQL API&#x4E0E;&#x5176;&#x4ED6;API&#x4EA4;&#x4E92;&#x7684;Java&#x63A5;&#x53E3;</span><br><span class="line">&#x251C;&#x2500;&#x2500; flink-table-api-java-uber          # &#x6253;&#x5305;&#x6A21;&#x5757;, &#x5305;&#x542B;Table/SQL&#x751F;&#x6001;&#x7684;&#x6240;&#x6709;Java API, &#x7528;&#x4E8E;&#x5728;Table&#x751F;&#x6001;&#x5185;&#x6216;&#x5176;&#x4ED6;Flink API&#x4E4B;&#x95F4;&#x7F16;&#x5199;Table/SQL&#x7A0B;&#x5E8F;</span><br><span class="line">&#x251C;&#x2500;&#x2500; flink-table-api-scala              # &#x5305;&#x542B;&#x7F16;&#x5199;Table/SQL&#x7A0B;&#x5E8F;&#x7684;Scala API&#x63A5;&#x53E3;</span><br><span class="line">&#x251C;&#x2500;&#x2500; flink-table-api-scala-bridge       # &#x5305;&#x542B;Table/SQL API&#x4E0E;&#x5176;&#x4ED6;API&#x4EA4;&#x4E92;&#x7684;Scala&#x63A5;&#x53E3;</span><br><span class="line">&#x251C;&#x2500;&#x2500; flink-table-calcite-bridge         # &#x5305;&#x542B;&#x6269;&#x5C55;Planner&#x63D2;&#x4EF6;&#x7684;Calcite&#x4F9D;&#x8D56;</span><br><span class="line">&#x251C;&#x2500;&#x2500; flink-table-code-splitter          # &#x7528;&#x4E8E;&#x5BF9;Codegen&#x751F;&#x6210;&#x7684;Java&#x4EE3;&#x7801;&#x8FDB;&#x884C;&#x5206;&#x5272;, &#x4EE5;&#x4FDD;&#x8BC1;&#x6EE1;&#x8DB3;Java&#x65B9;&#x6CD5;&#x4E0D;&#x8D85;&#x8FC7;64KB&#x7684;&#x9650;&#x5236;</span><br><span class="line">&#x251C;&#x2500;&#x2500; flink-table-common                 # &#x5305;&#x542B;Table/SQL API&#x7684;&#x4E00;&#x4E9B;&#x901A;&#x7528;&#x5B9E;&#x73B0;</span><br><span class="line">&#x251C;&#x2500;&#x2500; flink-table-planner                # Table/SQL&#x7A0B;&#x5E8F;&#x6838;&#x5FC3;&#x4F18;&#x5316;&#x5904;&#x7406;&#x6A21;&#x5757;</span><br><span class="line">&#x251C;&#x2500;&#x2500; flink-table-planner-loader         # &#x7528;&#x4E8E;&#x52A0;&#x8F7D;flink-table-planner</span><br><span class="line">&#x251C;&#x2500;&#x2500; flink-table-planner-loader-bundle  # &#x7528;&#x4E8E;&#x6784;&#x9020;&#x88AB;flink-table-planner-loader&#x52A0;&#x8F7D;&#x7684;JAR&#x5305;</span><br><span class="line">&#x251C;&#x2500;&#x2500; flink-table-runtime                # SQL&#x7B97;&#x5B50;&#x7684;&#x5177;&#x4F53;&#x5B9E;&#x73B0;</span><br><span class="line">&#x2514;&#x2500;&#x2500; flink-table-test-utils</span><br></pre></td></tr></tbody></table></figure><p></p>
+<h1 id="&#x603B;&#x7ED3;"><a href="#&#x603B;&#x7ED3;" class="headerlink" title="&#x603B;&#x7ED3;"></a>&#x603B;&#x7ED3;</h1><p>&#x672C;&#x6587;&#x4ECE;&#x5B8F;&#x89C2;&#x4E0A;&#x4ECB;&#x7ECD;&#x4E86;Flink SQL&#x7684;&#x6267;&#x884C;&#x6D41;&#x7A0B;, &#x53EF;&#x4EE5;&#x770B;&#x5230;&#x6574;&#x4E2A;&#x6D41;&#x7A0B;&#x57FA;&#x672C;&#x4E0A;&#x662F;&#x56F4;&#x7ED5;Calcite&#x6846;&#x67B6;&#x5C55;&#x5F00;&#x7684;, &#x5F53;&#x7136;&#x5728;&#x5176;&#x4E2D;&#x4E5F;&#x52A0;&#x5165;&#x4E86;&#x4E00;&#x4E9B;Flink&#x7279;&#x6709;&#x7684;&#x6B65;&#x9AA4;. Table Planner&#x7684;&#x6838;&#x5FC3;&#x76EE;&#x7684;&#x5C31;&#x662F;&#x901A;&#x8FC7;&#x5206;&#x5C42;&#x4F18;&#x5316;, &#x5C06;&#x7528;&#x6237;&#x8F93;&#x5165;&#x7684;SQL&#x4EE3;&#x7801;&#x5C3D;&#x53EF;&#x80FD;&#x8F6C;&#x5316;&#x4E3A;Flink&#x7684;&#x5E95;&#x5C42;&#x6267;&#x884C;&#x8BA1;&#x5212;(<code>Transformation</code>&#x7ED3;&#x6784;), &#x5F53;&#x7136;&#x8FD9;&#x5F53;&#x4E2D;&#x6D89;&#x53CA;&#x4F17;&#x591A;&#x7684;&#x4F18;&#x5316;&#x7EC6;&#x8282;, &#x5C06;&#x5728;&#x540E;&#x7EED;&#x7684;&#x6587;&#x7AE0;&#x4E2D;&#x9010;&#x6B65;&#x8BE6;&#x7EC6;&#x4ECB;&#x7ECD;.</p>
+<h1 id="&#x53C2;&#x8003;"><a href="#&#x53C2;&#x8003;" class="headerlink" title="&#x53C2;&#x8003;"></a>&#x53C2;&#x8003;</h1><p>[1] <a href="https://www.ververica.com/blog/how-to-write-fast-flink-sql" target="_blank" rel="noopener">How to write fast Flink SQL</a></p>
+</body></html>
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/Flink/">#Flink</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/flink-sql-table-api.html">Flink SQL源码 - Table API &amp; SQL概览</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/flink-code-rpc.html">Flink源码 - RPC原理与实现</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+<div class="sharebox">
+    
+<div class="sharethis-inline-share-buttons"></div>
+<script type='text/javascript' src='//platform-api.sharethis.com/js/sharethis.js#property=5e63913dd0c39800126ea9e7&amp;product=inline-share-buttons&amp;cms=sop' async='async'></script>
+
+</div>
+
+
+
+<div class="comments">
+    <p align="center">
+        本博客所有文章除特别声明外, 均采用<a href="https://creativecommons.org/licenses/by-nc-sa/3.0/cn/" target="_blank" rel="noopener">CC BY-NC-SA 3.0 CN</a>许可协议. 转载请注明出处!
+    </p>
+
+    <br><br>
+
+    <p align="center">
+        <img src="/images/WeChat.jpg" width="25%">
+    </p>
+    <p align="center">关注笔者微信公众号获得最新文章推送</p>
+</div>
+
+
+
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    
+<div id="valine-thread"></div>
+<script src="//code.bdstatic.com/npm/leancloud-storage@4.12.2/dist/av-min.js"></script>
+<script src='//cdn.jsdelivr.net/gh/AshinWang/SimpleValine@v0.1/SimpleValine.min.js'></script>
+<script>
+    new Valine({
+        el: '#valine-thread',
+        appId: 'v4Ich4NMxLXYhCkPcb1OmVPR-gzGzoHsz',
+        appKey: 'b5fiVY3XvcAwzJ06YR8rFCAj',
+        notify: true,
+        verify: false,
+        avatar: '',
+        placeholder: 'If you have any questions, please comment here!',
+        meta: ['nick', 'mail'],
+        visitor: true,
+        lang: 'en'
+    })
+</script>
+
+
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2018-2024 Liebing&nbsp;. 
+                <!-- <span id="busuanzi_container_site_uv"><span id="busuanzi_value_site_uv"></span> UV, </span>
+                <span id="busuanzi_container_site_pv"> <span id="busuanzi_value_site_pv"></span> PV</span> -->
+
+                View
+                <span id="busuanzi_value_site_pv" data-num="1000">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </span> times by
+                <span id="busuanzi_value_site_uv">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </span> visitors.
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="一行代码, 点滴生活!" href="">
+                    
+                    一行代码, 点滴生活!
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+    <script src="https://code.jquery.com/jquery-latest.js"></script>
+    <!-- 不蒜子计数初始值纠正 -->
+    <script >
+        $(document).ready(function() {
+            var int = setInterval(fixCount, 500);  // 50ms周期检测函数
+            var initPV = 3569;  // 初始化首次数据
+            var initUV = 1215;
+            function fixCount() {                   
+                if ($("#busuanzi_container_site_pv").css("display") != "none") {
+                    $("#busuanzi_value_site_pv").html(parseInt($("#busuanzi_value_site_pv").html()) + initPV); // 加上初始数据 
+                    clearInterval(int); // 停止检测
+                } 
+                if ($("#busuanzi_container_site_uv").css("display") != "none") {
+                    $("#busuanzi_value_site_uv").html(parseInt($("#busuanzi_value_site_uv").html()) + initUV); // 加上初始数据 
+                    clearInterval(int); // 停止检测
+                }  
+            }
+        });
+    </script>
+
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/" target="_blank" rel="noopener">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("en-AU");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+
+<script src="/js/script.js"></script>
+
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+    
+</body>
+</html>
