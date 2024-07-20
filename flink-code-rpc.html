@@ -33,7 +33,7 @@
 <meta property="og:image" content="http://yoursite.com/flink-code-rpc/Actor_create.png">
 <meta property="og:image" content="http://yoursite.com/flink-code-rpc/rpc_invoke.png">
 <meta property="article:published_time" content="2024-05-01T02:00:00.000Z">
-<meta property="article:modified_time" content="2024-05-29T12:13:46.478Z">
+<meta property="article:modified_time" content="2024-06-10T09:24:20.544Z">
 <meta property="article:author" content="Liebing">
 <meta property="article:tag" content="Flink">
 <meta name="twitter:card" content="summary">
@@ -216,7 +216,7 @@
         <span class="column is-narrow">
             
             
-            11 minutes read (About 1577 words)
+            11 minutes read (About 1579 words)
         </span>
         
         
@@ -241,7 +241,7 @@
 <p>&#x7531;&#x4E8E;Akka&#x5C06;&#x8BB8;&#x53EF;&#x534F;&#x8BAE;&#x4ECE;Apache 2.0&#x6539;&#x4E3A;&#x4E86;Business Source License (BSL) v1.1, &#x4E3A;&#x4E86;&#x907F;&#x514D;&#x5546;&#x4E1A;&#x98CE;&#x9669;, <a href="https://issues.apache.org/jira/browse/FLINK-32468" target="_blank" rel="noopener">FLINK-32468</a>&#x6682;&#x65F6;&#x5C06;Akka&#x66FF;&#x6362;&#x4E3A;&#x4E86;Apache Pekko(Fork&#x81EA;Akka 2.6.x), &#x5DF2;&#x7ECF;&#x5728;Flink 1.18&#x4E2D;&#x53D1;&#x5E03;, &#x7531;&#x4E8E;Pekko&#x6E90;&#x81EA;Akka, &#x56E0;&#x6B64;&#x672C;&#x6587;&#x5728;&#x4ECB;&#x7ECD;&#x65F6;&#x4E0D;&#x4F5C;&#x533A;&#x5206;. &#x8FDC;&#x671F;&#x770B;&#x793E;&#x533A;&#x6709;&#x8BA1;&#x5212;&#x5C06;Akka&#x66FF;&#x6362;&#x4E3A;gRPC(<a href="https://issues.apache.org/jira/browse/FLINK-29281" target="_blank" rel="noopener">FLINK-29281</a>).</p>
 </blockquote>
 <p>Flink&#x62BD;&#x8C61;&#x4E86;&#x4E00;&#x5957;RPC&#x63A5;&#x53E3;, &#x57FA;&#x4E8E;&#x8FD9;&#x5957;&#x63A5;&#x53E3;&#x53EF;&#x4EE5;&#x6709;&#x4E0D;&#x540C;&#x7684;&#x5E95;&#x5C42;&#x5B9E;&#x73B0;, &#x4F8B;&#x5982;&#x5F53;&#x524D;&#x57FA;&#x4E8E;Akka&#x7684;&#x5B9E;&#x73B0;, &#x4EE5;&#x53CA;<a href="https://issues.apache.org/jira/browse/FLINK-29281" target="_blank" rel="noopener">&#x8BA1;&#x5212;&#x4E2D;</a>&#x57FA;&#x4E8E;gRPC&#x7684;&#x5B9E;&#x73B0;. Flink&#x7684;RPC&#x5B9E;&#x73B0;&#x90FD;&#x5728;&#x72EC;&#x7ACB;&#x7684;<a href="https://github.com/apache/flink/tree/master/flink-rpc" target="_blank" rel="noopener">flink-rpc</a>&#x6A21;&#x5757;&#x4E0B;, &#x5982;&#x679C;&#x6709;&#x9700;&#x8981;&#x5B8C;&#x5168;&#x53EF;&#x4EE5;&#x5F15;&#x7528;&#x76F8;&#x5173;&#x4F9D;&#x8D56;&#x5E76;&#x5728;&#x5176;&#x4ED6;&#x9879;&#x76EE;&#x4E2D;&#x4F7F;&#x7528;.</p>
-<h1 id="&#x4F7F;&#x7528;&#x6848;&#x4F8B;"><a href="#&#x4F7F;&#x7528;&#x6848;&#x4F8B;" class="headerlink" title="&#x4F7F;&#x7528;&#x6848;&#x4F8B;"></a>&#x4F7F;&#x7528;&#x6848;&#x4F8B;</h1><p>&#x5728;&#x8FDB;&#x4E00;&#x6B65;&#x4ECB;&#x7ECD;Flink RPC&#x63A5;&#x53E3;&#x4E4B;&#x524D;, &#x6211;&#x4EEC;&#x5148;&#x901A;&#x8FC7;&#x4E00;&#x4E2A;&#x7B80;&#x5355;&#x7684;RPC&#x8FDC;&#x7A0B;&#x8C03;&#x7528;&#x6848;&#x4F8B;&#x6765;&#x5C55;&#x793A;&#x4E00;&#x4E0B;Flink RPC&#x63A5;&#x53E3;&#x7684;&#x4F7F;&#x7528;&#x65B9;&#x6CD5;. &#x5B8C;&#x6574;&#x4EE3;&#x7801;&#x53EF;&#x89C1;<a href="https://github.com/LB-Yu/data-systems-learning/tree/master/rpc-learning/flink/src/main/java/org/apache/flink/runtime/rpc/pekko" target="_blank" rel="noopener">&#x6B64;&#x5904;</a>.</p>
+<h1 id="&#x4F7F;&#x7528;&#x6848;&#x4F8B;"><a href="#&#x4F7F;&#x7528;&#x6848;&#x4F8B;" class="headerlink" title="&#x4F7F;&#x7528;&#x6848;&#x4F8B;"></a>&#x4F7F;&#x7528;&#x6848;&#x4F8B;</h1><p>&#x5728;&#x8FDB;&#x4E00;&#x6B65;&#x4ECB;&#x7ECD;Flink RPC&#x63A5;&#x53E3;&#x4E4B;&#x524D;, &#x6211;&#x4EEC;&#x5148;&#x901A;&#x8FC7;&#x4E00;&#x4E2A;&#x7B80;&#x5355;&#x7684;RPC&#x8FDC;&#x7A0B;&#x8C03;&#x7528;&#x6848;&#x4F8B;&#x6765;&#x5C55;&#x793A;&#x4E00;&#x4E0B;Flink RPC&#x63A5;&#x53E3;&#x7684;&#x4F7F;&#x7528;&#x65B9;&#x6CD5;. &#x5B8C;&#x6574;&#x4EE3;&#x7801;&#x53EF;&#x89C1;<a href="https://github.com/LB-Yu/data-systems-learning/tree/master/distributed-components/rpc-learning/flink/src/main/java/org/apache/flink/runtime/rpc/pekko" target="_blank" rel="noopener">&#x6B64;&#x5904;</a>.</p>
 <ol>
 <li><p>&#x5B9A;&#x4E49;&#x670D;&#x52A1;&#x63A5;&#x53E3;.<br></p><figure class="highlight java hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">HelloGateway</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">RpcGateway</span> </span>{</span><br><span class="line">    <span class="hljs-function">String <span class="hljs-title">hello</span><span class="hljs-params">()</span></span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><p></p>
 </li>
