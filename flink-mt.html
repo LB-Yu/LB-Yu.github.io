@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head>
+    <meta charset="utf-8">
+<title>Flink MT + Paimon - 开源低成本增量计算的曙光 - Liebing&#39;s Blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="baidu-site-verification" content="codeva-2Q9E1leVAG" />
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="">
+
+
+
+<meta name="keywords" content="code">
+
+
+
+    <meta name="description" content="&amp;#x672C;&amp;#x6587;&amp;#x5DF2;&amp;#x6536;&amp;#x5F55;&amp;#x5728;&amp;#x5408;&amp;#x96C6;Apche Flink&amp;#x539F;&amp;#x7406;&amp;#x4E0E;&amp;#x5B9E;&amp;#x8DF5;&amp;#x4E2D;.   &amp;#x81EA;Google&amp;#x201D;&amp;#x4E09;&amp;#x9A7E;&amp;#x9A6C;&amp;#x8F66;&amp;#x201D;&amp;#x4F0A;&amp;#x">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flink MT + Paimon - 开源低成本增量计算的曙光">
+<meta property="og:url" content="http://yoursite.com/flink-mt.html">
+<meta property="og:site_name" content="Liebing&#39;s Blog">
+<meta property="og:description" content="&amp;#x672C;&amp;#x6587;&amp;#x5DF2;&amp;#x6536;&amp;#x5F55;&amp;#x5728;&amp;#x5408;&amp;#x96C6;Apche Flink&amp;#x539F;&amp;#x7406;&amp;#x4E0E;&amp;#x5B9E;&amp;#x8DF5;&amp;#x4E2D;.   &amp;#x81EA;Google&amp;#x201D;&amp;#x4E09;&amp;#x9A7E;&amp;#x9A6C;&amp;#x8F66;&amp;#x201D;&amp;#x4F0A;&amp;#x">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/flink-mt/job.png">
+<meta property="article:published_time" content="2024-12-07T14:34:09.000Z">
+<meta property="article:modified_time" content="2024-12-21T04:52:39.501Z">
+<meta property="article:author" content="Liebing">
+<meta property="article:tag" content="Flink">
+<meta property="article:tag" content="Paimon">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/flink-mt/job.png">
+
+
+
+
+
+<link rel="icon" href="/img/favicon.ico">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt="" height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/collections">合集</a>
+            
+            <a class="navbar-item "
+               href="/courses">课程</a>
+            
+            <a class="navbar-item "
+               href="/archive">归档</a>
+            
+            <a class="navbar-item "
+               href="/categories">分类</a>
+            
+            <a class="navbar-item "
+               href="/tags">标签</a>
+            
+            <a class="navbar-item "
+               href="/friends">友链</a>
+            
+            <a class="navbar-item "
+               href="/about">关于</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#增量计算为何被重视">1&nbsp;&nbsp;<b>增量计算为何被重视?</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#增量计算的模型">2&nbsp;&nbsp;<b>增量计算的模型</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#增量计算的实现形式">3&nbsp;&nbsp;<b>增量计算的实现形式</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#增量计算示例">4&nbsp;&nbsp;<b>增量计算示例</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#总结">5&nbsp;&nbsp;<b>总结</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#参考">6&nbsp;&nbsp;<b>参考</b></a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/LB-Yu" target="_blank" rel="noopener">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="知" href="https://www.zhihu.com/people/liebingyu" target="_blank" rel="noopener">
+                
+                知
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Flink MT + Paimon - 开源低成本增量计算的曙光
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2024-12-07T14:34:09.000Z" itemprop="datePublished">Dec 7 2024</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/Distributed-System/">Distributed System</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            25 minutes read (About 3725 words)
+        </span>
+        
+        
+        <span id="/flink-mt.html" class="column is-narrow leancloud_visitors" data-flag-title="Flink MT + Paimon - 开源低成本增量计算的曙光">
+            VISITED
+                <i class="leancloud-visitors-count">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </i>
+            TIMES
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <html><head></head><body><blockquote class="colorquote info"><p>&#x672C;&#x6587;&#x5DF2;&#x6536;&#x5F55;&#x5728;&#x5408;&#x96C6;<a href="/collections/flink/">Apche Flink&#x539F;&#x7406;&#x4E0E;&#x5B9E;&#x8DF5;</a>&#x4E2D;.</p>
+</blockquote>
+
+<p>&#x81EA;Google&#x201D;&#x4E09;&#x9A7E;&#x9A6C;&#x8F66;&#x201D;&#x4F0A;&#x59CB;, &#x5927;&#x6570;&#x636E;&#x5904;&#x7406;&#x6280;&#x672F;&#x5DF2;&#x7ECF;&#x53D1;&#x5C55;&#x4E86;&#x4E8C;&#x5341;&#x5E74;. &#x5728;&#x524D;&#x5341;&#x5E74;&#x4E2D;, Hive+Spark&#x8FD9;&#x5957;&#x79BB;&#x7EBF;&#x5904;&#x7406;&#x6280;&#x672F;&#x5C31;&#x5DF2;&#x7ECF;&#x57FA;&#x672C;&#x5B8C;&#x5584;; &#x8FD1;&#x5341;&#x5E74;&#x6765;, Flink&#x7684;&#x5FEB;&#x901F;&#x53D1;&#x5C55;&#x53C8;&#x6709;&#x6548;&#x5730;&#x89E3;&#x51B3;&#x4E86;&#x5B9E;&#x65F6;&#x5904;&#x7406;&#x7684;&#x95EE;&#x9898;. &#x7136;&#x800C;, &#x4F4E;&#x6210;&#x672C;&#x7684;&#x8FD1;&#x5B9E;&#x65F6;&#x5904;&#x7406;&#x4F9D;&#x7136;&#x9762;&#x4E34;&#x6311;&#x6218;. &#x8FD1;&#x6765;, &#x968F;&#x7740;&#x4E1A;&#x754C;&#x5BF9;&#x8FD1;&#x5B9E;&#x65F6;&#x5904;&#x7406;&#x53CA;&#x6D41;&#x6279;&#x4E00;&#x4F53;&#x67B6;&#x6784;&#x7684;&#x9700;&#x6C42;&#x6108;&#x53D1;&#x5F3A;&#x70C8;, &#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x5F00;&#x59CB;&#x91CD;&#x65B0;&#x88AB;&#x5173;&#x6CE8;. Flink&#x5728;1.20&#x4E2D;&#x63A8;&#x51FA;&#x4E86;<a href="https://nightlies.apache.org/flink/flink-docs-master/docs/dev/table/materialized-table/overview/" target="_blank" rel="noopener"><strong>M</strong>aterialized <strong>T</strong>able</a>(MT)&#x6765;&#x7EDF;&#x4E00;&#x6D41;&#x6279;&#x4E24;&#x79CD;&#x6A21;&#x5F0F;&#x7684;&#x5904;&#x7406;, &#x914D;&#x5408;Paimon&#x5DF2;&#x6709;&#x7684;Changelog&#x5B58;&#x50A8;&#x80FD;&#x529B;, &#x5F00;&#x6E90;&#x4F4E;&#x6210;&#x672C;&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x7684;&#x66D9;&#x5149;&#x5DF2;&#x81F3;.<br>&#xFEFF;<br>&#x672C;&#x6587;&#x9996;&#x5148;&#x4ECB;&#x7ECD;&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x76F8;&#x5173;&#x7684;&#x6982;&#x5FF5;, &#x968F;&#x540E;&#x7ED3;&#x5408;Flink&#x548C;Paimon&#x4E24;&#x4E2A;&#x5F15;&#x64CE;&#x901A;&#x8FC7;&#x5177;&#x4F53;&#x6848;&#x4F8B;&#x6765;&#x4ECB;&#x7ECD;&#x5F53;&#x524D;&#x5F00;&#x6E90;&#x5F15;&#x64CE;&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x7684;&#x80FD;&#x529B;. &#x4ECE;&#x4E2D;&#x6211;&#x4EEC;&#x53EF;&#x4EE5;&#x5F97;&#x51FA;&#x5F53;&#x524D;&#x7684;&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x8FD8;&#x6709;&#x54EA;&#x4E9B;&#x4E0D;&#x8DB3;, &#x4EA6;&#x53EF;&#x7AA5;&#x89C6;&#x5176;&#x672A;&#x6765;&#x53D1;&#x5C55;&#x65B9;&#x5411;.</p>
+<a id="more"></a>
+
+<h1 id="&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x4E3A;&#x4F55;&#x88AB;&#x91CD;&#x89C6;"><a href="#&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x4E3A;&#x4F55;&#x88AB;&#x91CD;&#x89C6;" class="headerlink" title="&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x4E3A;&#x4F55;&#x88AB;&#x91CD;&#x89C6;?"></a>&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x4E3A;&#x4F55;&#x88AB;&#x91CD;&#x89C6;?</h1><p>&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x5728;&#x6570;&#x636E;&#x5E93;&#x9886;&#x57DF;&#x65E9;&#x6709;&#x7814;&#x7A76;, &#x5728;&#x6570;&#x636E;&#x5E93;&#x9886;&#x57DF;&#x79F0;&#x4E3A;Incremental View Maintenance(IVM), &#x5176;&#x6838;&#x5FC3;&#x662F;&#x4E3A;&#x4E86;&#x964D;&#x4F4E;&#x57FA;&#x7840;&#x6570;&#x636E;&#x53D8;&#x5316;&#x65F6;, &#x66F4;&#x65B0;&#x7269;&#x5316;&#x89C6;&#x56FE;&#x7684;&#x6210;&#x672C;, PostgreSQL&#x5BF9;&#x6B64;&#x4E5F;&#x6709;<a href="https://wiki.postgresql.org/wiki/Incremental_View_Maintenance" target="_blank" rel="noopener">&#x5B9E;&#x73B0;</a>. &#x800C;&#x5927;&#x6570;&#x636E;&#x5904;&#x7406;&#x9886;&#x57DF;&#x4E00;&#x5411;&#x662F;&#x5927;&#x529B;&#x51FA;&#x5947;&#x8FF9;, &#x4E3A;&#x4EC0;&#x4E48;&#x8FD1;&#x6765;&#x4E5F;&#x5F00;&#x59CB;&#x5173;&#x6CE8;&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x5462;? &#x7B14;&#x8005;&#x8BA4;&#x4E3A;&#x6709;&#x4E24;&#x4E2A;&#x6838;&#x5FC3;&#x539F;&#x56E0;:</p>
+<ul>
+<li>&#x4E00;&#x662F;&#x5BF9;&#x6D41;&#x6279;&#x4E00;&#x4F53;&#x67B6;&#x6784;&#x7684;&#x8FFD;&#x6C42;, &#x6D41;&#x6279;&#x4E00;&#x4F53;&#x7684;&#x53E3;&#x53F7;&#x4E1A;&#x754C;&#x5DF2;&#x7ECF;&#x558A;&#x4E86;&#x591A;&#x5E74;, &#x4F46;&#x662F;&#x5B9E;&#x9645;&#x843D;&#x5730;&#x7684;&#x573A;&#x666F;&#x5E76;&#x4E0D;&#x591A;.&#x5373;&#x4F7F;&#x50CF;Flink&#x8FD9;&#x7C7B;&#x652F;&#x6301;&#x6D41;&#x6279;&#x4E24;&#x79CD;&#x5904;&#x7406;&#x6A21;&#x5F0F;&#x7684;&#x5F15;&#x64CE;, &#x4E0D;&#x540C;&#x5904;&#x7406;&#x6A21;&#x5F0F;&#x4E0B;&#x7684;&#x4EE3;&#x7801;&#x4E5F;&#x96BE;&#x4EE5;&#x5171;&#x7528;.&#x7B14;&#x8005;&#x8BA4;&#x4E3A;&#x5176;&#x6838;&#x5FC3;&#x539F;&#x56E0;&#x662F;&#x5E95;&#x5C42;&#x8BA1;&#x7B97;&#x6A21;&#x578B;&#x6CA1;&#x6709;&#x7EDF;&#x4E00;, &#x6279;&#x5904;&#x7406;&#x662F;&#x5168;&#x91CF;&#x8BA1;&#x7B97;&#x6A21;&#x578B;, &#x800C;Flink&#x7684;&#x6D41;&#x5904;&#x7406;&#x662F;&#x57FA;&#x4E8E;Changelog&#x7684;&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x6A21;&#x578B;. &#x4E0D;&#x540C;&#x8BA1;&#x7B97;&#x6A21;&#x578B;&#x4E0B;, &#x5BF9;&#x8F93;&#x5165;&#x548C;&#x8F93;&#x51FA;&#x7684;&#x8981;&#x6C42;&#x4E0D;&#x901A;, &#x5C31;&#x96BE;&#x4EE5;&#x505A;&#x5230;&#x6D41;&#x6279;&#x5B8C;&#x5168;&#x4E00;&#x81F4;.</li>
+<li>&#x53E6;&#x4E00;&#x4E2A;&#x539F;&#x56E0;&#x662F;&#x5BF9;&#x6210;&#x672C;&#x548C;&#x6570;&#x636E;&#x65B0;&#x9C9C;&#x5EA6;&#x7684;&#x6743;&#x8861;. &#x76EE;&#x524D;&#x7684;&#x6279;&#x5904;&#x7406;&#x901A;&#x8FC7;&#x8C03;&#x5EA6;+&#x5168;&#x91CF;&#x8BA1;&#x7B97;&#x7684;&#x6A21;&#x5F0F;&#x80FD;&#x591F;&#x505A;&#x5230;&#x5F88;&#x4F4E;&#x7684;&#x8BA1;&#x7B97;&#x6210;&#x672C;, &#x4F46;&#x5EF6;&#x8FDF;&#x5728;&#x7406;&#x60F3;&#x60C5;&#x51B5;&#x4E0B;&#x4E5F;&#x662F;T+1; &#x6D41;&#x5904;&#x7406;&#x901A;&#x8FC7;Long Running+&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x7684;&#x6A21;&#x5F0F;&#x80FD;&#x591F;&#x505A;&#x5230;&#x5F88;&#x4F4E;&#x7684;&#x8BA1;&#x7B97;&#x5EF6;&#x8FDF;, &#x4F46;Long Running&#x7684;&#x8BA1;&#x7B97;&#x4F5C;&#x4E1A;&#x5E26;&#x6765;&#x4E86;&#x6781;&#x5927;&#x7684;&#x8FD0;&#x7EF4;&#x548C;&#x8D44;&#x6E90;&#x6210;&#x672C;. &#x8FD9;&#x51E0;&#x4E4E;&#x662F;&#x4E24;&#x4E2A;&#x6781;&#x7AEF;, &#x5728;&#x8FD1;&#x5B9E;&#x65F6;&#x573A;&#x666F;&#x4E0B;, &#x60F3;&#x8981;&#x727A;&#x7272;&#x4E00;&#x5B9A;&#x7684;&#x5EF6;&#x8FDF;(&#x4ECE;&#x6D41;&#x5904;&#x7406;&#x7684;&#x79D2;&#x7EA7;&#x5230;&#x5206;&#x949F;&#x7EA7;), &#x6765;&#x964D;&#x4F4E;&#x6210;&#x672C;&#x51E0;&#x4E4E;&#x4E0D;&#x53EF;&#x80FD;.</li>
+</ul>
+<p>&#x76EE;&#x524D;&#x6765;&#x770B;, &#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x662F;&#x80FD;&#x591F;&#x89E3;&#x51B3;&#x4E0A;&#x8FF0;&#x4E24;&#x4E2A;&#x95EE;&#x9898;&#x7684;. &#x4ECE;&#x8BA1;&#x7B97;&#x6A21;&#x578B;&#x4E0A;&#x6765;&#x770B;, &#x5168;&#x91CF;&#x8BA1;&#x7B97;&#x662F;&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x7684;&#x4E00;&#x4E2A;&#x7279;&#x4F8B;, &#x80FD;&#x591F;&#x7EDF;&#x4E00;&#x6210;&#x589E;&#x91CF;&#x8BA1;&#x7B97;. &#x4ECE;&#x6210;&#x672C;&#x548C;&#x6570;&#x636E;&#x65B0;&#x9C9C;&#x5EA6;&#x65B9;&#x9762;, &#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x80FD;&#x591F;&#x901A;&#x8FC7;&#x8C03;&#x6574;&#x8BA1;&#x7B97;&#x9891;&#x7387;&#x6765;&#x5E73;&#x8861;&#x5EF6;&#x8FDF;&#x548C;&#x6210;&#x672C;. </p>
+<blockquote>
+<p>&#x8FD9;&#x91CC;&#x9700;&#x8981;&#x6CE8;&#x610F;&#x7684;&#x662F;, Flink&#x7684;&#x8BA1;&#x7B97;&#x6A21;&#x5F0F;&#x662F;&#x57FA;&#x4E8E;Changelog&#x7684;&#x589E;&#x91CF;&#x8BA1;&#x7B97;, &#x5B83;&#x662F;&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x7684;&#x4E00;&#x79CD;&#x5B9E;&#x73B0;&#x65B9;&#x5F0F;, &#x5B83;&#x628A;&#x53D8;&#x66F4;&#x4F5C;&#x4E3A;&#x72B6;&#x6001;&#x8BB0;&#x5F55;&#x5728;&#x5F15;&#x64CE;&#x5185;&#x90E8;, &#x7406;&#x8BBA;&#x4E0A;&#x8981;&#x4FDD;&#x8BC1;&#x8BA1;&#x7B97;&#x7ED3;&#x679C;&#x51C6;&#x786E;, &#x72B6;&#x6001;&#x662F;&#x9700;&#x8981;&#x6C38;&#x4E45;&#x4FDD;&#x5B58;&#x7684;. &#x5728;&#x5B9E;&#x64CD;&#x4E2D;&#x4E4B;&#x6240;&#x4EE5;&#x80FD;&#x7ED9;&#x72B6;&#x6001;&#x8BBE;&#x5B9A;&#x4E00;&#x4E2A;TTL, &#x662F;&#x56E0;&#x4E3A;&#x5B58;&#x5728;&#x4E00;&#x79CD;&#x9690;&#x542B;&#x7684;&#x5047;&#x8BBE;, &#x589E;&#x91CF;&#x6570;&#x636E;&#x4EA7;&#x751F;&#x7684;&#x56DE;&#x64A4;&#x64CD;&#x4F5C;&#x4E0D;&#x4F1A;&#x5F71;&#x54CD;&#x90A3;&#x4E2A;TTL&#x4E4B;&#x524D;&#x7684;&#x5386;&#x53F2;&#x7ED3;&#x679C;. Flink&#x9ED8;&#x8BA4;&#x662F;&#x9010;&#x6761;&#x6570;&#x636E;&#x5904;&#x7406;&#x7684;, &#x5728;Mini-Batch&#x6A21;&#x5F0F;&#x4E0B;&#x53EF;&#x4EE5;&#x6512;&#x5C0F;&#x6279;, &#x9002;&#x5408;&#x4F4E;&#x5EF6;&#x8FDF;&#x7684;&#x8BA1;&#x7B97;, &#x4F46;&#x7531;&#x4E8E;Long Runing&#x4F5C;&#x4E1A;&#x7684;&#x5B58;&#x5728;&#x5176;&#x6210;&#x672C;&#x8FD8;&#x662F;&#x8F83;&#x9AD8;, &#x8981;&#x5B9E;&#x73B0;&#x4F4E;&#x6210;&#x672C;&#x7684;&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x663E;&#x7136;&#x8981;&#x53E6;&#x5BFB;&#x65B9;&#x6CD5;. </p>
+</blockquote>
+<h1 id="&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x7684;&#x6A21;&#x578B;"><a href="#&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x7684;&#x6A21;&#x578B;" class="headerlink" title="&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x7684;&#x6A21;&#x578B;"></a>&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x7684;&#x6A21;&#x578B;</h1><p>&#x5168;&#x91CF;&#x8BA1;&#x7B97;&#x4E2D;, &#x6BCF;&#x4E00;&#x6B21;&#x7684;&#x8BA1;&#x7B97;&#x7ED3;&#x679C;&#x53EA;&#x4E0E;&#x672C;&#x6B21;&#x8F93;&#x5165;&#x6709;&#x5173;, &#x800C;&#x4E14;&#x662F;&#x5E42;&#x7B49;&#x7684;.&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x4E2D;, &#x6BCF;&#x4E00;&#x6279;&#x6B21;&#x7684;&#x8BA1;&#x7B97;&#x7ED3;&#x679C;, &#x662F;&#x7531;&#x672C;&#x6279;&#x6570;&#x636E;&#x548C;&#x5386;&#x53F2;&#x6570;&#x636E;&#x7ED3;&#x5408;&#x8BA1;&#x7B97;&#x51FA;&#x6765;&#x7684;, &#x5373;$R&#x2019; = f(R, \Delta R)$.</p>
+<p>&#x4ECE;&#x4EE5;&#x4E0A;&#x516C;&#x5F0F;&#x4E0A;&#x6765;&#x770B;, &#x5B9E;&#x73B0;&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x6709;&#x4E24;&#x4E2A;&#x8981;&#x70B9;: </p>
+<ul>
+<li>&#x4E00;&#x662F;&#x8981;&#x6355;&#x83B7;&#x589E;&#x91CF;&#x53D8;&#x66F4;, &#x5373;$\Delta R$;</li>
+<li>&#x4E8C;&#x662F;&#x5982;&#x4F55;&#x57FA;&#x4E8E;&#x589E;&#x91CF;&#x53D8;&#x66F4;&#x8FDB;&#x884C;&#x589E;&#x91CF;&#x8BA1;&#x7B97;, &#x5373;&#x5982;&#x4F55;&#x5B9E;&#x73B0;&#x51FD;&#x6570;$f$.</li>
+</ul>
+<p>&#x76EE;&#x524D;&#x6765;&#x770B;, &#x6570;&#x636E;&#x5E93;&#x9886;&#x57DF;&#x548C;&#x5927;&#x6570;&#x636E;&#x5904;&#x7406;&#x9886;&#x57DF;&#x91C7;&#x7528;&#x4E86;&#x4E0D;&#x592A;&#x4E00;&#x6837;&#x7684;&#x5B9E;&#x73B0;&#x65B9;&#x6848;:</p>
+<ul>
+<li>&#x6570;&#x636E;&#x5E93;&#x9886;&#x57DF;, &#x5728;&#x589E;&#x91CF;&#x6570;&#x636E;&#x6355;&#x83B7;&#x4E0A;&#x901A;&#x5E38;&#x4F1A;&#x57FA;&#x4E8E;&#x5176;&#x5185;&#x90E8;&#x673A;&#x5236;&#x8BB0;&#x5F55;&#x53D8;&#x66F4;&#x6570;&#x636E;, &#x4F8B;&#x5982;<a href="https://wiki.postgresql.org/wiki/Incremental_View_Maintenance#How_to_calculate_the_delta_to_be_applied_to_materialized_views" target="_blank" rel="noopener">PostgreSQL</a>&#x57FA;&#x4E8E;AFTER&#x89E6;&#x53D1;&#x5668;&#x548C;Transition Table&#x6765;&#x6355;&#x83B7;&#x589E;&#x91CF;&#x6570;&#x636E;; &#x5728;&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x4E0A;, &#x901A;&#x8FC7;&#x67E5;&#x8BE2;&#x6539;&#x5199;&#x6765;&#x5B9E;&#x73B0;&#x589E;&#x91CF;&#x8BA1;&#x7B97;, &#x4F8B;&#x5982;&#x4E00;&#x4E2A;InnerJoin $V = R \Join S$, &#x82E5;&#x80FD;&#x591F;&#x6355;&#x83B7;&#x5173;&#x7CFB;$R$&#x548C;$S$&#x7684;&#x53D8;&#x66F4;$\Delta R$&#x548C;$\Delta S$, &#x90A3;&#x4E48;&#x5176;&#x589E;&#x91CF;&#x53EF;&#x6539;&#x5199;&#x4E3A;$\Delta V = \Delta R \Join S \cup R \Join \Delta S \cup \Delta R \Join \Delta S$.</li>
+<li>&#x5728;&#x5927;&#x6570;&#x636E;&#x5904;&#x7406;&#x9886;&#x57DF;, &#x5728;&#x589E;&#x91CF;&#x6570;&#x636E;&#x6355;&#x83B7;&#x4E0A;&#x4F1A;&#x57FA;&#x4E8E;&#x901A;&#x7528;&#x7684;Changelog&#x6A21;&#x578B;, &#x4F8B;&#x5982;Paimon&#x7684;<a href="https://paimon.apache.org/docs/master/primary-key-table/changelog-producer/" target="_blank" rel="noopener">Changelog Producer</a>. &#x5728;&#x8BA1;&#x7B97;&#x4E0A;, &#x4F7F;&#x7528;&#x901A;&#x7528;&#x7684;Changelog&#x6A21;&#x578B;&#x5C31;&#x53EF;&#x4EE5;&#x5927;&#x529B;&#x51FA;&#x5947;&#x8FF9;&#x4E86;, &#x5F15;&#x64CE;&#x4E0D;&#x9700;&#x8981;&#x4E3A;&#x6BCF;&#x4E2A;&#x5904;&#x7406;&#x64CD;&#x4F5C;&#x5236;&#x5B9A;&#x7279;&#x6709;&#x7684;&#x589E;&#x91CF;&#x7B97;&#x6CD5;, &#x53EA;&#x9700;&#x6309;&#x5E38;&#x89C4;&#x65B9;&#x5F0F;&#x5B9E;&#x73B0;&#x5E76;&#x8003;&#x8651;&#x6570;&#x636E;&#x7684;Changelog&#x7C7B;&#x578B;&#x5373;&#x53EF;. </li>
+</ul>
+<h1 id="&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x7684;&#x5B9E;&#x73B0;&#x5F62;&#x5F0F;"><a href="#&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x7684;&#x5B9E;&#x73B0;&#x5F62;&#x5F0F;" class="headerlink" title="&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x7684;&#x5B9E;&#x73B0;&#x5F62;&#x5F0F;"></a>&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x7684;&#x5B9E;&#x73B0;&#x5F62;&#x5F0F;</h1><p>&#x4E0A;&#x6587;&#x6211;&#x4EEC;&#x8BF4;&#x5230;&#x6570;&#x636E;&#x5E93;&#x9886;&#x57DF;&#x548C;&#x5927;&#x6570;&#x636E;&#x5904;&#x7406;&#x9886;&#x57DF;&#x5728;&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x7684;&#x5B9E;&#x73B0;&#x4E0A;&#x6709;&#x6240;&#x4E0D;&#x540C;, &#x6570;&#x636E;&#x5E93;&#x9886;&#x57DF;&#x591A;&#x503E;&#x5411;&#x4E8E;&#x901A;&#x8FC7;&#x7B97;&#x6CD5;&#x8FDB;&#x884C;&#x67E5;&#x8BE2;&#x6539;&#x5199;&#x6765;&#x5B9E;&#x73B0;, &#x867D;&#x7136;&#x53EF;&#x4EE5;&#x66F4;&#x52A0;&#x7CBE;&#x7EC6;&#x5316;, &#x4F46;&#x662F;&#x96BE;&#x5EA6;&#x5927;&#x6CA1;&#x6709;&#x7EDF;&#x4E00;&#x7684;&#x6A21;&#x578B;, &#x56E0;&#x6B64;&#x672C;&#x6587;&#x4E0D;&#x4F5C;&#x8BE6;&#x7EC6;&#x4ECB;&#x7ECD;. &#x8FD9;&#x91CC;&#x6211;&#x4EEC;&#x91CD;&#x70B9;&#x4ECB;&#x7ECD;&#x4E00;&#x4E0B;&#x5927;&#x6570;&#x636E;&#x5904;&#x7406;&#x9886;&#x57DF;&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x7684;&#x5B9E;&#x73B0;&#x5F62;&#x5F0F;. </p>
+<p>&#x76EE;&#x524D;&#x6700;&#x4E3A;&#x6210;&#x719F;&#x7684;&#x662F;<strong>&#x6D41;&#x5904;&#x7406;&#x5F15;&#x64CE;&#x4E2D;&#x57FA;&#x4E8E;Changelog+&#x72B6;&#x6001;&#x7684;&#x589E;&#x91CF;&#x8BA1;&#x7B97;</strong>, Flink&#x5C31;&#x662F;&#x5176;&#x4E2D;&#x7684;&#x4EE3;&#x8868;. &#x8FD9;&#x79CD;&#x57FA;&#x4E8E;&#x5185;&#x7F6E;&#x72B6;&#x6001;&#x7684;&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x7684;&#x597D;&#x5904;&#x662F;&#x53EF;&#x4EE5;&#x9010;&#x6761;&#x8BB0;&#x5F55;&#x5904;&#x7406;, &#x4ECE;&#x800C;&#x8FBE;&#x5230;&#x6700;&#x4F4E;&#x5EF6;&#x8FDF;. &#x4F46;&#x4E5F;&#x9762;&#x4E34;&#x4E24;&#x4E2A;&#x95EE;&#x9898;: &#x9996;&#x5148;&#x662F;&#x56DE;&#x64A4;&#x5E26;&#x6765;&#x5927;&#x91CF;&#x65E0;&#x7528;&#x8BA1;&#x7B97;, &#x56DE;&#x64A4;&#x610F;&#x5473;&#x7740;&#x968F;&#x7740;&#x6570;&#x636E;&#x7684;&#x589E;&#x91CF;&#x53D8;&#x5316;, &#x4E4B;&#x524D;&#x7684;&#x8BA1;&#x7B97;&#x7ED3;&#x679C;&#x662F;&#x65E0;&#x6548;&#x7684;, &#x9700;&#x8981;&#x5220;&#x9664;&#x5E76;&#x91CD;&#x65B0;&#x66F4;&#x65B0;&#x7ED3;&#x679C;. &#x5B9E;&#x8DF5;&#x4E0A;, &#x5F88;&#x591A;&#x573A;&#x666F;&#x4E0B;&#x4E0D;&#x4F1A;&#x9700;&#x8981;&#x6BCF;&#x65B0;&#x589E;&#x4E00;&#x6761;&#x6570;&#x636E;&#x5C31;&#x8BA1;&#x7B97;&#x4E00;&#x6B21;&#x7ED3;&#x679C;, &#x56E0;&#x6B64;&#x53EF;&#x4EE5;&#x901A;&#x8FC7;&#x6512;&#x6279;&#x6765;&#x51CF;&#x5C11;&#x56DE;&#x64A4;, Flink&#x4E5F;&#x5B9E;&#x73B0;&#x4E86;Mini-Batch Aggregate&#x548C;Mini-Batch Join&#x6765;&#x51CF;&#x5C11;&#x56DE;&#x64A4;. &#x4F46;&#x8FD9;&#x4ECD;&#x65E0;&#x6CD5;&#x89E3;&#x51B3;&#x5728;&#x8D85;&#x957F;&#x65F6;&#x95F4;&#x8DE8;&#x5EA6;&#x56DE;&#x64A4;&#x7684;&#x573A;&#x666F;&#x4E0B;, &#x8981;&#x4FDD;&#x8BC1;&#x8BA1;&#x7B97;&#x7ED3;&#x679C;&#x51C6;&#x786E;, &#x72B6;&#x6001;TTL&#x5FC5;&#x987B;&#x65E0;&#x7A77;&#x7684;&#x95EE;&#x9898;. </p>
+<p>&#x4E0A;&#x8FF0;&#x6A21;&#x5F0F;&#x6700;&#x5927;&#x7684;&#x95EE;&#x9898;&#x662F;&#x72B6;&#x6001;TTL&#x65E0;&#x7A77;. &#x72B6;&#x6001;&#x672C;&#x8D28;&#x4E0A;&#x662F;&#x622A;&#x6B62;&#x5F53;&#x524D;&#x6240;&#x6709;&#x589E;&#x91CF;&#x6570;&#x636E;&#x8BA1;&#x7B97;&#x7684;&#x7ED3;&#x679C;, &#x8BBE;&#x60F3;&#x5982;&#x679C;&#x6211;&#x4EEC;&#x53BB;&#x6389;&#x72B6;&#x6001;&#x5C31;&#x65E0;&#x6CD5;&#x5C06;&#x589E;&#x91CF;&#x7ED3;&#x679C;&#x4E0E;&#x5386;&#x53F2;&#x7ED3;&#x679C;&#x5408;&#x5E76;, &#x4ECE;&#x800C;&#x5F97;&#x5230;&#x65B0;&#x7684;&#x8BA1;&#x7B97;&#x7ED3;&#x679C;. &#x4F46;&#x662F;&#x6362;&#x4E00;&#x79CD;&#x601D;&#x8DEF;, &#x6211;&#x4EEC;&#x5E76;&#x4E0D;&#x4E00;&#x5B9A;&#x8981;&#x8F93;&#x51FA;&#x5408;&#x5E76;&#x540E;&#x7684;&#x8BA1;&#x7B97;&#x7ED3;&#x679C;, &#x800C;&#x662F;&#x53EF;&#x4EE5;&#x8F93;&#x51FA;&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x7ED3;&#x679C;(&#x5F53;&#x7136;&#x589E;&#x91CF;&#x7ED3;&#x679C;&#x4E5F;&#x9700;&#x8981;&#x7B26;&#x5408;Changelog&#x683C;&#x5F0F;), &#x5728;&#x67E5;&#x8BE2;&#x65F6;&#x518D;&#x5BF9;&#x591A;&#x4E2A;&#x589E;&#x91CF;&#x7ED3;&#x679C;&#x8FDB;&#x884C;&#x5408;&#x5E76;, &#x4ECE;&#x800C;&#x5F97;&#x5230;&#x6700;&#x7EC8;&#x7ED3;&#x679C;. &#x8FD9;&#x79CD;&#x6A21;&#x5F0F;&#x5C31;&#x662F;&#x76EE;&#x524D;<strong>&#x6D41;&#x5904;&#x7406;&#x5F15;&#x64CE;+&#x6570;&#x636E;&#x6E56;&#x7684;&#x589E;&#x91CF;&#x8BA1;&#x7B97;</strong>, &#x4E0E;&#x4E0A;&#x8FF0;&#x6A21;&#x5F0F;&#x4E0D;&#x540C;&#x7684;&#x662F;&#x6D41;&#x5904;&#x7406;&#x5F15;&#x64CE;&#x4E0D;&#x518D;&#x9700;&#x8981;&#x65E0;&#x7A77;&#x72B6;&#x6001;, &#x53EA;&#x8BA1;&#x7B97;&#x5E76;&#x8F93;&#x51FA;&#x589E;&#x91CF;&#x7ED3;&#x679C;&#x5230;&#x6570;&#x636E;&#x6E56;(&#x8981;&#x6C42;&#x6570;&#x636E;&#x6E56;&#x652F;&#x6301;Changelog&#x5B58;&#x50A8;), &#x7ED3;&#x679C;&#x7684;&#x5408;&#x5E76;&#x7531;&#x6570;&#x636E;&#x6E56;&#x8FDB;&#x884C;, &#x53EF;&#x4EE5;&#x9009;&#x62E9;&#x5199;&#x65F6;&#x5408;&#x5E76;&#x6216;&#x8BFB;&#x65F6;&#x5408;&#x5E76;. &#x5E76;&#x4E14;&#x901A;&#x8FC7;&#x6512;&#x6279;&#x53EF;&#x4EE5;&#x51CF;&#x5C11;&#x56DE;&#x64A4;, &#x4ECE;&#x800C;&#x964D;&#x4F4E;&#x5408;&#x5E76;&#x65F6;&#x7684;&#x538B;&#x529B;. &#x76EE;&#x524D;Paimon&#x63D0;&#x4F9B;&#x4E86;&#x591A;&#x79CD;&#x7C7B;&#x578B;&#x7684;<a href="https://paimon.apache.org/docs/master/primary-key-table/merge-engine/overview/" target="_blank" rel="noopener">Merge Engine</a>, &#x53EF;&#x4EE5;&#x51CF;&#x5C11;&#x6216;&#x6D88;&#x9664;Flink&#x72B6;&#x6001;. </p>
+<p>&#x4E0A;&#x8FF0;&#x6A21;&#x5F0F;&#x5C3D;&#x7BA1;&#x89E3;&#x51B3;&#x4E86;&#x72B6;&#x6001;&#x95EE;&#x9898;, &#x4F46;&#x662F;&#x4ECD;&#x9700;&#x8981;&#x4E00;&#x4E2A;Long Running&#x7684;&#x6D41;&#x5904;&#x7406;&#x4F5C;&#x4E1A;. &#x5E76;&#x4E14;&#x53EF;&#x4EE5;&#x53D1;&#x73B0;, &#x6570;&#x636E;&#x6E56;&#x7684;&#x5199;&#x662F;&#x901A;&#x8FC7;&#x57FA;&#x4E8E;Checkpoint&#x7684;&#x4E24;&#x9636;&#x6BB5;&#x63D0;&#x4EA4;&#x6765;&#x4FDD;&#x8BC1;&#x4E00;&#x81F4;&#x6027;&#x7684;, &#x90A3;&#x6570;&#x636E;&#x53EF;&#x89C1;&#x6027;&#x5EF6;&#x8FDF;&#x5B9E;&#x9645;&#x4E0A;&#x5C31;&#x662F;Checkpoint&#x7684;&#x65F6;&#x95F4;&#x95F4;&#x9694;. &#x65E2;&#x7136;&#x5982;&#x6B64;, &#x4E3A;&#x4E86;&#x8FDB;&#x4E00;&#x6B65;&#x964D;&#x4F4E;&#x6210;&#x672C;, &#x6211;&#x4EEC;&#x53EF;&#x4EE5;&#x53BB;&#x6389;&#x8FD9;&#x4E2A;Long Running&#x7684;&#x6D41;&#x5904;&#x7406;&#x4F5C;&#x4E1A;, &#x4F7F;&#x7528;&#x4F4E;&#x5EF6;&#x8FDF;&#x8C03;&#x5EA6;&#x7684;&#x6279;&#x5904;&#x7406;&#x4F5C;&#x4E1A;&#x4F5C;&#x4E3A;&#x66FF;&#x4EE3;, &#x53EA;&#x8981;&#x4FDD;&#x8BC1;&#x6279;&#x5904;&#x7406;&#x4F5C;&#x4E1A;&#x7684;&#x8C03;&#x5EA6;&#x65F6;&#x95F4;&#x95F4;&#x9694;&#x4E0E;&#x6D41;&#x5904;&#x7406;&#x4F5C;&#x4E1A;Checkpoint&#x7684;&#x65F6;&#x95F4;&#x95F4;&#x9694;&#x4E00;&#x81F4;, &#x5C31;&#x80FD;&#x4FDD;&#x8BC1;&#x4E00;&#x81F4;&#x7684;&#x6570;&#x636E;&#x53EF;&#x89C1;&#x6027;&#x5EF6;&#x8FDF;. &#x7531;&#x4E8E;&#x6279;&#x5904;&#x7406;&#x5F15;&#x64CE;&#x6BCF;&#x6B21;&#x53EA;&#x5904;&#x7406;&#x589E;&#x91CF;&#x6570;&#x636E;, &#x628A;&#x5EF6;&#x8FDF;&#x964D;&#x4F4E;&#x5230;&#x5206;&#x949F;&#x7EA7;&#x662F;&#x53EF;&#x80FD;&#x7684;. &#x5F53;&#x7136;&#x8FD9;&#x79CD;&#x57FA;&#x4E8E;<strong>&#x6279;&#x5904;&#x7406;&#x5F15;&#x64CE;&#x4F4E;&#x5EF6;&#x65F6;&#x8C03;&#x5EA6;+&#x6570;&#x636E;&#x6E56;&#x7684;&#x589E;&#x91CF;&#x8BA1;&#x7B97;</strong>, &#x8981;&#x6C42;&#x6279;&#x5904;&#x7406;&#x5F15;&#x64CE;&#x4E5F;&#x80FD;&#x8BC6;&#x522B;&#x548C;&#x5904;&#x7406;Chengelog&#x6570;&#x636E;. &#x76EE;&#x524D;Flink&#x5728;Streaming&#x6A21;&#x5F0F;&#x4E0B;&#x80FD;&#x914D;&#x5408;Paimon&#x5904;&#x7406;Changelog&#x6570;&#x636E;, &#x4F46;&#x662F;Batch&#x6A21;&#x5F0F;&#x4E0B;&#x5E76;&#x6CA1;&#x6709;Changelog&#x7684;&#x5904;&#x7406;&#x80FD;&#x529B;, &#x56E0;&#x6B64;&#x5F00;&#x6E90;&#x5F15;&#x64CE;&#x76EE;&#x524D;&#x5C1A;&#x65E0;&#x6CD5;&#x5B9E;&#x73B0;&#x8FD9;&#x4E00;&#x6A21;&#x5F0F;. &#x4E0D;&#x8FC7;&#x5DF2;&#x6709;&#x5546;&#x4E1A;&#x6570;&#x636E;&#x5E73;&#x53F0;&#x5B9E;&#x73B0;&#x4E86;&#x7C7B;&#x4F3C;&#x7684;&#x80FD;&#x529B;, &#x56FD;&#x5916;&#x7684;&#x5982;Snowflake&#x7684;<a href="https://docs.snowflake.com/en/user-guide/dynamic-tables-intro" target="_blank" rel="noopener">Dynamic tables</a>, Databricks&#x7684;<a href="https://docs.databricks.com/en/delta-live-tables/index.html" target="_blank" rel="noopener">Delta Live Tables</a>;&#x56FD;&#x5185;&#x7684;&#x5982;MaxCompute&#x7684;<a href="https://help.aliyun.com/zh/maxcompute/user-guide/delta-table/?spm=a2c4g.11174283.help-menu-27797.d_2_6_1.6d0111c1ki5JsI&amp;scm=20140722.H_2794225._.OR_help-T_cn~zh-V_1" target="_blank" rel="noopener">Delta Table</a>, &#x4E91;&#x5668;&#x79D1;&#x6280;&#x7684;<a href="https://www.yunqi.tech/documents/dynamic-table" target="_blank" rel="noopener">Dynamic Table</a>.</p>
+<h1 id="&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x793A;&#x4F8B;"><a href="#&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x793A;&#x4F8B;" class="headerlink" title="&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x793A;&#x4F8B;"></a>&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x793A;&#x4F8B;</h1><p>&#x4E0A;&#x6587;&#x4ECB;&#x7ECD;&#x4E86;&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x7684;&#x7406;&#x8BBA;, &#x76EE;&#x524D;&#x5F00;&#x6E90;&#x7CFB;&#x7EDF;&#x4E2D;, &#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x5B9E;&#x73B0;&#x6700;&#x5B8C;&#x5584;&#x7684;&#x662F;Flink+Paimon&#x8FD9;&#x5957;&#x7EC4;&#x5408;, &#x8FD9;&#x91CC;&#x4EE5;&#x8FD9;&#x4E24;&#x4E2A;&#x7CFB;&#x7EDF;&#x4E3A;&#x4F8B;&#x901A;&#x8FC7;&#x4E00;&#x4E2A;&#x5177;&#x4F53;&#x6848;&#x4F8B;, &#x6765;&#x66F4;&#x76F4;&#x89C2;&#x5730;&#x5C55;&#x793A;&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x7684;&#x6548;&#x679C;, &#x4E3B;&#x8981;&#x6D89;&#x53CA;&#x4E24;&#x4E2A;&#x7CFB;&#x7EDF;&#x7684;&#x4EE5;&#x4E0B;&#x51E0;&#x4E2A;&#x7279;&#x6027;: </p>
+<ul>
+<li>Flink&#x5BF9;&#x5904;&#x7406;Changelog&#x6570;&#x636E;&#x7684;&#x652F;&#x6301;&#x4EE5;&#x53CA;1.20&#x65B0;&#x589E;&#x7684;Materialized Table&#x7279;&#x6027;. &#x7531;&#x4E8E;Paimon&#x4E5F;&#x662F;&#x4ECE;Flink&#x884D;&#x751F;, &#x5176;Changelog&#x5B58;&#x50A8;&#x7684;&#x5B9E;&#x73B0;&#x5728;&#x539F;&#x7406;&#x4E0A;&#x4E5F;&#x4E0E;Flink&#x7C7B;&#x4F3C;, &#x56E0;&#x6B64;&#x7406;&#x89E3;Flink&#x7684;Changelog&#x539F;&#x7406;&#x662F;&#x5173;&#x952E;, &#x5177;&#x4F53;&#x53EF;&#x53C2;&#x8003;&#x7B14;&#x8005;&#x4E4B;&#x524D;&#x7684;&#x6587;&#x7AE0;<a href="/flink-sql-changelog.html">FlinkSQL&#x6E90;&#x7801;-Changelog&#x539F;&#x7406;&#x4E0E;&#x5B9E;&#x73B0;</a>. </li>
+<li>Paimon&#x7684;Merge Engine&#x80FD;&#x529B;&#x4EE5;&#x53CA;Changelog Producer. </li>
+</ul>
+<p>&#x4E0D;&#x4F7F;&#x7528;Flink MT&#x8BED;&#x6CD5;&#x5B9E;&#x9645;&#x4E0A;&#x4E5F;&#x80FD;&#x914D;&#x5408;Paimon&#x5B9E;&#x73B0;&#x4E0A;&#x8FF0;&#x7B2C;&#x4E8C;&#x79CD;&#x6A21;&#x5F0F;&#x7684;&#x589E;&#x91CF;&#x8BA1;&#x7B97;, &#x4E0D;&#x8FC7;<a href="https://github.com/apache/paimon/pull/4109" target="_blank" rel="noopener">Paimon&#x5C06;&#x4F1A;&#x652F;&#x6301;Flink MT</a>, &#x5E76;&#x4E14;MT&#x8BED;&#x6CD5;&#x63D0;&#x4F9B;&#x4E86;&#x66F4;&#x597D;&#x7684;&#x5C01;&#x88C5;&#x65B9;&#x4FBF;&#x94FE;&#x8DEF;&#x5F00;&#x53D1;. &#x8FD9;&#x91CC;&#x7ED9;&#x51FA;&#x4E00;&#x4E2A;FlinkMT+Paimon&#x7684;&#x5C1D;&#x9C9C;&#x6848;&#x4F8B;. &#x8FD9;&#x4E00;&#x6848;&#x4F8B;&#x7EDF;&#x8BA1;&#x5404;&#x4E2A;&#x7269;&#x6D41;&#x516C;&#x53F8;&#x7684;&#x8FD0;&#x5355;&#x6570;&#x91CF;, &#x4F46;&#x662F;&#x7531;&#x4E8E;&#x5404;&#x79CD;&#x539F;&#x56E0;&#x67D0;&#x4E2A;&#x8BA2;&#x5355;&#x7684;&#x7269;&#x6D41;&#x516C;&#x53F8;&#x53EF;&#x4EE5;&#x4ECE;A&#x53D8;&#x6210;B.<br></p><figure class="highlight sql hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">SET</span> <span class="hljs-string">&apos;sql-client.execution.result-mode&apos;</span> = <span class="hljs-string">&apos;tableau&apos;</span>;</span><br><span class="line"><span class="hljs-keyword">SET</span> <span class="hljs-string">&apos;table.exec.sink.upsert-materialize&apos;</span> = <span class="hljs-string">&apos;NONE&apos;</span>;</span><br><span class="line"><span class="hljs-keyword">SET</span> <span class="hljs-string">&apos;execution.runtime-mode&apos;</span> = <span class="hljs-string">&apos;streaming&apos;</span>;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">-- &#x521B;&#x5EFA;&#x4E00;&#x4E2A;Paimon Catalog, &#x6211;&#x4EEC;&#x7684;&#x64CD;&#x4F5C;&#x90FD;&#x5C06;&#x5728;&#x6B64;Catalog&#x4E0B;&#x8FDB;&#x884C;</span></span><br><span class="line"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">CATALOG</span> paimon <span class="hljs-keyword">WITH</span> (</span><br><span class="line">	<span class="hljs-string">&apos;type&apos;</span>=<span class="hljs-string">&apos;paimon&apos;</span>,</span><br><span class="line">	<span class="hljs-string">&apos;warehouse&apos;</span>=<span class="hljs-string">&apos;file:/tmp/paimon&apos;</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">-- &#x521B;&#x5EFA;&#x6E90;&#x8868;</span></span><br><span class="line"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> tms_source (</span><br><span class="line">	order_id <span class="hljs-keyword">STRING</span> PRIMARY <span class="hljs-keyword">KEY</span> <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">ENFORCED</span>,</span><br><span class="line">	tms_company <span class="hljs-keyword">STRING</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span></span><br><span class="line">) <span class="hljs-keyword">WITH</span> (</span><br><span class="line">	<span class="hljs-string">&apos;connector&apos;</span> = <span class="hljs-string">&apos;paimon&apos;</span>,</span><br><span class="line">	<span class="hljs-string">&apos;path&apos;</span> = <span class="hljs-string">&apos;file:/tmp/paimon/default.db/tms_source&apos;</span>,</span><br><span class="line">	<span class="hljs-string">&apos;changelog-producer&apos;</span> = <span class="hljs-string">&apos;lookup&apos;</span>,</span><br><span class="line">	<span class="hljs-string">&apos;scan.remove-normalize&apos;</span> = <span class="hljs-string">&apos;true&apos;</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">-- &#x4F7F;&#x7528;Flink MT&#x8BED;&#x6CD5;&#x521B;&#x5EFA;&#x4E00;&#x4E2A;Materialized Table</span></span><br><span class="line"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">MATERIALIZED</span> <span class="hljs-keyword">TABLE</span> continues_tms_res</span><br><span class="line">(<span class="hljs-keyword">CONSTRAINT</span> <span class="hljs-string">`pk_tms_company`</span> PRIMARY <span class="hljs-keyword">KEY</span> (tms_company) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">ENFORCED</span>)</span><br><span class="line"><span class="hljs-keyword">WITH</span> (</span><br><span class="line">	<span class="hljs-string">&apos;format&apos;</span> = <span class="hljs-string">&apos;debezium-json&apos;</span>,</span><br><span class="line">	<span class="hljs-string">&apos;scan.remove-normalize&apos;</span> = <span class="hljs-string">&apos;true&apos;</span>,</span><br><span class="line">	<span class="hljs-string">&apos;changelog-producer&apos;</span> = <span class="hljs-string">&apos;lookup&apos;</span>,</span><br><span class="line">	<span class="hljs-string">&apos;merge-engine&apos;</span> = <span class="hljs-string">&apos;aggregation&apos;</span>,</span><br><span class="line">	<span class="hljs-string">&apos;fields.order_cnt.aggregate-function&apos;</span> = <span class="hljs-string">&apos;sum&apos;</span></span><br><span class="line">)</span><br><span class="line">FRESHNESS = <span class="hljs-built_in">INTERVAL</span> <span class="hljs-string">&apos;30&apos;</span> <span class="hljs-keyword">SECOND</span></span><br><span class="line"><span class="hljs-keyword">AS</span> <span class="hljs-keyword">SELECT</span> tms_company, <span class="hljs-number">1</span> <span class="hljs-keyword">AS</span> order_cnt</span><br><span class="line"><span class="hljs-keyword">FROM</span> tms_source; </span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">-- &#x6267;&#x884C;&#x4EE5;&#x4E0B;&#x8BED;&#x53E5;&#x5411;&#x6E90;&#x8868;&#x4E2D;&#x63D2;&#x5165;&#x6570;&#x636E;</span></span><br><span class="line"><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> tms_source <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&apos;001&apos;</span>, <span class="hljs-string">&apos;ZhongTong&apos;</span>);</span><br><span class="line"><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> tms_source <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&apos;002&apos;</span>, <span class="hljs-string">&apos;ZhongTong&apos;</span>);</span><br><span class="line"><span class="hljs-comment">-- &#x8BA2;&#x5355;001&#x7684;&#x627F;&#x8FD0;&#x516C;&#x53F8;&#x4ECE;ZhongTong&#x6362;&#x6210;&#x4E86;&#x5706;&#x901A;</span></span><br><span class="line"><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> tms_source <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&apos;001&apos;</span>, <span class="hljs-string">&apos;YuanTong&apos;</span>);</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>&#x5982;&#x679C;&#x5728;&#x5411;&#x6E90;&#x8868;&#x63D2;&#x5165;&#x6570;&#x636E;&#x7684;&#x8FC7;&#x7A0B;&#x4E2D;&#x89C2;&#x5BDF;<code>tms_source</code>&#x548C;<code>continues_tms_res</code>, &#x6211;&#x4EEC;&#x53EF;&#x4EE5;&#x5F97;&#x5230;&#x5982;&#x4E0B;&#x7ED3;&#x679C;. &#x7531;&#x4E8E;&#x4E24;&#x4E2A;&#x8868;&#x90FD;&#x542F;&#x7528;&#x4E86;Changelog Producer, &#x56E0;&#x6B64;&#x8868;&#x4E2D;&#x4F1A;&#x8BB0;&#x5F55;&#x6240;&#x6709;&#x7684;Changelog&#x8BB0;&#x5F55;(<code>+I</code>, <code>-U</code>, <code>+U</code>, <code>-D</code>). &#x8FD9;&#x91CC;&#x9700;&#x8981;&#x8BF4;&#x660E;&#x7684;&#x662F;, &#x4EE5;&#x4E0B;&#x7ED3;&#x679C;&#x662F;&#x5728;&#x6BCF;&#x6761;&#x8BB0;&#x5F55;&#x7684;&#x63D2;&#x5165;&#x65F6;&#x95F4;&#x95F4;&#x9694;&#x8D85;&#x8FC7;30s&#x65F6;&#x5F97;&#x5230;&#x7684;, &#x5982;&#x679C;&#x4E09;&#x6761;&#x8BB0;&#x5F55;&#x5728;&#x4E00;&#x4E2A;Checkpoint&#x6279;&#x6B21;&#x5185;&#x63D2;&#x5165;, &#x90A3;&#x7531;&#x4E8E;&#x6512;&#x6279;&#x64CD;&#x4F5C;, &#x56DE;&#x64A4;&#x64CD;&#x4F5C;&#x5C06;&#x88AB;&#x6D88;&#x9664;.<br></p><figure class="highlight plain hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">Flink SQL&gt; SELECT * FROM tms_source;</span><br><span class="line">+----+-----------------+--------------------+</span><br><span class="line">| op |        order_id |        tms_company |</span><br><span class="line">+----+-----------------+--------------------+</span><br><span class="line">| +I |             001 |          ZhongTong |</span><br><span class="line">| +I |             002 |          ZhongTong |</span><br><span class="line">| -U |             001 |          ZhongTong |</span><br><span class="line">| +U |             001 |           YuanTong |</span><br><span class="line"></span><br><span class="line">Flink SQL&gt; SELCT * FROM continues_tms_res;</span><br><span class="line">+----+-----------------+--------------------+</span><br><span class="line">| op |     tms_company |          order_cnt |</span><br><span class="line">+----+-----------------+--------------------+</span><br><span class="line">| +I |       ZhongTong |                  1 |</span><br><span class="line">| -U |       ZhongTong |                  1 |</span><br><span class="line">| +U |       ZhongTong |                  2 |</span><br><span class="line">| +I |        YuanTong |                  1 |</span><br><span class="line">| -U |       ZhongTong |                  2 |</span><br><span class="line">| +U |       ZhongTong |                  1 |</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>&#x6700;&#x7EC8;&#x67E5;&#x8BE2;&#x4E24;&#x4E2A;&#x8868;&#x7684;&#x6700;&#x7EC8;&#x72B6;&#x6001;, &#x53EF;&#x4EE5;&#x5F97;&#x5230;&#x5982;&#x4E0B;&#x7ED3;&#x679C;, Changelog&#x4E2D;&#x95F4;&#x7ED3;&#x679C;(&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x7ED3;&#x679C;)&#x5C06;&#x5728;&#x8BFB;&#x65F6;&#x88AB;&#x5408;&#x5E76;.<br></p><figure class="highlight plain hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Flink SQL&gt; SELECT * FROM tms_source;</span><br><span class="line">+----+------------------+-------------------+</span><br><span class="line">| op |         order_id |       tms_company |</span><br><span class="line">+----+------------------+-------------------+</span><br><span class="line">| +I |              001 |          YuanTong |</span><br><span class="line">| +I |              002 |         ZhongTong |</span><br><span class="line"></span><br><span class="line">Flink SQL&gt; SELECT * FROM continues_tms_res;</span><br><span class="line">+----+------------------+-------------------+</span><br><span class="line">| op |      tms_company |         order_cnt |</span><br><span class="line">+----+------------------+-------------------+</span><br><span class="line">| +I |         YuanTong |                 1 |</span><br><span class="line">| +I |        ZhongTong |                 1 |</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p><code>continues_tms_res</code>&#x8FD9;&#x4E2A;Materialized Table&#x80CC;&#x540E;&#x5176;&#x5B9E;&#x662F;&#x6709;&#x4E00;&#x4E2A;Long Running&#x7684;Flink&#x4F5C;&#x4E1A;, &#x5728;&#x5B9E;&#x73B0;&#x4E0A;SQL Gateway&#x4F1A;&#x5C06;Materialized Table&#x8BED;&#x6CD5;&#x89E3;&#x6790;&#x4E3A;&#x4E00;&#x4E2A;&#x666E;&#x901A;&#x7684;<a href="https://github.com/apache/flink/blob/7fa4f78e43bfd99a7e7a3d655a9a3641e4d7bc59/flink-table/flink-sql-gateway/src/main/java/org/apache/flink/table/gateway/service/materializedtable/MaterializedTableManager.java#L559" target="_blank" rel="noopener">INSERT INTO</a>&#x8BED;&#x53E5;&#x5E76;&#x63D0;&#x4EA4;&#x7ED9;Flink&#x96C6;&#x7FA4;, &#x5B83;&#x7684;&#x4F5C;&#x4E1A;&#x56FE;&#x5982;&#x4E0B;, &#x53EF;&#x4EE5;&#x770B;&#x5230;&#x6574;&#x4E2A;&#x4F5C;&#x4E1A;&#x4E2D;&#x662F;&#x4E0D;&#x5B58;&#x5728;&#x72B6;&#x6001;&#x7B97;&#x5B50;&#x7684;, &#x4F46;&#x662F;&#x6211;&#x4EEC;&#x6700;&#x7EC8;&#x5B9E;&#x73B0;&#x4E86;&#x589E;&#x91CF;&#x7684;&#x805A;&#x5408;&#x8BA1;&#x7B97;. </p>
+<p align="center">
+    <img src="./flink-mt/job.png" width="100%">
+</p>
+
+<p>&#x4EE5;&#x4E0A;&#x793A;&#x4F8B;&#x8FD0;&#x884C;&#x5728;Flink&#x7684;Streaming&#x6A21;&#x5F0F;&#x4E0B;, &#x7531;&#x4E8E;&#x76EE;&#x524D;Flink Batch&#x6A21;&#x5F0F;&#x5E76;&#x4E0D;&#x652F;&#x6301;&#x57FA;&#x4E8E;Changelog&#x6570;&#x636E;&#x7684;&#x8BA1;&#x7B97;, &#x56E0;&#x6B64;FlinkMT + Paimon&#x7684;&#x7EC4;&#x5408;&#x76EE;&#x524D;&#x8FD8;&#x65E0;&#x6CD5;&#x5B9E;&#x73B0;&#x8C03;&#x5EA6;+&#x6279;&#x5904;&#x7406;&#x6A21;&#x5F0F;&#x7684;&#x589E;&#x91CF;&#x8BA1;&#x7B97;. &#x4E0D;&#x8FC7;&#x53D7;&#x76CA;&#x4E8E;&#x6D41;&#x5904;&#x7406;&#x6A21;&#x5F0F;&#x4E0B;&#x5DF2;&#x6709;&#x7684;&#x7ECF;&#x9A8C;, &#x76F8;&#x4FE1;Flink&#x662F;&#x6700;&#x6709;&#x53EF;&#x80FD;&#x6210;&#x4E3A;&#x8865;&#x8DB3;&#x8FD9;&#x4E00;&#x80FD;&#x529B;&#x7684;&#x6279;&#x5904;&#x7406;&#x5F15;&#x64CE;. </p>
+<h1 id="&#x603B;&#x7ED3;"><a href="#&#x603B;&#x7ED3;" class="headerlink" title="&#x603B;&#x7ED3;"></a>&#x603B;&#x7ED3;</h1><p>&#x672C;&#x6587;&#x4ECB;&#x7ECD;&#x4E86;&#x5927;&#x6570;&#x636E;&#x5904;&#x7406;&#x4E2D;&#x7684;&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x6280;&#x672F;, &#x76EE;&#x524D;&#x770B;&#x6765;&#x4E0D;&#x7BA1;&#x662F;&#x5F00;&#x6E90;&#x8FD8;&#x662F;&#x5546;&#x4E1A;&#x5316;&#x5F15;&#x64CE;, &#x90FD;&#x5728;&#x4E0D;&#x65AD;&#x8865;&#x8DB3;&#x8FD9;&#x4E00;&#x90E8;&#x5206;&#x80FD;&#x529B;. &#x901A;&#x8FC7;&#x76EE;&#x524D;&#x8D8B;&#x52BF;&#x6765;&#x770B;, &#x4E2A;&#x4EBA;&#x8BA4;&#x540C;&#x7684;&#x4E00;&#x4E2A;&#x89C2;&#x70B9;&#x662F;: &#x57FA;&#x4E8E;&#x6279;&#x5904;&#x7406;&#x5F15;&#x64CE;&#x4F4E;&#x5EF6;&#x65F6;&#x8C03;&#x5EA6;+&#x589E;&#x91CF;&#x8BA1;&#x7B97;&#x7684;&#x65B9;&#x5F0F;&#x5C06;&#x662F;&#x672A;&#x6765;&#x771F;&#x6B63;&#x80FD;&#x591F;&#x5B9E;&#x73B0;&#x6D41;&#x6279;&#x4E00;&#x4F53;&#x7684;&#x67B6;&#x6784;, &#x5E76;&#x4E14;&#x80FD;&#x5728;&#x5206;&#x949F;&#x7EA7;&#x5EF6;&#x8FDF;&#x7684;&#x6570;&#x636E;&#x65B0;&#x9C9C;&#x5EA6;&#x4E0B;&#x4FDD;&#x6301;&#x8F83;&#x4F4E;&#x7684;&#x6210;&#x672C;. &#x4E0D;&#x8FC7;&#x8FD9;&#x5957;&#x67B6;&#x6784;&#x96BE;&#x4EE5;&#x89E3;&#x51B3;&#x7EAF;&#x5B9E;&#x65F6;&#x7684;&#x573A;&#x666F;. &#x56E0;&#x6B64;&#x6700;&#x7EC8;&#x79BB;&#x7EBF;&#x548C;&#x8FD1;&#x5B9E;&#x65F6;&#x5904;&#x7406;&#x662F;&#x80FD;&#x591F;&#x5728;&#x5B58;&#x50A8;&#x548C;&#x8BA1;&#x7B97;&#x4E0A;&#x90FD;&#x505A;&#x5230;&#x6D41;&#x6279;&#x4E00;&#x4F53;&#x7684;, &#x4F46;&#x662F;&#x7EAF;&#x5B9E;&#x65F6;&#x9886;&#x57DF;&#x8FD8;&#x662F;&#x9700;&#x8981;&#x53E6;&#x5916;&#x4E00;&#x5957;&#x67B6;&#x6784;. </p>
+<h1 id="&#x53C2;&#x8003;"><a href="#&#x53C2;&#x8003;" class="headerlink" title="&#x53C2;&#x8003;"></a>&#x53C2;&#x8003;</h1><p>[1] <a href="https://cwiki.apache.org/confluence/display/FLINK/FLIP-435%3A+Introduce+a+New+Materialized+Table+for+Simplifying+Data+Pipelines" target="_blank" rel="noopener">FLIP-435: Introduce a New Materialized Table for Simplifying Data Pipelines</a>&#xFEFF;<br>[2] <a href="https://lists.apache.org/thread/c1gnn3bvbfs8v1trlf975t327s4rsffs" target="_blank" rel="noopener">[DISCUSS] FLIP-435: Introduce a New Dynamic Table for Simplifying Data Pipelines</a>&#xFEFF;<br>[3] <a href="https://wiki.postgresql.org/wiki/Incremental_View_Maintenance" target="_blank" rel="noopener">Incremental View Maintenance</a><br>[4] <a href="https://zhuanlan.zhihu.com/p/659048818" target="_blank" rel="noopener">&#x79BB;&#x7EBF;&#x6570;&#x4ED3;&#x8FD1;&#x5B9E;&#x65F6;&#x5316;&#x7684;&#x6210;&#x672C;&#x95EE;&#x9898;&#x2014; &#x589E;&#x91CF;&#x6570;&#x4ED3;&#x7CFB;&#x5217;&#x5176;&#x4E00;</a><br>[5] <a href="https://zhuanlan.zhihu.com/p/688990525" target="_blank" rel="noopener">&#x662F;&#x65F6;&#x5019;&#x51C6;&#x5907;&#x7ED3;&#x675F;&#x6570;&#x4ED3;&#x9886;&#x57DF;&#x6D41;&#x6279;&#x4E00;&#x4F53;&#x7684;&#x8BA8;&#x8BBA;&#x4E86;&#x2014;&#x589E;&#x91CF;&#x6570;&#x4ED3;&#x7CFB;&#x5217;&#x5176;&#x4E8C;</a>&#xFEFF;<br>[6] <a href="https://www.feldera.com/blog/incremental-database-computations" target="_blank" rel="noopener">Incremental Database Computations</a>&#xFEFF;<br>[7] <a href="https://zuozhiw.github.io/tempura-journal.pdf" target="_blank" rel="noopener">Tempura: a general cost-based optimizer framework for incremental data processing (Journal Version)</a>&#xFEFF;<br>[8] <a href="https://www.yunqi.tech/documents/streaming_pipeline_with_dynamic_table" target="_blank" rel="noopener">&#x4E91;&#x5668;&#x79D1;&#x6280;-&#x4EA7;&#x54C1;&#x6587;&#x6863;-&#x5F00;&#x53D1;&#x52A8;&#x6001;&#x8868;&#x5B9E;&#x73B0;&#x8FD1;&#x5B9E;&#x65F6;&#x589E;&#x91CF;&#x5904;&#x7406;</a></p>
+</body></html>
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/Flink/">#Flink</a></span>
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/Paimon/">#Paimon</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop is-hidden-mobile article-nav-prev">
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/flink-sql-table-api.html">Flink SQL源码 - Table API &amp; SQL概览</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+<div class="sharebox">
+    
+<div class="sharethis-inline-share-buttons"></div>
+<script type='text/javascript' src='//platform-api.sharethis.com/js/sharethis.js#property=5e63913dd0c39800126ea9e7&amp;product=inline-share-buttons&amp;cms=sop' async='async'></script>
+
+</div>
+
+
+
+<div class="comments">
+    <p align="center">
+        本博客所有文章除特别声明外, 均采用<a href="https://creativecommons.org/licenses/by-nc-sa/3.0/cn/" target="_blank" rel="noopener">CC BY-NC-SA 3.0 CN</a>许可协议. 转载请注明出处!
+    </p>
+
+    <br><br>
+
+    <p align="center">
+        <img src="/images/WeChat.jpg" width="25%">
+    </p>
+    <p align="center">关注笔者微信公众号获得最新文章推送</p>
+</div>
+
+
+
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    
+<div id="valine-thread"></div>
+<script src="//code.bdstatic.com/npm/leancloud-storage@4.12.2/dist/av-min.js"></script>
+<script src='//cdn.jsdelivr.net/gh/AshinWang/SimpleValine@v0.1/SimpleValine.min.js'></script>
+<script>
+    new Valine({
+        el: '#valine-thread',
+        appId: 'v4Ich4NMxLXYhCkPcb1OmVPR-gzGzoHsz',
+        appKey: 'b5fiVY3XvcAwzJ06YR8rFCAj',
+        notify: true,
+        verify: false,
+        avatar: '',
+        placeholder: 'If you have any questions, please comment here!',
+        meta: ['nick', 'mail'],
+        visitor: true,
+        lang: 'en'
+    })
+</script>
+
+
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2018-2024 Liebing&nbsp;. 
+                <!-- <span id="busuanzi_container_site_uv"><span id="busuanzi_value_site_uv"></span> UV, </span>
+                <span id="busuanzi_container_site_pv"> <span id="busuanzi_value_site_pv"></span> PV</span> -->
+
+                View
+                <span id="busuanzi_value_site_pv" data-num="1000">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </span> times by
+                <span id="busuanzi_value_site_uv">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </span> visitors.
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="一行代码, 点滴生活!" href="">
+                    
+                    一行代码, 点滴生活!
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+    <script src="https://code.jquery.com/jquery-latest.js"></script>
+    <!-- 不蒜子计数初始值纠正 -->
+    <script >
+        $(document).ready(function() {
+            var int = setInterval(fixCount, 500);  // 50ms周期检测函数
+            var initPV = 3569;  // 初始化首次数据
+            var initUV = 1215;
+            function fixCount() {                   
+                if ($("#busuanzi_container_site_pv").css("display") != "none") {
+                    $("#busuanzi_value_site_pv").html(parseInt($("#busuanzi_value_site_pv").html()) + initPV); // 加上初始数据 
+                    clearInterval(int); // 停止检测
+                } 
+                if ($("#busuanzi_container_site_uv").css("display") != "none") {
+                    $("#busuanzi_value_site_uv").html(parseInt($("#busuanzi_value_site_uv").html()) + initUV); // 加上初始数据 
+                    clearInterval(int); // 停止检测
+                }  
+            }
+        });
+    </script>
+
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/" target="_blank" rel="noopener">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("en-AU");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+
+<script src="/js/script.js"></script>
+
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+    
+</body>
+</html>
