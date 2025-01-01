@@ -2,8 +2,9 @@
 <html class="has-navbar-fixed-top">
 <head>
     <meta charset="utf-8">
-<title>Softmax Regression (SR) - Liebing&#39;s Homepage</title>
+<title>Softmax Regression (SR) - Liebing&#39;s Blog</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="baidu-site-verification" content="codeva-2Q9E1leVAG" />
 
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
 
@@ -21,12 +22,12 @@
     <meta name="description" content="Softmax regression (SR) (or multinomial logistic regression) is a generalization of logistic regression to the case where we want to handle multiple classes. Same as the blog about LR, this blog will">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Softmax Regression (SR)">
-<meta property="og:url" content="http://yoursite.com/2019/07/02/Softmax-Regression/index.html">
-<meta property="og:site_name" content="Liebing&#39;s Homepage">
+<meta property="og:url" content="http://yoursite.com/softmax-regression.html">
+<meta property="og:site_name" content="Liebing&#39;s Blog">
 <meta property="og:description" content="Softmax regression (SR) (or multinomial logistic regression) is a generalization of logistic regression to the case where we want to handle multiple classes. Same as the blog about LR, this blog will">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2019-07-02T04:00:00.000Z">
-<meta property="article:modified_time" content="2021-12-21T11:44:43.447Z">
+<meta property="article:modified_time" content="2024-05-30T02:43:00.782Z">
 <meta property="article:author" content="Liebing">
 <meta property="article:tag" content="Algorithm">
 <meta name="twitter:card" content="summary">
@@ -89,19 +90,25 @@
         <div class="navbar-menu navbar-start">
             
             <a class="navbar-item "
-               href="/archives">Archives</a>
+               href="/collections">合集</a>
             
             <a class="navbar-item "
-               href="/categories">Cats</a>
+               href="/courses">课程</a>
             
             <a class="navbar-item "
-               href="/tags">Tags</a>
+               href="/archive">归档</a>
             
             <a class="navbar-item "
-               href="/courses">Courses</a>
+               href="/categories">分类</a>
             
             <a class="navbar-item "
-               href="/bio">Bio</a>
+               href="/tags">标签</a>
+            
+            <a class="navbar-item "
+               href="/friends">友链</a>
+            
+            <a class="navbar-item "
+               href="/about">关于</a>
             
         </div>
         
@@ -196,7 +203,16 @@
         <span class="column is-narrow">
             
             
-            8 minutes read (About 1179 words)
+            8 minutes read (About 1176 words)
+        </span>
+        
+        
+        <span id="/softmax-regression.html" class="column is-narrow leancloud_visitors" data-flag-title="Softmax Regression (SR)">
+            VISITED
+                <i class="leancloud-visitors-count">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </i>
+            TIMES
         </span>
         
     </div>
@@ -204,31 +220,19 @@
     
         <html><head></head><body><p>Softmax regression (SR) (or multinomial logistic regression) is a generalization of logistic regression to the case where we want to handle multiple classes. Same as the <a href="/2019/08/02/Logistic-Regression">blog</a> about LR, this blog will detail the <strong>modeling approach</strong>, <strong>loss function</strong>, <strong>forward and backward propagation</strong> of SR. In the end, I will use python with numpy to implement SR and give the use on data sets iris and mnist. You can find all the code <a href="https://github.com/LB-Yu/publication/tree/master/sr" target="_blank" rel="noopener">here</a>.</p>
 <a id="more"></a>
-<h1 id="Softmax-function"><a href="#Softmax-function" class="headerlink" title="Softmax function"></a>Softmax function</h1><p>The softmax function is defined by the following formula. Where <script type="math/tex">K</script> is the number of classes and <script type="math/tex">K \geqslant 2</script>.</p>
-<script type="math/tex; mode=display">softmax(x)=\frac{1}{\sum_{j=1}^{K}e^{x^{(j)}}}\begin{bmatrix} e^{x^{(1)}}\\ e^{x^{(2)}}\\ \vdots \\ e^{x^{(K)}} \end{bmatrix}</script><p>Unfortunately, the original softmax definition has a numerical overflow problem in actual use. For a large positive <script type="math/tex">x^{(i)}</script> value, the value of <script type="math/tex">e^{x^{(i)}}</script> may be quite large and cause a numerical overflow. Similarly, for a smaller negative <script type="math/tex">x^{(i)}</script> value, the value of <script type="math/tex">e^{x^{(i)}}</script> may be very close to zero, resulting in a numerical underflow. Therefore, in practice we use the following equivalent formula.</p>
-<script type="math/tex; mode=display">softmax(x-D)=\frac{1}{\sum_{j=1}^{K}e^{x^{(j)-D}}}\begin{bmatrix} e^{x^{(1)}-D}\\ e^{x^{(2)}-D}\\ \vdots \\ e^{x^{(K)}-D} \end{bmatrix}=\frac{1}{e^{-D}\sum_{j=1}^{K}e^{x^{(j)}}}\begin{bmatrix} e^{-D}e^{x^{(1)}}\\ e^{-D}e^{x^{(2)}}\\ \vdots \\ e^{-D}e^{x^{(K)}} \end{bmatrix}=softmax(x)</script><p>Where <script type="math/tex">D=max(x)</script>.<br>We need to use the derivative of softmax in backpropagation, so let&#x2019;s calculate it first. For writing convenience, let <script type="math/tex">\hat{y}=softmax(x)</script>, then <script type="math/tex">\hat{y^{(i)}}=\frac{e^{x^{(i)}}}{\sum_{j=1}^{K}e^{x^{(j)}}}</script>.</p>
-<script type="math/tex; mode=display">if \ j=i, \ \ \ \ \frac{\partial \hat{y^{(i)}}}{\partial x^{(j)}}=\frac{e^{x^{(i)}}\sum_{j=1}^{K}e^{x^{(j)}}-e^{x^{(i)}}e^{x^{(j)}}}{(\sum_{j=1}^{K}e^{x^{(j)}})^2}=\hat{y^{(i)}}-(\hat{y^{(i)}})^2</script><script type="math/tex; mode=display">if \ j \neq i, \ \ \ \ \frac{\partial \hat{y^{(i)}}}{\partial x^{(j)}}=\frac{-e^{x^{(i)}e^{x^{(j)}}}}{(\sum_{j=1}{k}e^{x^{(j)}})^2}=-\hat{y^{(i)}}\hat{y^{(j)}}</script><h1 id="Modeling-approach"><a href="#Modeling-approach" class="headerlink" title="Modeling approach"></a>Modeling approach</h1><p>In LR we assumed that the labels were binary: <script type="math/tex">y\in {\{0, 1\}}</script>. SR allows us to handle <script type="math/tex">K</script> classification problem. In SR we often use one hot vector to represent the label. For example, in the MNIST digit recognition task, we will use <script type="math/tex">y=[0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]^T</script> to represent the label of the image with the number 3. In SR we use softmax function to model probability. Suppose we have a training set <script type="math/tex">{\{(x_1, y_1), (x_2, y_2), ..., (x_m, y_m)\}}</script> of <script type="math/tex">m</script> labeled examples, where the input features are <script type="math/tex">x_i \in \Re^{[n, 1]}</script>. We can use the <script type="math/tex">i</script>-th output of the softmax function as the probability that the current sample belongs to the <script type="math/tex">i</script>-th class. The formal expression is as follows.</p>
-<script type="math/tex; mode=display">P(y^{(i)}=1|x;w^{(i)}, b^{(i)})=\frac{e^{(w^{(i)})^Tx+b^{(i)}}}{\sum_{j=1}^{K}e^{(w^{(j)})^Tx+b^{(j)}}}</script><p>Where <script type="math/tex">w^{(i)} \in \Re^{[n, 1]}</script>, <script type="math/tex">w=\begin{bmatrix} |& |& |& |\\ w^{(1)}& w^{(2)}& \cdots & w^{(K)} \\ |&  |&  |& | \end{bmatrix} \in \Re^{[n, K]}</script>, <script type="math/tex">b^{(i)} \in \Re</script>, <script type="math/tex">b=\begin{bmatrix} b^{(1)} & b^{(2)} & \cdots & b^{(K)} \end{bmatrix} \in \Re^{[1, K]}</script>.<br>For the convenience of writing, let <script type="math/tex">\hat{y^{(i)}}=P(y^{(i)}=1|x;w^{(i)}, b^{(i)})</script>.</p>
-<h1 id="Loss-function"><a href="#Loss-function" class="headerlink" title="Loss function"></a>Loss function</h1><p>In SR our goal is to </p>
-<script type="math/tex; mode=display">maximize \ \ \ \ \prod_{i=1}^{K}(P(y^{(i)}=1|x;w^{(i)},b^{(i)}))^{I\{y^{(i)}=1\}}</script><script type="math/tex; mode=display">maximize \ \ \ \ \sum_{i=1}^{K}I\{y^{(i)}=1\}log(\hat{y^{(i)}})</script><script type="math/tex; mode=display">minimize \ \ \ \ -\sum_{i=1}^{K}I\{y^{(i)}=1\}log(\hat{y^{(i)}})=-\sum_{i=1}^{K}y^{(i)}log(\hat{y^{(i)}})</script><p>So the loss function of SR is:</p>
-<script type="math/tex; mode=display">\mathcal L(y,\hat{y})=-\sum_{i=1}^{K}y^{(i)}log(\hat{y^{(i)}})</script><p>Note: <script type="math/tex">I</script> is the indicator function, in which</p>
-<script type="math/tex; mode=display">\left\{\begin{matrix}
- I\{condition\}=1& if \ condition=true \\ 
- I\{condition\}=0& else 
-\end{matrix}\right.</script><h1 id="Gradient"><a href="#Gradient" class="headerlink" title="Gradient"></a>Gradient</h1><p>The forward propagation of SR is similar with LR, for one example:</p>
-<script type="math/tex; mode=display">z=w^Tx+b^T</script><script type="math/tex; mode=display">\hat{y}=softmax(z)</script><p>vectorization:</p>
-<script type="math/tex; mode=display">Z=Xw+b</script><script type="math/tex; mode=display">\hat{Y}=softmax(Z)</script><p>We can derivative the gradient based on the chain rule. For one example:</p>
-<script type="math/tex; mode=display">\frac{\partial \mathcal L}{\partial z^{(i)}}=\left\{\begin{matrix}
--\frac{1}{\hat{y^{(k)}}}(\hat{y^{(k)}}-(\hat{y^{(k)}})^2)=\hat{y^{(k)}}-1 & if \ i=k \\ 
--\frac{1}{\hat{y^{k}}}(-\hat{y^{(k)}}\hat{y^{(i)}})=\hat{y^{(i)}} & if \ i\neq k 
-\end{matrix}\right. \Rightarrow \frac{\partial \mathcal L}{\partial z}=\hat{y}-y</script><script type="math/tex; mode=display">\frac{\partial z^{(i)}}{\partial w^{(i)}}=x,\ \ \ \   \frac{\partial z^{(i)}}{\partial b^{(i)}}=1</script><script type="math/tex; mode=display">\frac{\partial \mathcal L}{\partial w^{(i)}}=\frac{\partial \mathcal L}{z^{(i)}}\frac{\partial z^{(i)}}{\partial w^{(i)}}=x(\hat{y^{(i)}}-y^{(i)}) \Rightarrow \frac{\partial \mathcal L}{\partial w}=x(\hat{y}-y)^T</script><script type="math/tex; mode=display">\frac{\partial \mathcal L}{b^{(i)}}=\frac{\partial \mathcal L}{\partial z^{(i)}}\frac{\partial z^{(i)}}{\partial b^{(i)}}=\hat{y^{(i)}}-y^{(i)} \Rightarrow \frac{\partial \mathcal L}{\partial b}=(\hat{y}-y)^T</script><p>vectorization:</p>
-<script type="math/tex; mode=display">\frac{\partial \mathcal L}{\partial w}=\frac{1}{m}X^T(\hat{Y}-Y)</script><script type="math/tex; mode=display">\frac{\partial \mathcal L}{\partial b}= \frac{1}{m}\sum_{row}(\hat{Y}-Y)</script><h1 id="Implementation"><a href="#Implementation" class="headerlink" title="Implementation"></a>Implementation</h1><p>Here we use python with numpy to implement the forward and backward propagation of SR.</p>
-<figure class="highlight python hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">softmax</span><span class="hljs-params">(x)</span>:</span></span><br><span class="line">    <span class="hljs-string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="hljs-string">    Softmax regression for a vector or matrix.</span></span><br><span class="line"><span class="hljs-string">    Args:</span></span><br><span class="line"><span class="hljs-string">        x: [n_examples, n_classes]</span></span><br><span class="line"><span class="hljs-string">    Returns: values after softmax.</span></span><br><span class="line"><span class="hljs-string">    &quot;&quot;&quot;</span></span><br><span class="line">    b = x - np.max(x, axis=<span class="hljs-number">1</span>, keepdims=<span class="hljs-literal">True</span>)</span><br><span class="line">    expb = np.exp(b)</span><br><span class="line">    softmax = expb / np.sum(expb, axis=<span class="hljs-number">1</span>, keepdims=<span class="hljs-literal">True</span>)</span><br><span class="line">    <span class="hljs-keyword">return</span> softmax</span><br></pre></td></tr></tbody></table></figure>
 
-<figure class="highlight python hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SoftmaxRegression</span>:</span></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self, max_iter=<span class="hljs-number">200</span>, learning_rate=<span class="hljs-number">0.01</span>)</span>:</span></span><br><span class="line">        self.max_iter = max_iter</span><br><span class="line">        self.learning_rate = learning_rate</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">fit</span><span class="hljs-params">(self, X, Y)</span>:</span></span><br><span class="line">        <span class="hljs-string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="hljs-string">        Train the model.</span></span><br><span class="line"><span class="hljs-string">        Args:</span></span><br><span class="line"><span class="hljs-string">            X: [n_samples, n_features]</span></span><br><span class="line"><span class="hljs-string">            Y: [n_samples, n_classes]</span></span><br><span class="line"><span class="hljs-string">        &quot;&quot;&quot;</span></span><br><span class="line">        m, n = X.shape</span><br><span class="line">        _, K = Y.shape</span><br><span class="line">        self.w_ = np.zeros([n, K])</span><br><span class="line">        self.b_ = np.zeros([<span class="hljs-number">1</span>, K])</span><br><span class="line">        self.cost_ = []</span><br><span class="line"></span><br><span class="line">        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(self.max_iter):</span><br><span class="line">            Y_hat = self.predict(X)</span><br><span class="line"></span><br><span class="line">            cost = -np.sum(Y * np.log(Y_hat)) / m</span><br><span class="line"></span><br><span class="line">            <span class="hljs-keyword">if</span> i != <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> i % <span class="hljs-number">10</span> == <span class="hljs-number">0</span>:</span><br><span class="line">                print(<span class="hljs-string">&quot;Step: &quot;</span> + str(i) + <span class="hljs-string">&quot;, Cost: &quot;</span> + str(cost))</span><br><span class="line"></span><br><span class="line">            self.cost_.append(cost)</span><br><span class="line"></span><br><span class="line">            self.w_ -= self.learning_rate * np.dot(X.T, Y_hat - Y) / m</span><br><span class="line">            self.b_ -= self.learning_rate * np.sum(Y_hat - Y, axis=<span class="hljs-number">0</span>) / m</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">predict</span><span class="hljs-params">(self, X)</span>:</span></span><br><span class="line">        <span class="hljs-string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="hljs-string">        Predict the given examples.</span></span><br><span class="line"><span class="hljs-string">        Args:</span></span><br><span class="line"><span class="hljs-string">            X: [n_samples, n_features]</span></span><br><span class="line"><span class="hljs-string">        &quot;&quot;&quot;</span></span><br><span class="line">        z = np.dot(X, self.w_)</span><br><span class="line">        <span class="hljs-keyword">return</span> softmax(np.dot(X, self.w_) + self.b_)</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">score</span><span class="hljs-params">(self, X, Y)</span>:</span></span><br><span class="line">        Y_hat = self.predict(X)</span><br><span class="line">        Y_hat = np.argmax(Y_hat, axis=<span class="hljs-number">1</span>)</span><br><span class="line">        Y = np.argmax(Y, axis=<span class="hljs-number">1</span>)</span><br><span class="line">        true_num = np.sum(Y_hat == Y)</span><br><span class="line">        <span class="hljs-keyword">return</span> true_num / len(X)</span><br></pre></td></tr></tbody></table></figure>
-
+<h1 id="Softmax-function"><a href="#Softmax-function" class="headerlink" title="Softmax function"></a>Softmax function</h1><p>The softmax function is defined by the following formula. Where $ K $ is the number of classes and $ K \geqslant 2 $.<br>$$ softmax(x)=\frac{1}{\sum_{j=1}^{K}e^{x^{(j)}}}\begin{bmatrix} e^{x^{(1)}}\ e^{x^{(2)}}\ \vdots \ e^{x^{(K)}} \end{bmatrix} $$<br>Unfortunately, the original softmax definition has a numerical overflow problem in actual use. For a large positive $ x^{(i)} $ value, the value of $ e^{x^{(i)}} $ may be quite large and cause a numerical overflow. Similarly, for a smaller negative $ x^{(i)} $ value, the value of $ e^{x^{(i)}} $ may be very close to zero, resulting in a numerical underflow. Therefore, in practice we use the following equivalent formula.<br>$$ softmax(x-D)=\frac{1}{\sum_{j=1}^{K}e^{x^{(j)-D}}}\begin{bmatrix} e^{x^{(1)}-D}\ e^{x^{(2)}-D}\ \vdots \ e^{x^{(K)}-D} \end{bmatrix}=\frac{1}{e^{-D}\sum_{j=1}^{K}e^{x^{(j)}}}\begin{bmatrix} e^{-D}e^{x^{(1)}}\ e^{-D}e^{x^{(2)}}\ \vdots \ e^{-D}e^{x^{(K)}} \end{bmatrix}=softmax(x) $$<br>Where $ D=max(x) $.<br>We need to use the derivative of softmax in backpropagation, so let&#x2019;s calculate it first. For writing convenience, let $ \hat{y}=softmax(x) $, then $ \hat{y^{(i)}}=\frac{e^{x^{(i)}}}{\sum_{j=1}^{K}e^{x^{(j)}}} $.<br>$$ if \ j=i, \ \ \ \ \frac{\partial \hat{y^{(i)}}}{\partial x^{(j)}}=\frac{e^{x^{(i)}}\sum_{j=1}^{K}e^{x^{(j)}}-e^{x^{(i)}}e^{x^{(j)}}}{(\sum_{j=1}^{K}e^{x^{(j)}})^2}=\hat{y^{(i)}}-(\hat{y^{(i)}})^2 $$<br>$$ if \ j \neq i, \ \ \ \ \frac{\partial \hat{y^{(i)}}}{\partial x^{(j)}}=\frac{-e^{x^{(i)}e^{x^{(j)}}}}{(\sum_{j=1}{k}e^{x^{(j)}})^2}=-\hat{y^{(i)}}\hat{y^{(j)}} $$</p>
+<h1 id="Modeling-approach"><a href="#Modeling-approach" class="headerlink" title="Modeling approach"></a>Modeling approach</h1><p>In LR we assumed that the labels were binary: $ y\in { {0, 1} } $. SR allows us to handle $ K $ classification problem. In SR we often use one hot vector to represent the label. For example, in the MNIST digit recognition task, we will use $ y=[0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]^T $ to represent the label of the image with the number 3. In SR we use softmax function to model probability. Suppose we have a training set $ { {(x_1, y_1), (x_2, y_2), &#x2026;, (x_m, y_m)} } $ of $ m $ labeled examples, where the input features are $ x_i \in \Re^{[n, 1]} $. We can use the $i$-th output of the softmax function as the probability that the current sample belongs to the $i$-th class. The formal expression is as follows.<br>$$ P(y^{(i)}=1|x;w^{(i)}, b^{(i)})=\frac{e^{(w^{(i)})^Tx+b^{(i)}}}{\sum_{j=1}^{K}e^{(w^{(j)})^Tx+b^{(j)}}} $$</p>
+<p>Where<br>$$ w^{(i)} \in \Re^{[n, 1]} $$<br>$$ w=\begin{bmatrix} |&amp; |&amp; |&amp; |\ w^{(1)}&amp; w^{(2)}&amp; \cdots &amp; w^{(K)} \ |&amp;  |&amp;  |&amp; | \end{bmatrix} \in \Re^{[n, K]} $$<br>$$ b^{(i)} \in \Re $$<br>$$ b=\begin{bmatrix} b^{(1)} &amp; b^{(2)} &amp; \cdots &amp; b^{(K)} \end{bmatrix} \in \Re^{[1, K]} $$</p>
+<p>For the convenience of writing, let $ \hat{y^{(i)}}=P(y^{(i)}=1|x;w^{(i)}, b^{(i)}) $.</p>
+<h1 id="Loss-function"><a href="#Loss-function" class="headerlink" title="Loss function"></a>Loss function</h1><p>In SR our goal is to<br>$$ maximize \ \ \ \ \prod_{i=1}^{K}(P(y^{(i)}=1|x;w^{(i)},b^{(i)}))^{I{y^{(i)}=1}} $$<br>$$ maximize \ \ \ \ \sum_{i=1}^{K}I{y^{(i)}=1}log(\hat{y^{(i)}}) $$<br>$$ minimize \ \ \ \ -\sum_{i=1}^{K}I{y^{(i)}=1}log(\hat{y^{(i)}})=-\sum_{i=1}^{K}y^{(i)}log(\hat{y^{(i)}}) $$<br>So the loss function of SR is:<br>$$ \mathcal L(y,\hat{y})=-\sum_{i=1}^{K}y^{(i)}log(\hat{y^{(i)}}) $$</p>
+<p>Note: $I$ is the indicator function, in which<br>$$ I{condition} = \begin{cases} 1 \ if \ condition \ is \ true \ 0 \ else \end{cases} $$</p>
+<h1 id="Gradient"><a href="#Gradient" class="headerlink" title="Gradient"></a>Gradient</h1><p>The forward propagation of SR is similar with LR, for one example:<br>$$ z=w^Tx+b^T $$<br>$$ \hat{y}=softmax(z) $$<br>vectorization:<br>$$ Z=Xw+b $$<br>$$ \hat{Y}=softmax(Z) $$</p>
+<p>We can derivative the gradient based on the chain rule. For one example:<br>$$ \frac{\partial \mathcal L}{\partial z^{(i)}}=\left{\begin{matrix}<br>-\frac{1}{\hat{y^{(k)}}}(\hat{y^{(k)}}-(\hat{y^{(k)}})^2)=\hat{y^{(k)}}-1 &amp; if \ i=k \<br>-\frac{1}{\hat{y^{k}}}(-\hat{y^{(k)}}\hat{y^{(i)}})=\hat{y^{(i)}} &amp; if \ i\neq k<br>\end{matrix}\right. \Rightarrow \frac{\partial \mathcal L}{\partial z}=\hat{y}-y $$</p>
+<p>$$ \frac{\partial z^{(i)}}{\partial w^{(i)}}=x,\ \ \ \   \frac{\partial z^{(i)}}{\partial b^{(i)}}=1 $$<br>$$ \frac{\partial \mathcal L}{\partial w^{(i)}}=\frac{\partial \mathcal L}{z^{(i)}}\frac{\partial z^{(i)}}{\partial w^{(i)}}=x(\hat{y^{(i)}}-y^{(i)}) \Rightarrow \frac{\partial \mathcal L}{\partial w}=x(\hat{y}-y)^T $$<br>$$ \frac{\partial \mathcal L}{b^{(i)}}=\frac{\partial \mathcal L}{\partial z^{(i)}}\frac{\partial z^{(i)}}{\partial b^{(i)}}=\hat{y^{(i)}}-y^{(i)} \Rightarrow \frac{\partial \mathcal L}{\partial b}=(\hat{y}-y)^T $$<br>vectorization:<br>$$ \frac{\partial \mathcal L}{\partial w}=\frac{1}{m}X^T(\hat{Y}-Y) $$<br>$$ \frac{\partial \mathcal L}{\partial b}= \frac{1}{m}\sum_{row}(\hat{Y}-Y) $$</p>
+<h1 id="Implementation"><a href="#Implementation" class="headerlink" title="Implementation"></a>Implementation</h1><p>Here we use python with numpy to implement the forward and backward propagation of SR.<br></p><figure class="highlight python hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">softmax</span><span class="hljs-params">(x)</span>:</span></span><br><span class="line">    <span class="hljs-string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="hljs-string">    Softmax regression for a vector or matrix.</span></span><br><span class="line"><span class="hljs-string">    Args:</span></span><br><span class="line"><span class="hljs-string">        x: [n_examples, n_classes]</span></span><br><span class="line"><span class="hljs-string">    Returns: values after softmax.</span></span><br><span class="line"><span class="hljs-string">    &quot;&quot;&quot;</span></span><br><span class="line">    b = x - np.max(x, axis=<span class="hljs-number">1</span>, keepdims=<span class="hljs-literal">True</span>)</span><br><span class="line">    expb = np.exp(b)</span><br><span class="line">    softmax = expb / np.sum(expb, axis=<span class="hljs-number">1</span>, keepdims=<span class="hljs-literal">True</span>)</span><br><span class="line">    <span class="hljs-keyword">return</span> softmax</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p></p><figure class="highlight python hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SoftmaxRegression</span>:</span></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self, max_iter=<span class="hljs-number">200</span>, learning_rate=<span class="hljs-number">0.01</span>)</span>:</span></span><br><span class="line">        self.max_iter = max_iter</span><br><span class="line">        self.learning_rate = learning_rate</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">fit</span><span class="hljs-params">(self, X, Y)</span>:</span></span><br><span class="line">        <span class="hljs-string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="hljs-string">        Train the model.</span></span><br><span class="line"><span class="hljs-string">        Args:</span></span><br><span class="line"><span class="hljs-string">            X: [n_samples, n_features]</span></span><br><span class="line"><span class="hljs-string">            Y: [n_samples, n_classes]</span></span><br><span class="line"><span class="hljs-string">        &quot;&quot;&quot;</span></span><br><span class="line">        m, n = X.shape</span><br><span class="line">        _, K = Y.shape</span><br><span class="line">        self.w_ = np.zeros([n, K])</span><br><span class="line">        self.b_ = np.zeros([<span class="hljs-number">1</span>, K])</span><br><span class="line">        self.cost_ = []</span><br><span class="line"></span><br><span class="line">        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(self.max_iter):</span><br><span class="line">            Y_hat = self.predict(X)</span><br><span class="line"></span><br><span class="line">            cost = -np.sum(Y * np.log(Y_hat)) / m</span><br><span class="line"></span><br><span class="line">            <span class="hljs-keyword">if</span> i != <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> i % <span class="hljs-number">10</span> == <span class="hljs-number">0</span>:</span><br><span class="line">                print(<span class="hljs-string">&quot;Step: &quot;</span> + str(i) + <span class="hljs-string">&quot;, Cost: &quot;</span> + str(cost))</span><br><span class="line"></span><br><span class="line">            self.cost_.append(cost)</span><br><span class="line"></span><br><span class="line">            self.w_ -= self.learning_rate * np.dot(X.T, Y_hat - Y) / m</span><br><span class="line">            self.b_ -= self.learning_rate * np.sum(Y_hat - Y, axis=<span class="hljs-number">0</span>) / m</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">predict</span><span class="hljs-params">(self, X)</span>:</span></span><br><span class="line">        <span class="hljs-string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="hljs-string">        Predict the given examples.</span></span><br><span class="line"><span class="hljs-string">        Args:</span></span><br><span class="line"><span class="hljs-string">            X: [n_samples, n_features]</span></span><br><span class="line"><span class="hljs-string">        &quot;&quot;&quot;</span></span><br><span class="line">        z = np.dot(X, self.w_)</span><br><span class="line">        <span class="hljs-keyword">return</span> softmax(np.dot(X, self.w_) + self.b_)</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">score</span><span class="hljs-params">(self, X, Y)</span>:</span></span><br><span class="line">        Y_hat = self.predict(X)</span><br><span class="line">        Y_hat = np.argmax(Y_hat, axis=<span class="hljs-number">1</span>)</span><br><span class="line">        Y = np.argmax(Y, axis=<span class="hljs-number">1</span>)</span><br><span class="line">        true_num = np.sum(Y_hat == Y)</span><br><span class="line">        <span class="hljs-keyword">return</span> true_num / len(X)</span><br></pre></td></tr></tbody></table></figure><p></p>
 <h1 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h1><p>In order to verify the correctness of the implementation. I experimented on the irsi dataset and the mnist dataset. The parameters and results of the experiment are as follows:</p>
-<div class="table-container">
 <table>
 <thead>
 <tr>
@@ -237,8 +241,7 @@
 <th>mnist</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>learnig rate</td>
 <td>0.1</td>
 <td>0.01</td>
@@ -253,9 +256,7 @@
 <td>100%</td>
 <td>90.98%</td>
 </tr>
-</tbody>
-</table>
-</div>
+</tbody></table>
 <p>You can find the all the experimental code <a href="https://github.com/LB-Yu/publication/tree/master/sr" target="_blank" rel="noopener">here</a> and reproduce the experimental results.</p>
 </body></html>
     
@@ -271,12 +272,12 @@
     <div class="columns is-mobile is-multiline article-nav">
         <span class="column is-12-mobile is-half-desktop  article-nav-prev">
             
-            <a href="/2019/07/22/Automatic-Differentiation-Based-on-Computation-Graph/">Automatic Differentiation Based on Computation Graph</a>
+            <a href="/automatic-differentiation.html">Automatic Differentiation Based on Computation Graph</a>
             
         </span>
         <span class="column is-12-mobile is-half-desktop  article-nav-next">
             
-            <a href="/2019/07/01/Logistic-Regression/">Logistic Regression (LR)</a>
+            <a href="/logistic-regression.html">Logistic Regression (LR)</a>
             
         </span>
     </div>
@@ -294,10 +295,25 @@
 
 
 <div class="comments">
+    <p align="center">
+        本博客所有文章除特别声明外, 均采用<a href="https://creativecommons.org/licenses/by-nc-sa/3.0/cn/" target="_blank" rel="noopener">CC BY-NC-SA 3.0 CN</a>许可协议. 转载请注明出处!
+    </p>
+
+    <br><br>
+
+    <p align="center">
+        <img src="/images/WeChat.jpg" width="25%">
+    </p>
+    <p align="center">关注笔者微信公众号获得最新文章推送</p>
+</div>
+
+
+
+<div class="comments">
     <h3 class="title is-4">Comments</h3>
     
 <div id="valine-thread"></div>
-<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="//code.bdstatic.com/npm/leancloud-storage@4.12.2/dist/av-min.js"></script>
 <script src='//cdn.jsdelivr.net/gh/AshinWang/SimpleValine@v0.1/SimpleValine.min.js'></script>
 <script>
     new Valine({
@@ -323,9 +339,17 @@
     <div class="container">
         <div class="columns content">
             <div class="column is-narrow has-text-centered">
-                &copy; 2018-2021 Liebing&nbsp;. 
-                <span id="busuanzi_container_site_uv"><span id="busuanzi_value_site_uv"></span> UV, </span>
-                <span id="busuanzi_container_site_pv"> <span id="busuanzi_value_site_pv"></span> PV</span>
+                &copy; 2018-2025 Liebing&nbsp;. 
+                <!-- <span id="busuanzi_container_site_uv"><span id="busuanzi_value_site_uv"></span> UV, </span>
+                <span id="busuanzi_container_site_pv"> <span id="busuanzi_value_site_pv"></span> PV</span> -->
+
+                View
+                <span id="busuanzi_value_site_pv" data-num="1000">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </span> times by
+                <span id="busuanzi_value_site_uv">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </span> visitors.
             </div>
             <div class="column is-hidden-mobile"></div>
 
@@ -348,6 +372,26 @@
     </div>
 
     <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+    <script src="https://code.jquery.com/jquery-latest.js"></script>
+    <!-- 不蒜子计数初始值纠正 -->
+    <script >
+        $(document).ready(function() {
+            var int = setInterval(fixCount, 500);  // 50ms周期检测函数
+            var initPV = 3569;  // 初始化首次数据
+            var initUV = 1215;
+            function fixCount() {                   
+                if ($("#busuanzi_container_site_pv").css("display") != "none") {
+                    $("#busuanzi_value_site_pv").html(parseInt($("#busuanzi_value_site_pv").html()) + initPV); // 加上初始数据 
+                    clearInterval(int); // 停止检测
+                } 
+                if ($("#busuanzi_container_site_uv").css("display") != "none") {
+                    $("#busuanzi_value_site_uv").html(parseInt($("#busuanzi_value_site_uv").html()) + initUV); // 加上初始数据 
+                    clearInterval(int); // 停止检测
+                }  
+            }
+        });
+    </script>
 
 </footer>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
