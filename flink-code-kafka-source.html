@@ -41,7 +41,7 @@
 <meta property="og:image" content="http://yoursite.com/flink-code-kafka-source/enum_failover.png">
 <meta property="og:image" content="http://yoursite.com/flink-code-kafka-source/reader_failover.png">
 <meta property="article:published_time" content="2023-05-21T02:00:00.000Z">
-<meta property="article:modified_time" content="2024-05-29T12:13:46.457Z">
+<meta property="article:modified_time" content="2025-05-24T02:29:26.717Z">
 <meta property="article:author" content="Liebing">
 <meta property="article:tag" content="Flink">
 <meta name="twitter:card" content="summary">
@@ -238,7 +238,7 @@
         <span class="column is-narrow">
             
             
-            30 minutes read (About 4451 words)
+            30 minutes read (About 4439 words)
         </span>
         
         
@@ -404,7 +404,7 @@
 </p>
 
 <p>&#x4E0A;&#x6587;&#x4ECB;&#x7ECD;&#x4E86;Watermark&#x5BF9;&#x9F50;&#x7684;&#x6574;&#x4F53;&#x4EA4;&#x4E92;&#x6D41;&#x7A0B;. &#x5728;&#x5177;&#x4F53;&#x5B9E;&#x73B0;&#x4E0A;, <code>SourceCoordinator</code>&#x7AEF;&#x7684;&#x5B9E;&#x73B0;&#x6BD4;&#x8F83;&#x7B80;&#x5355;, &#x5C31;&#x662F;&#x5C06;&#x5404;&#x4E2A;<code>SourceOperator</code>&#x4E0A;&#x62A5;&#x7684;Watermark&#x805A;&#x5408;, &#x9009;&#x51FA;&#x6700;&#x5C0F;&#x7684;Watermark&#x503C;, &#x5C06;&#x5176;&#x52A0;&#x4E0A;<code>maxAllowedWatermarkDrift</code>&#x4E4B;&#x540E;&#x5B9A;&#x671F;&#x4E0B;&#x53D1;&#x7ED9;<code>SourceOperator</code>, &#x4F5C;&#x4E3A;&#x5141;&#x8BB8;&#x8BFB;&#x53D6;&#x7684;&#x6700;&#x5927;Watermark.</p>
-<p><code>SourceOperator</code>&#x7AEF;&#x7684;Watermark&#x5BF9;&#x9F50;&#x6D41;&#x7A0B;&#x76F8;&#x5BF9;&#x590D;&#x6742;&#x4E00;&#x4E9B;. [FLIP-182](<a href="https://cwiki.apache.org/confluence/display/FLINK/FLIP-182%3A+Support+watermark+alignment+of+FLIP-27+Sources" target="_blank" rel="noopener">FLIP-182: Support watermark alignment of FLIP-27 Sources - Apache Flink - Apache Software Foundation</a>)&#x63D0;&#x51FA;&#x4E86;<code>SourceOperator</code>&#x7EA7;&#x522B;&#x7684;Watermark&#x5BF9;&#x9F50;, &#x53EF;&#x4EE5;&#x652F;&#x6301;&#x4E00;&#x4E2A;<code>SourceOperator</code>&#x4EC5;&#x8BFB;&#x53D6;&#x4E00;&#x4E2A;Split&#x7684;&#x573A;&#x666F;, &#x5728;Flink 1.15&#x53CA;&#x4E4B;&#x540E;&#x7684;&#x7248;&#x672C;&#x4E2D;&#x53EF;&#x7528;. <a href="https://cwiki.apache.org/confluence/display/FLINK/FLIP-217%3A+Support+watermark+alignment+of+source+splits" target="_blank" rel="noopener">FLIP-217</a>&#x63D0;&#x51FA;&#x4E86;Split&#x7EA7;&#x522B;&#x7684;Watermark&#x5BF9;&#x9F50;, &#x652F;&#x6301;&#x4E00;&#x4E2A;<code>SourceOperator</code>&#x8BFB;&#x53D6;&#x591A;&#x4E2A;Split&#x7684;&#x573A;&#x666F;, &#x5728;Flink 1.17&#x53CA;&#x4E4B;&#x540E;&#x7684;&#x7248;&#x672C;&#x4E2D;&#x53EF;&#x7528;. &#x6574;&#x4F53;&#x7684;&#x5BF9;&#x9F50;&#x6D41;&#x7A0B;&#x5982;&#x4E0B;&#x56FE;&#x6240;&#x793A;.</p>
+<p><code>SourceOperator</code>&#x7AEF;&#x7684;Watermark&#x5BF9;&#x9F50;&#x6D41;&#x7A0B;&#x76F8;&#x5BF9;&#x590D;&#x6742;&#x4E00;&#x4E9B;. <a href="https://cwiki.apache.org/confluence/display/FLINK/FLIP-182%3A+Support+watermark+alignment+of+FLIP-27+Sources" target="_blank" rel="noopener">FLIP-182</a>&#x63D0;&#x51FA;&#x4E86;<code>SourceOperator</code>&#x7EA7;&#x522B;&#x7684;Watermark&#x5BF9;&#x9F50;, &#x53EF;&#x4EE5;&#x652F;&#x6301;&#x4E00;&#x4E2A;<code>SourceOperator</code>&#x4EC5;&#x8BFB;&#x53D6;&#x4E00;&#x4E2A;Split&#x7684;&#x573A;&#x666F;, &#x5728;Flink 1.15&#x53CA;&#x4E4B;&#x540E;&#x7684;&#x7248;&#x672C;&#x4E2D;&#x53EF;&#x7528;. <a href="https://cwiki.apache.org/confluence/display/FLINK/FLIP-217%3A+Support+watermark+alignment+of+source+splits" target="_blank" rel="noopener">FLIP-217</a>&#x63D0;&#x51FA;&#x4E86;Split&#x7EA7;&#x522B;&#x7684;Watermark&#x5BF9;&#x9F50;, &#x652F;&#x6301;&#x4E00;&#x4E2A;<code>SourceOperator</code>&#x8BFB;&#x53D6;&#x591A;&#x4E2A;Split&#x7684;&#x573A;&#x666F;, &#x5728;Flink 1.17&#x53CA;&#x4E4B;&#x540E;&#x7684;&#x7248;&#x672C;&#x4E2D;&#x53EF;&#x7528;. &#x6574;&#x4F53;&#x7684;&#x5BF9;&#x9F50;&#x6D41;&#x7A0B;&#x5982;&#x4E0B;&#x56FE;&#x6240;&#x793A;.</p>
 <p align="center">
     <img src="./flink-code-kafka-source/split_alignment.png" width="100%">
 </p>
