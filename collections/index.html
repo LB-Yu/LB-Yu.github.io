@@ -19,22 +19,23 @@
 
 
 
-    <meta name="description" content=".card {   width: 250px;   box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.15), 0 6px 10px 0 rgba(0, 0, 0, 0.19);&#x2F;&#x2F;设置两层阴影   text-align: center;   vertical-align: middle;   border-radius: 5px; }  .card:hover {">
+    <meta name="description" content=".card {   width: 250px;   height: 210px; &#x2F;* 固定高度，保持磁贴风格 *&#x2F;   &#x2F;* box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.15),               0 6px 10px 0 rgba(0, 0, 0, 0.19); *&#x2F;   border-radius: 5px;   overflow: hidde">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Collections">
 <meta property="og:url" content="http://yoursite.com/collections/index.html">
 <meta property="og:site_name" content="Liebing&#39;s Blog">
-<meta property="og:description" content=".card {   width: 250px;   box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.15), 0 6px 10px 0 rgba(0, 0, 0, 0.19);&#x2F;&#x2F;设置两层阴影   text-align: center;   vertical-align: middle;   border-radius: 5px; }  .card:hover {">
+<meta property="og:description" content=".card {   width: 250px;   height: 210px; &#x2F;* 固定高度，保持磁贴风格 *&#x2F;   &#x2F;* box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.15),               0 6px 10px 0 rgba(0, 0, 0, 0.19); *&#x2F;   border-radius: 5px;   overflow: hidde">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://yoursite.com/collections/img/a.jpg">
-<meta property="og:image" content="http://yoursite.com/collections/img/b.jpg">
-<meta property="og:image" content="http://yoursite.com/collections/img/c.jpg">
-<meta property="article:published_time" content="2024-05-29T12:13:46.540Z">
-<meta property="article:modified_time" content="2024-05-29T12:13:46.540Z">
+<meta property="og:image" content="http://yoursite.com/collections/img/fluss.svg">
+<meta property="og:image" content="http://yoursite.com/collections/img/flink.png">
+<meta property="og:image" content="http://yoursite.com/collections/img/calcite.svg">
+<meta property="og:image" content="http://yoursite.com/collections/img/paper.png">
+<meta property="article:published_time" content="2025-07-19T02:10:57.288Z">
+<meta property="article:modified_time" content="2025-07-19T02:10:57.288Z">
 <meta property="article:author" content="Liebing">
 <meta property="article:tag" content="code">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://yoursite.com/collections/img/a.jpg">
+<meta name="twitter:image" content="http://yoursite.com/collections/img/fluss.svg">
 
 
 
@@ -97,9 +98,6 @@
                href="/collections">合集</a>
             
             <a class="navbar-item "
-               href="/courses">课程</a>
-            
-            <a class="navbar-item "
                href="/archive">归档</a>
             
             <a class="navbar-item "
@@ -151,7 +149,7 @@
     </h1> -->
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <!-- <span class="column is-narrow">
-            <time datetime="2024-05-29T12:13:46.540Z" itemprop="datePublished">May 29 2024</time>
+            <time datetime="2025-07-19T02:10:57.288Z" itemprop="datePublished">Jul 19 2025</time>
         </span> -->
         
         
@@ -161,33 +159,59 @@
         <html><head><style>
 .card {
   width: 250px;
-  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.15), 0 6px 10px 0 rgba(0, 0, 0, 0.19);//设置两层阴影
-  text-align: center;
-  vertical-align: middle;
+  height: 210px; /* 固定高度，保持磁贴风格 */
+  /* box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.15),
+              0 6px 10px 0 rgba(0, 0, 0, 0.19); */
   border-radius: 5px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #ffffff; /* 淡蓝色背景 */
+  transition: none; /* 移除过渡效果 */
+  border: none; /* 无边框 */
+  outline: none; /* 无聚焦轮廓 */
+  cursor: pointer;
 }
 
-.card:hover {
-    box-shadow: 1px 10px 10px 1px rgba(0, 0, 0, .25);
-    transition: all .1s ease-in-out;
+.card-link {
+  text-decoration: none; /* 去掉下划线 */
+  display: block;        /* 使 a 标签可以包含 div */
+  width: 250px;
+  height: 210px;
 }
 
-.header {
-    background-color: #fefefe;
-    color: white;
-    padding: 10px;
-    padding-bottom: 0px;
-    font-size: 40px;
+/* .card:hover {
+  box-shadow: 1px 10px 10px 1px rgba(0, 0, 0, 0.25);
+} */
+
+.card .header {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+}
+
+.card .header img {
+  max-width: 100%;
+  max-height: 100%;
+  /* display: block; */
+  pointer-events: none; /* 禁止图片响应鼠标事件（不影响父级 a 的点击） */
+}
+
+.header img {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  pointer-events: none; /* 禁止图片响应鼠标事件（不影响父级 a 的点击） */
 }
 
 .container {
     padding: 10px;
     padding-top: 0px;
-}
-
-.img{
-    width: 230px;
-    height: 130px;
 }
 
 #wrap{
@@ -200,9 +224,22 @@
 
 <meta name="generator" content="Hexo 4.2.0"></head><body><div id="wrap">
 
-<div class="card">
+<!-- <div class="card">
   <div class="header">
-    <a href="./flink"><img src="./img/a.jpg"></a>
+    <a href="./fluss">
+      <img src="./img/fluss.svg" alt="Fluss Logo">
+    </a>
+  </div>
+  <div class="container">
+    <p>Apache Fluss原理与实践</p>
+  </div>
+</div> -->
+
+<div class="card" onclick="window.location.href=&apos;./flink&apos;">
+  <div class="header">
+    <a href="./flink">
+      <img src="./img/flink.png">
+    </a>
   </div>
 
   <div class="container">
@@ -210,9 +247,9 @@
   </div>
 </div>
 
-<div class="card">
+<div class="card" onclick="window.location.href=&apos;./calcite&apos;">
   <div class="header">
-    <a href="./calcite"><img src="./img/b.jpg"></a>
+    <a href="./calcite"><img src="./img/calcite.svg"></a>
   </div>
 
   <div class="container">
@@ -220,15 +257,16 @@
   </div>
 </div>
 
-<div class="card">
+<div class="card" onclick="window.location.href=&apos;./paper&apos;">
   <div class="header">
-    <a href="./paper"><img src="./img/c.jpg"></a>
+    <a href="./paper"><img src="./img/paper.png"></a>
   </div>
 
   <div class="container">
     <p>&#x6570;&#x636E;&#x7CFB;&#x7EDF;&#x7ECF;&#x5178;&#x8BBA;&#x6587;&#x9605;&#x8BFB;</p>
   </div>
 </div>
+
 </div>
 </body></html>
     
